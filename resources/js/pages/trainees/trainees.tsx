@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
-import { dashboard, user } from '@/routes';
+import { dashboard, trainees } from '@/routes';
 import { columns, Payment } from "./columns"
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
@@ -19,15 +19,15 @@ async function getData(): Promise<Payment[]> {
 }
 
 const data = await getData()
-export default function User() {
+export default function Trainee() {
     return (
         <>
-            <Head title="Users" />
+            <Head title="Trainees" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4 px-10">
                 <div className="flex justify-between">
                     <div>Left Side (Logo)</div>
                     <div>
-                        <Button variant="outline" className='cursor-pointer' ><Link href="/create-user">Add User</Link></Button>
+                        <Button variant="outline" className='cursor-pointer' ><Link href="/create-trainee">Add Trainee</Link></Button>
                     </div>
                 </div>
                 <div className="grid auto-rows-min ">
@@ -39,11 +39,11 @@ export default function User() {
     );
 }
 
-User.layout = {
+Trainee.layout = {
     breadcrumbs: [
         {
-            title: 'Users',
-            href: user(),
+            title: 'Trainees',
+            href: trainees(),
         },
     ],
 };

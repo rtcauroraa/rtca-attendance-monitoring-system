@@ -21,8 +21,6 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { Head } from "@inertiajs/react"
 
-
-ty
 export default function CreateUser() {
 
   return (
@@ -36,10 +34,8 @@ export default function CreateUser() {
           <form>
             <FieldGroup>
               <FieldSet>
-                <FieldLegend>Payment Method</FieldLegend>
-                <FieldDescription>
-                  All transactions are secure and encrypted
-                </FieldDescription>
+                <FieldLegend>Personal Information</FieldLegend>
+               
                 <FieldGroup>
                   <Field>
                     <FieldLabel htmlFor="checkout-7j9-card-name-43j">
@@ -51,23 +47,23 @@ export default function CreateUser() {
                       required
                     />
                   </Field>
+
                   <Field>
                     <FieldLabel htmlFor="checkout-7j9-card-number-uw1">
-                      Bir
+                      Birthday
                     </FieldLabel>
                     <Input
+                      type="date"
                       id="checkout-7j9-card-number-uw1"
                       placeholder="1234 5678 9012 3456"
                       required
                     />
-                    <FieldDescription>
-                      Enter your 16-digit card number
-                    </FieldDescription>
+
                   </Field>
-                  <div className="grid grid-cols-3 gap-4">
+                 
                     <Field>
                       <FieldLabel htmlFor="checkout-exp-month-ts6">
-                        Month
+                        Religion
                       </FieldLabel>
                       <Select defaultValue="">
                         <SelectTrigger id="checkout-exp-month-ts6">
@@ -75,84 +71,102 @@ export default function CreateUser() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup>
-                            <SelectItem value="01">01</SelectItem>
-                            <SelectItem value="02">02</SelectItem>
-                            <SelectItem value="03">03</SelectItem>
-                            <SelectItem value="04">04</SelectItem>
-                            <SelectItem value="05">05</SelectItem>
-                            <SelectItem value="06">06</SelectItem>
-                            <SelectItem value="07">07</SelectItem>
-                            <SelectItem value="08">08</SelectItem>
-                            <SelectItem value="09">09</SelectItem>
-                            <SelectItem value="10">10</SelectItem>
-                            <SelectItem value="11">11</SelectItem>
-                            <SelectItem value="12">12</SelectItem>
+                            {
+                              ['Roman Catholic', 'Islam'].map(label => <SelectItem value={label}>{label}</SelectItem>)
+                            }
                           </SelectGroup>
                         </SelectContent>
                       </Select>
                     </Field>
+
                     <Field>
                       <FieldLabel htmlFor="checkout-7j9-exp-year-f59">
-                        Year
+                        Address
                       </FieldLabel>
-                      <Select defaultValue="">
-                        <SelectTrigger id="checkout-7j9-exp-year-f59">
-                          <SelectValue placeholder="YYYY" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectItem value="2024">2024</SelectItem>
-                            <SelectItem value="2025">2025</SelectItem>
-                            <SelectItem value="2026">2026</SelectItem>
-                            <SelectItem value="2027">2027</SelectItem>
-                            <SelectItem value="2028">2028</SelectItem>
-                            <SelectItem value="2029">2029</SelectItem>
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
+                      <Textarea />
+
                     </Field>
                     <Field>
-                      <FieldLabel htmlFor="checkout-7j9-cvv">CVV</FieldLabel>
+                      <FieldLabel htmlFor="checkout-7j9-cvv">Contact No.</FieldLabel>
                       <Input id="checkout-7j9-cvv" placeholder="123" required />
                     </Field>
-                  </div>
-                </FieldGroup>
-              </FieldSet>
-              <FieldSeparator />
-              <FieldSet>
-                <FieldLegend>Billing Address</FieldLegend>
-                <FieldDescription>
-                  The billing address associated with your payment method
-                </FieldDescription>
-                <FieldGroup>
-                  <Field orientation="horizontal">
-                    <Checkbox
-                      id="checkout-7j9-same-as-shipping-wgm"
-                      defaultChecked
-                    />
-                    <FieldLabel
-                      htmlFor="checkout-7j9-same-as-shipping-wgm"
-                      className="font-normal"
-                    >
-                      Same as shipping address
-                    </FieldLabel>
-                  </Field>
-                </FieldGroup>
-              </FieldSet>
-              <FieldSet>
-                <FieldGroup>
+                
                   <Field>
-                    <FieldLabel htmlFor="checkout-7j9-optional-comments">
-                      Comments
-                    </FieldLabel>
-                    <Textarea
-                      id="checkout-7j9-optional-comments"
-                      placeholder="Add any additional comments"
-                      className="resize-none"
-                    />
+                    <FieldLabel htmlFor="checkout-7j9-cvv">Emergency Contact Persson</FieldLabel>
+                    <Input id="checkout-7j9-cvv" placeholder="123" required />
                   </Field>
+                  <Field>
+                    <FieldLabel htmlFor="checkout-7j9-cvv">Email</FieldLabel>
+                    <Input id="checkout-7j9-cvv" placeholder="123" type="email" required />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="checkout-exp-month-ts6">
+                      Status
+                    </FieldLabel>
+                    <Select defaultValue="">
+                      <SelectTrigger id="checkout-exp-month-ts6">
+                        <SelectValue placeholder="MM" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          {
+                            ['Single', 'Married', 'Widowed'].map(label => <SelectItem value={label}>{label}</SelectItem>)
+                          }
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="checkout-exp-month-ts6">
+                      Blood Type
+                    </FieldLabel>
+                    <Select defaultValue="">
+                      <SelectTrigger id="checkout-exp-month-ts6">
+                        <SelectValue placeholder="MM" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          {
+                            ['A', 'A+', 'B', 'B+', 'AB', 'O', 'O+'].map(label => <SelectItem value={label}>{label}</SelectItem>)
+                          }
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </Field>
+
+                  <Field>
+                    <FieldLabel htmlFor="checkout-7j9-cvv">Height (cm)</FieldLabel>
+                    <Input id="checkout-7j9-cvv" placeholder="123" type="number"  required />
+                  </Field>
+
+                   <Field>
+                    <FieldLabel htmlFor="checkout-7j9-cvv">Weight (kg)</FieldLabel>
+                    <Input id="checkout-7j9-cvv" placeholder="123" type="number"  required />
+                  </Field>
+
+
+                 <Field>
+                    <FieldLabel htmlFor="checkout-7j9-cvv">Identifying Marks</FieldLabel>
+                    <Input id="checkout-7j9-cvv" placeholder="123"  required />
+                  </Field>
+
+
+                 <Field>
+                    <FieldLabel htmlFor="checkout-7j9-cvv">Eye Color</FieldLabel>
+                    <Input id="checkout-7j9-cvv" placeholder="123"  required />
+                  </Field>
+
+
+                 <Field>
+                    <FieldLabel htmlFor="checkout-7j9-cvv">Hair Color</FieldLabel>
+                    <Input id="checkout-7j9-cvv" placeholder="123"  required />
+                  </Field>
+
+
                 </FieldGroup>
               </FieldSet>
+
+
               <Field orientation="horizontal">
                 <Button type="submit">Submit</Button>
                 <Button variant="outline" type="button">
