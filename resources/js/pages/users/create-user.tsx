@@ -21,7 +21,10 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { Head } from "@inertiajs/react"
 
+
+ty
 export default function CreateUser() {
+
   return (
 
 
@@ -50,7 +53,7 @@ export default function CreateUser() {
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="checkout-7j9-card-number-uw1">
-                      Card Number
+                      Bir
                     </FieldLabel>
                     <Input
                       id="checkout-7j9-card-number-uw1"
