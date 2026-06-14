@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\PersonnelController;
+use App\Http\Controllers\TraineeController;
 
 Route::inertia('/', 'welcome')->name('home');
 
@@ -18,6 +19,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     ->name('trainees.store');
     Route::get('/trainees', [TraineeController::class, 'index'])
     ->name('trainees');
+    
+    // Attendance 
+     Route::inertia('attendance', 'attendance/attendance')->name('attendance');
+     Route::inertia('create-attendance', 'attendance/create-attendance')->name('create-attendance');
 });
 
 require __DIR__.'/settings.php';

@@ -1,7 +1,7 @@
 import { useForm } from '@inertiajs/react';
 
 export default function Edit({ personnel }: any) {
-    const { data, setData, personnel, processing, errors } = useForm({
+    const { data, setData, perso, processing, errors } = useForm({
         rank: personnel.rank,
         lastname: personnel.lastname,
         firstname: personnel.firstname,
@@ -19,7 +19,7 @@ export default function Edit({ personnel }: any) {
 
     const submit = (e: any) => {
         e.preventDefault();
-        put(`/personnel/${personnel.id}`);
+        // put(`/personnel/${personnel.id}`);
     };
 
     return (

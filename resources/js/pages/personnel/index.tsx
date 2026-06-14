@@ -54,7 +54,7 @@ export default function Index({ personnels }: any) {
                             <td>
                                 <Link
                                     href={`/personnels/${personnel.id}/edit`}
-                                    className="mr-3 text-blue-500"
+                                    className="mr-2 text-blue-500"
                                 >
                                     Edit
                                 </Link>
