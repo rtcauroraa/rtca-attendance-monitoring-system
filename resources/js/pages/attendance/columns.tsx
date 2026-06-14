@@ -1,6 +1,4 @@
 'use client';
-
-import { formatDateToMilitary } from '@/utils/formatDateToMilitary';
 import { ColumnDef } from '@tanstack/react-table';
 
 export type Attendance = {

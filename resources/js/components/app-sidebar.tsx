@@ -34,13 +34,13 @@ const mainNavItems: NavItem[] = [
         icon: User,
     },
     {
-        title: 'Personnel',
-        href: '/personnels',
+        title: 'Attendance',
+        href: attendance(),
         icon: User,
     },
     {
-        title: 'Attendance',
-        href: attendance(),
+        title: 'Personnel',
+        href: '/personnels',
         icon: User,
     },
 ];

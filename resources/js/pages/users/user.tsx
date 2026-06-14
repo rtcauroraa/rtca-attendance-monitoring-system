@@ -1,7 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { dashboard, user } from '@/routes';
-import { columns, Payment } from "./columns"
+import { columns, Payment } from './columns';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
 
@@ -9,16 +9,16 @@ async function getData(): Promise<Payment[]> {
     // Fetch data from your API here.
     return [
         {
-            id: "728ed52f",
+            id: '728ed52f',
             amount: 100,
-            status: "pending",
-            email: "m@example.com",
+            status: 'pending',
+            email: 'm@example.com',
         },
         // ...
-    ]
+    ];
 }
 
-const data = await getData()
+const data = await getData();
 export default function User() {
     return (
         <>
@@ -27,11 +27,12 @@ export default function User() {
                 <div className="flex justify-between">
                     <div>Left Side (Logo)</div>
                     <div>
-                        <Button variant="outline" className='cursor-pointer' ><Link href="/create-user">Add User</Link></Button>
+                        <Button variant="outline" className="cursor-pointer">
+                            <Link href="/create-user">Add User</Link>
+                        </Button>
                     </div>
                 </div>
-                <div className="grid auto-rows-min ">
-
+                <div className="grid auto-rows-min">
                     <DataTable columns={columns} data={data} />
                 </div>
             </div>
@@ -47,5 +48,3 @@ User.layout = {
         },
     ],
 };
-
-
