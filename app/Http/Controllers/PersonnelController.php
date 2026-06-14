@@ -31,7 +31,24 @@ class PersonnelController extends Controller
      */
     public function store(Request $request)
     {
-        //
+         $validated = $request->validate([
+            'rank' => ['required'],
+            'lastname' => ['required'],
+            'firstname' => ['required'],
+            'middlename' => ['required'],
+            'suffix' => ['required'],
+            'serialno' => ['required'],
+            'email' => ['required'],
+            'duty_status' => ['required'],
+            'primary_designation' => ['required'],
+            'other_designation' => ['required'],
+            'date_of_last_promotion' => ['required'],
+            'date_entered_service' => ['required'],
+            'date_enlisted_or_commissioned' => ['required'],
+        ]);
+        Personnel::create($validated);
+        
+        return redirect()->route('personnels.index');
     }
 
     /**
@@ -63,6 +80,8 @@ class PersonnelController extends Controller
      */
     public function destroy(Personnel $personnel)
     {
-        //
+         $personnel->delete();
+
+        return redirect()->route('personnels.index');
     }
 }

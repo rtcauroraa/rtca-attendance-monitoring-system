@@ -12,14 +12,14 @@ export default function Create() {
         duty_status: '',
         primary_designation: '',
         other_designation: '',
-        date_last_promotion: '',
+        date_of_last_promotion: '',
         date_entered_service: '',
-        date_enlisted_or_commisioned: '',
+        date_enlisted_or_commissioned: '',
     });
 
     const submit = (e: any) => {
         e.preventDefault();
-        post('/posts');
+        post('/personnels');
     };
 
     return (
@@ -112,6 +112,18 @@ export default function Create() {
 
                 <input
                     type="text"
+                    placeholder="duty status"
+                    value={data.duty_status}
+                    onChange={(e) => setData('duty_status', e.target.value)}
+                    className="mb-2 w-full border p-2"
+                />
+
+                {errors.duty_status && (
+                    <div className="text-red-500">{errors.duty_status}</div>
+                )}
+
+                <input
+                    type="text"
                     placeholder="Primary Designation"
                     value={data.primary_designation}
                     onChange={(e) =>
@@ -159,17 +171,33 @@ export default function Create() {
 
                 <input
                     type="text"
-                    placeholder="Date Enlisted/Commisioned"
-                    value={data.date_enlisted_or_commisioned}
+                    placeholder="Date Last Promotion"
+                    value={data.date_of_last_promotion}
                     onChange={(e) =>
-                        setData('date_enlisted_or_commisioned', e.target.value)
+                        setData('date_of_last_promotion', e.target.value)
                     }
                     className="mb-2 w-full border p-2"
                 />
 
-                {errors.date_enlisted_or_commisioned && (
+                {errors.date_of_last_promotion && (
                     <div className="text-red-500">
-                        {errors.date_enlisted_or_commisioned}
+                        {errors.date_of_last_promotion}
+                    </div>
+                )}
+
+                <input
+                    type="text"
+                    placeholder="Date Enlisted/Commisioned"
+                    value={data.date_enlisted_or_commissioned}
+                    onChange={(e) =>
+                        setData('date_enlisted_or_commissioned', e.target.value)
+                    }
+                    className="mb-2 w-full border p-2"
+                />
+
+                {errors.date_enlisted_or_commissioned && (
+                    <div className="text-red-500">
+                        {errors.date_enlisted_or_commissioned}
                     </div>
                 )}
 

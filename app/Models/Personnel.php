@@ -6,8 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class Personnel extends Model
 {
-    protected $guarded = [
-        'id',
-        'timestamp',
-    ];
+    protected $guarded = [];
 }
