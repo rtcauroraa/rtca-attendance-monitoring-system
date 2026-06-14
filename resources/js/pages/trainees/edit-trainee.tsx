@@ -1,28 +1,12 @@
+import { useForm, Head, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-
-const options = {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-};
-
-const formattedDateTime = new Date().toLocaleString('en-US', options);
-// Output: June 14, 2026, 4:20 PM
-
+import { Input } from '@/components/ui/input';
 import {
     Field,
-    FieldDescription,
-    FieldGroup,
     FieldLabel,
     FieldLegend,
-    FieldSeparator,
     FieldSet,
 } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
 import {
     Select,
     SelectContent,
@@ -32,115 +16,117 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Head, Link } from '@inertiajs/react';
-import { useForm } from '@inertiajs/react';
-import { CloudCog } from 'lucide-react';
-import { toast, useSonner } from 'sonner';
 
-const religions = [
-    'Roman Catholic',
-    'Islam',
-    'Iglesia ni Cristo',
-    'Aglipayan',
-    'Seventh-day Adventist',
-    "Jehovah's Witnesses",
-    'Born Again Christian',
-    'Protestant',
-    'Other Christian',
-    'Buddhism',
-    'Hinduism',
-    'Other Religion',
-    'None',
-    'Prefer not to say',
-];
+interface Trainee {
+    id: number;
+    name: string;
+    birthday: string;
+    religion: string;
+    contact_no: string;
+    email: string;
+    status: string;
+    address: string;
+    emergency_contact_person: string;
+    emergency_contact_no: string;
+    blood_type: string;
+    height: string;
+    weight: string;
+    identifying_marks: string;
+    eye_color: string;
+    hair_color: string;
+}
 
-export default function CreateTrainee() {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
-        birthday: '',
-        religion: '',
-        contact_no: '',
-        email: '',
-        status: '',
-        address: '',
-        emergency_contact_person: '',
-        emergency_contact_no: '',
-        blood_type: '',
-        height: '',
-        weight: '',
-        identifying_marks: '',
-        eye_color: '',
-        hair_color: '',
+export default function EditTrainee({ trainee }: { trainee: Trainee }) {
+    const { data, setData, put, processing, errors, reset } = useForm({
+        name: trainee.name || '',
+        birthday: trainee.birthday || '',
+        religion: trainee.religion || '',
+        contact_no: trainee.contact_no || '',
+        email: trainee.email || '',
+        status: trainee.status || '',
+        address: trainee.address || '',
+        emergency_contact_person: trainee.emergency_contact_person || '',
+        emergency_contact_no: trainee.emergency_contact_no || '',
+        blood_type: trainee.blood_type || '',
+        height: trainee.height || '',
+        weight: trainee.weight || '',
+        identifying_marks: trainee.identifying_marks || '',
+        eye_color: trainee.eye_color || '',
+        hair_color: trainee.hair_color || '',
     });
 
- 
+    const religions = [
+        'Roman Catholic',
+        'Islam',
+        'Iglesia ni Cristo',
+        'Aglipayan',
+        'Seventh-day Adventist',
+        "Jehovah's Witnesses",
+        'Born Again Christian',
+        'Protestant',
+        'Other Christian',
+        'Buddhism',
+        'Hinduism',
+        'None',
+    ];
+
+    const statuses = ['Single', 'Married', 'Widowed'];
+
+    const bloodTypes = ['A', 'A+', 'B', 'B+', 'AB', 'O', 'O+'];
+
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        post('/trainees/', {
-            onSuccess: () => {
-                toast.success('Trainee has been created successfully.', {
-                    description: formattedDateTime,
-                    duration: 4000,
-                    position: 'top-center',
-                });
-                reset();
-            },
-            onError: (errors) => {
-                console.log('Validation errors:', errors);
-            },
-        });
+        put(`/trainees/${trainee.id}/update`);
     };
+
     return (
         <>
-            <Head title="Create Trainee" />
+            <Head title="Edit Trainee" />
+
             <div className="flex h-full flex-1 flex-col overflow-auto p-4 md:p-6 lg:p-10">
                 <div className="mx-auto w-full max-w-7xl">
                     <form onSubmit={submit}>
                         <FieldSet>
                             <FieldLegend className="mb-6 text-lg font-semibold">
-                                Trainee Personal Information
+                                Edit Trainee Information
                             </FieldLegend>
 
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-                                {/* Standard Text Input */}
+                                {/* NAME */}
                                 <Field>
                                     <FieldLabel>Name</FieldLabel>
                                     <Input
-                                        placeholder="Enter name"
-                                        required
                                         value={data.name}
                                         onChange={(e) =>
                                             setData('name', e.target.value)
                                         }
                                     />
                                     {errors.name && (
-                                        <span className="text-sm text-destructive">
+                                        <span className="text-sm leading-tight text-destructive">
                                             {errors.name}
                                         </span>
                                     )}
                                 </Field>
 
-                                {/* Date Input */}
+                                {/* BIRTHDAY */}
                                 <Field>
                                     <FieldLabel>Birthday</FieldLabel>
                                     <Input
                                         type="date"
-                                        required
                                         value={data.birthday}
-                                        min="1900-01-01"
                                         onChange={(e) =>
                                             setData('birthday', e.target.value)
                                         }
                                     />
                                     {errors.birthday && (
-                                        <span className="text-sm text-destructive">
+                                        <span className="text-sm leading-tight text-destructive">
                                             {errors.birthday}
                                         </span>
                                     )}
                                 </Field>
 
-                                {/* Radix / Shadcn UI Select Component */}
+                                {/* RELIGION */}
                                 <Field>
                                     <FieldLabel>Religion</FieldLabel>
                                     <Select
@@ -154,29 +140,29 @@ export default function CreateTrainee() {
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectGroup>
-                                                {religions.map((religion) => (
+                                                {religions.map((r) => (
                                                     <SelectItem
-                                                        key={religion}
-                                                        value={religion}
+                                                        key={r}
+                                                        value={r}
                                                     >
-                                                        {religion}
+                                                        {r}
                                                     </SelectItem>
                                                 ))}
                                             </SelectGroup>
                                         </SelectContent>
                                     </Select>
+
                                     {errors.religion && (
-                                        <span className="text-sm text-destructive">
+                                        <span className="text-sm leading-tight text-destructive">
                                             {errors.religion}
                                         </span>
                                     )}
                                 </Field>
 
+                                {/* CONTACT */}
                                 <Field>
-                                    <FieldLabel>Contact No.</FieldLabel>
+                                    <FieldLabel>Contact No</FieldLabel>
                                     <Input
-                                        required
-                                        type="text" // Kept as text or tel to handle leading zeros safely
                                         value={data.contact_no}
                                         onChange={(e) =>
                                             setData(
@@ -185,30 +171,31 @@ export default function CreateTrainee() {
                                             )
                                         }
                                     />
+
                                     {errors.contact_no && (
-                                        <span className="text-sm text-destructive">
+                                        <span className="text-sm leading-tight text-destructive">
                                             {errors.contact_no}
                                         </span>
                                     )}
                                 </Field>
 
+                                {/* EMAIL */}
                                 <Field>
                                     <FieldLabel>Email</FieldLabel>
                                     <Input
-                                        type="email"
-                                        required
                                         value={data.email}
                                         onChange={(e) =>
                                             setData('email', e.target.value)
                                         }
                                     />
                                     {errors.email && (
-                                        <span className="text-sm text-destructive">
+                                        <span className="text-sm leading-tight text-destructive">
                                             {errors.email}
                                         </span>
                                     )}
                                 </Field>
 
+                                {/* STATUS */}
                                 <Field>
                                     <FieldLabel>Status</FieldLabel>
                                     <Select
@@ -222,50 +209,41 @@ export default function CreateTrainee() {
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectGroup>
-                                                {[
-                                                    'Single',
-                                                    'Married',
-                                                    'Widowed',
-                                                ].map((label) => (
+                                                {statuses.map((s) => (
                                                     <SelectItem
-                                                        key={label}
-                                                        value={label}
+                                                        key={s}
+                                                        value={s}
                                                     >
-                                                        {label}
+                                                        {s}
                                                     </SelectItem>
                                                 ))}
                                             </SelectGroup>
                                         </SelectContent>
                                     </Select>
-                                    {errors.status && (
-                                        <span className="text-sm text-destructive">
-                                            {errors.status}
-                                        </span>
-                                    )}
                                 </Field>
 
-                                <Field className="xl:col-span-3">
+                                {/* ADDRESS */}
+                                <Field className="md:col-span-2 xl:col-span-3">
                                     <FieldLabel>Address</FieldLabel>
                                     <Textarea
-                                        rows={4}
                                         value={data.address}
                                         onChange={(e) =>
                                             setData('address', e.target.value)
                                         }
                                     />
                                     {errors.address && (
-                                        <span className="text-sm text-destructive">
+                                        <span className="text-sm leading-tight text-destructive">
                                             {errors.address}
                                         </span>
                                     )}
                                 </Field>
 
+                                {/* EMERGENCY PERSON */}
                                 <Field>
                                     <FieldLabel>
                                         Emergency Contact Person
                                     </FieldLabel>
                                     <Input
-                                        required
                                         value={data.emergency_contact_person}
                                         onChange={(e) =>
                                             setData(
@@ -274,20 +252,20 @@ export default function CreateTrainee() {
                                             )
                                         }
                                     />
+
                                     {errors.emergency_contact_person && (
-                                        <span className="text-sm text-destructive">
+                                        <span className="text-sm leading-tight text-destructive">
                                             {errors.emergency_contact_person}
                                         </span>
                                     )}
                                 </Field>
 
+                                {/* EMERGENCY NO */}
                                 <Field>
                                     <FieldLabel>
-                                        Emergency Contact No.
+                                        Emergency Contact No
                                     </FieldLabel>
                                     <Input
-                                        required
-                                        type="text"
                                         value={data.emergency_contact_no}
                                         onChange={(e) =>
                                             setData(
@@ -296,13 +274,15 @@ export default function CreateTrainee() {
                                             )
                                         }
                                     />
+
                                     {errors.emergency_contact_no && (
-                                        <span className="text-sm text-destructive">
+                                        <span className="text-sm leading-tight text-destructive">
                                             {errors.emergency_contact_no}
                                         </span>
                                     )}
                                 </Field>
 
+                                {/* BLOOD TYPE */}
                                 <Field>
                                     <FieldLabel>Blood Type</FieldLabel>
                                     <Select
@@ -316,32 +296,20 @@ export default function CreateTrainee() {
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectGroup>
-                                                {[
-                                                    'A',
-                                                    'A+',
-                                                    'B',
-                                                    'B+',
-                                                    'AB',
-                                                    'O',
-                                                    'O+',
-                                                ].map((label) => (
+                                                {bloodTypes.map((b) => (
                                                     <SelectItem
-                                                        key={label}
-                                                        value={label}
+                                                        key={b}
+                                                        value={b}
                                                     >
-                                                        {label}
+                                                        {b}
                                                     </SelectItem>
                                                 ))}
                                             </SelectGroup>
                                         </SelectContent>
                                     </Select>
-                                    {errors.blood_type && (
-                                        <span className="text-sm text-destructive">
-                                            {errors.blood_type}
-                                        </span>
-                                    )}
                                 </Field>
 
+                                {/* HEIGHT */}
                                 <Field>
                                     <FieldLabel>Height (cm)</FieldLabel>
                                     <Input
@@ -351,13 +319,15 @@ export default function CreateTrainee() {
                                             setData('height', e.target.value)
                                         }
                                     />
+
                                     {errors.height && (
-                                        <span className="text-sm text-destructive">
+                                        <span className="text-sm leading-tight text-destructive">
                                             {errors.height}
                                         </span>
                                     )}
                                 </Field>
 
+                                {/* WEIGHT */}
                                 <Field>
                                     <FieldLabel>Weight (kg)</FieldLabel>
                                     <Input
@@ -368,12 +338,13 @@ export default function CreateTrainee() {
                                         }
                                     />
                                     {errors.weight && (
-                                        <span className="text-sm text-destructive">
+                                        <span className="text-sm leading-tight text-destructive">
                                             {errors.weight}
                                         </span>
                                     )}
                                 </Field>
 
+                                {/* MARKS */}
                                 <Field>
                                     <FieldLabel>Identifying Marks</FieldLabel>
                                     <Input
@@ -386,12 +357,13 @@ export default function CreateTrainee() {
                                         }
                                     />
                                     {errors.identifying_marks && (
-                                        <span className="text-sm text-destructive">
+                                        <span className="text-sm leading-tight text-destructive">
                                             {errors.identifying_marks}
                                         </span>
                                     )}
                                 </Field>
 
+                                {/* EYE */}
                                 <Field>
                                     <FieldLabel>Eye Color</FieldLabel>
                                     <Input
@@ -401,12 +373,13 @@ export default function CreateTrainee() {
                                         }
                                     />
                                     {errors.eye_color && (
-                                        <span className="text-sm text-destructive">
+                                        <span className="text-sm leading-tight text-destructive">
                                             {errors.eye_color}
                                         </span>
                                     )}
                                 </Field>
 
+                                {/* HAIR */}
                                 <Field>
                                     <FieldLabel>Hair Color</FieldLabel>
                                     <Input
@@ -419,23 +392,25 @@ export default function CreateTrainee() {
                                         }
                                     />
                                     {errors.hair_color && (
-                                        <span className="text-sm text-destructive">
+                                        <span className="text-sm leading-tight text-destructive">
                                             {errors.hair_color}
                                         </span>
                                     )}
                                 </Field>
                             </div>
 
-                            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                            <div className="mt-8 flex gap-3">
                                 <Button type="submit" disabled={processing}>
-                                    {processing ? 'Submitting...' : 'Submit'}
+                                    {processing
+                                        ? 'Updating...'
+                                        : 'Update Trainee'}
                                 </Button>
                                 <Button
                                     variant="outline"
                                     type="button"
                                     onClick={() => reset()}
                                 >
-                                    <Link href='/trainees'>Cancel</Link>
+                                    <Link href="/trainees">Cancel</Link>
                                 </Button>
                             </div>
                         </FieldSet>

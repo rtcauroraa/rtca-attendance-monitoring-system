@@ -8,7 +8,7 @@ export const formatDateToMilitary = (dateInput?: Date | string | null): string =
   const day = date.getDate().toString().padStart(2, "0");
 
   // Short month names in uppercase
-  const monthNames = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+  const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const month = monthNames[date.getMonth()];
 
   const year = date.getFullYear();
