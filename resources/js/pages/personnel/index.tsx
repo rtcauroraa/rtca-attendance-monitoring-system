@@ -1,31 +1,45 @@
+import { DataTable } from '@/components/ui/data-table';
+import PersonnelService from '@/services/personnel-service';
 import { Link, router } from '@inertiajs/react';
+import { useQuery } from '@tanstack/react-query';
 import {
     Key,
     ReactElement,
     JSXElementConstructor,
     ReactNode,
     ReactPortal,
+    useState,
 } from 'react';
+import { columns } from './columns';
+import SaveDialog from './save-dialog';
+import { Button } from '@/components/ui/button';
 
-export default function Index({ personnels }: any) {
-    const destroy = (id: any) => {
-        if (confirm('Delete this personnel?')) {
-            router.delete(`/personnels/${id}`);
-        }
-    };
+export default function Index() {
+
+    const [openSaveDialog,setOpenSaveDialog] = useState<boolean>(false)
+    const { data: personnels } = useQuery({
+        queryKey: ["personnels"],
+        queryFn: PersonnelService.GetAll,
+        initialData: []
+    })
+
+
 
     return (
         <div className="p-6">
             <h1 className="mb-4 text-2xl font-bold">Manage Personnel</h1>
 
-            <Link
-                href="/personnels/create"
-                className="rounded bg-blue-500 px-4 py-2 text-white"
+<SaveDialog open={openSaveDialog}/>
+            <Button
+             onClick={()=>setOpenSaveDialog(true)}
             >
                 Create Personnel
-            </Link>
-
-            <table className="mt-4 w-full border">
+            </Button>
+            <DataTable columns={columns} data={personnels} 
+            globalFilter={''} setGlobalFilter={function (value: string): void {
+                throw new Error('Function not implemented.');
+            }} />
+            {/* <table className="mt-4 w-full border">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -59,17 +73,11 @@ export default function Index({ personnels }: any) {
                                     Edit
                                 </Link>
 
-                                <button
-                                    onClick={() => destroy(personnel.id)}
-                                    className="text-red-500"
-                                >
-                                    Delete
-                                </button>
                             </td>
                         </tr>
                     ))}
                 </tbody>
-            </table>
+            </table> */}
         </div>
     );
 }
