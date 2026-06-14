@@ -16,13 +16,13 @@ export default function Index({ personnels }: any) {
 
     return (
         <div className="p-6">
-            <h1 className="mb-4 text-2xl font-bold">personnels</h1>
+            <h1 className="mb-4 text-2xl font-bold">Manage Personnel</h1>
 
             <Link
                 href="/personnels/create"
                 className="rounded bg-blue-500 px-4 py-2 text-white"
             >
-                Create personnel
+                Create Personnel
             </Link>
 
             <table className="mt-4 w-full border">
@@ -42,7 +42,7 @@ export default function Index({ personnels }: any) {
 
                 <tbody>
                     {personnels.map((personnel: any) => (
-                        <tr key="{personnel.id}">
+                        <tr key={personnel.id}>
                             <td>{personnel.id}</td>
                             <td>{personnel.rank}</td>
                             <td>{personnel.lastname}</td>

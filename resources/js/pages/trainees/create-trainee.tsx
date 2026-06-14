@@ -1,5 +1,18 @@
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+
+const options = {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+};
+
+const formattedDateTime = new Date().toLocaleString('en-US', options);
+// Output: June 14, 2026, 4:20 PM
+
 import {
     Field,
     FieldDescription,
@@ -8,8 +21,8 @@ import {
     FieldLegend,
     FieldSeparator,
     FieldSet,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
+} from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
 import {
     Select,
     SelectContent,
@@ -17,102 +30,124 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { Head } from "@inertiajs/react"
-import { useForm } from "@inertiajs/react"
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Head, Link } from '@inertiajs/react';
+import { useForm } from '@inertiajs/react';
+import { CloudCog } from 'lucide-react';
+import { toast, useSonner } from 'sonner';
 
 const religions = [
-    "Roman Catholic",
-    "Islam",
-    "Iglesia ni Cristo",
-    "Aglipayan",
-    "Seventh-day Adventist",
+    'Roman Catholic',
+    'Islam',
+    'Iglesia ni Cristo',
+    'Aglipayan',
+    'Seventh-day Adventist',
     "Jehovah's Witnesses",
-    "Born Again Christian",
-    "Protestant",
-    "Other Christian",
-    "Buddhism",
-    "Hinduism",
-    "Other Religion",
-    "None",
-    "Prefer not to say"
+    'Born Again Christian',
+    'Protestant',
+    'Other Christian',
+    'Buddhism',
+    'Hinduism',
+    'Other Religion',
+    'None',
+    'Prefer not to say',
 ];
 
 export default function CreateTrainee() {
-    
     const { data, setData, post, processing, errors, reset } = useForm({
-        name: "",
-        birthday: "",
-        religion: "",
-        contact_no: "",
-        email: "",
-        status: "",
-        address: "",
-        emergency_contact_person: "",
-        emergency_contact_no: "",
-        blood_type: "",
-        height: "",
-        weight: "",
-        identifying_marks: "",
-        eye_color: "",
-        hair_color: "",
+        name: '',
+        birthday: '',
+        religion: '',
+        contact_no: '',
+        email: '',
+        status: '',
+        address: '',
+        emergency_contact_person: '',
+        emergency_contact_no: '',
+        blood_type: '',
+        height: '',
+        weight: '',
+        identifying_marks: '',
+        eye_color: '',
+        hair_color: '',
     });
 
+    console.log(formattedDateTime);
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
 
-      
-        post(route("trainees.store"), {
+        post('/trainees', {
             onSuccess: () => {
+                toast.success('Trainee has been created successfully.', {
+                    description: formattedDateTime,
+                    duration: 4000,
+                    position: 'top-center',
+                });
                 reset();
+            },
+            onError: (errors) => {
+                console.log('Validation errors:', errors);
             },
         });
     };
-
     return (
         <>
             <Head title="Create Trainee" />
             <div className="flex h-full flex-1 flex-col overflow-auto p-4 md:p-6 lg:p-10">
-                <div className="w-full max-w-7xl mx-auto">
+                <div className="mx-auto w-full max-w-7xl">
                     <form onSubmit={submit}>
                         <FieldSet>
                             <FieldLegend className="mb-6 text-lg font-semibold">
                                 Trainee Personal Information
                             </FieldLegend>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-
+                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
                                 {/* Standard Text Input */}
                                 <Field>
                                     <FieldLabel>Name</FieldLabel>
-                                    <Input 
-                                        placeholder="Enter name" 
-                                        required 
+                                    <Input
+                                        placeholder="Enter name"
+                                        required
                                         value={data.name}
-                                        onChange={e => setData('name', e.target.value)}
+                                        onChange={(e) =>
+                                            setData('name', e.target.value)
+                                        }
                                     />
-                                    {errors.name && <span className="text-sm text-destructive">{errors.name}</span>}
+                                    {errors.name && (
+                                        <span className="text-sm text-destructive">
+                                            {errors.name}
+                                        </span>
+                                    )}
                                 </Field>
 
                                 {/* Date Input */}
                                 <Field>
                                     <FieldLabel>Birthday</FieldLabel>
-                                    <Input 
-                                        type="date" 
-                                        required 
+                                    <Input
+                                        type="date"
+                                        required
                                         value={data.birthday}
-                                        onChange={e => setData('birthday', e.target.value)}
+                                        min="1900-01-01"
+                                        onChange={(e) =>
+                                            setData('birthday', e.target.value)
+                                        }
                                     />
-                                    {errors.birthday && <span className="text-sm text-destructive">{errors.birthday}</span>}
+                                    {errors.birthday && (
+                                        <span className="text-sm text-destructive">
+                                            {errors.birthday}
+                                        </span>
+                                    )}
                                 </Field>
 
                                 {/* Radix / Shadcn UI Select Component */}
                                 <Field>
                                     <FieldLabel>Religion</FieldLabel>
-                                    <Select 
-                                        value={data.religion} 
-                                        onValueChange={value => setData('religion', value)}
+                                    <Select
+                                        value={data.religion}
+                                        onValueChange={(value) =>
+                                            setData('religion', value)
+                                        }
                                     >
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select religion" />
@@ -120,168 +155,287 @@ export default function CreateTrainee() {
                                         <SelectContent>
                                             <SelectGroup>
                                                 {religions.map((religion) => (
-                                                    <SelectItem key={religion} value={religion}>
+                                                    <SelectItem
+                                                        key={religion}
+                                                        value={religion}
+                                                    >
                                                         {religion}
                                                     </SelectItem>
                                                 ))}
                                             </SelectGroup>
                                         </SelectContent>
                                     </Select>
-                                    {errors.religion && <span className="text-sm text-destructive">{errors.religion}</span>}
+                                    {errors.religion && (
+                                        <span className="text-sm text-destructive">
+                                            {errors.religion}
+                                        </span>
+                                    )}
                                 </Field>
 
                                 <Field>
                                     <FieldLabel>Contact No.</FieldLabel>
-                                    <Input 
-                                        required 
+                                    <Input
+                                        required
                                         type="text" // Kept as text or tel to handle leading zeros safely
                                         value={data.contact_no}
-                                        onChange={e => setData('contact_no', e.target.value)}
+                                        onChange={(e) =>
+                                            setData(
+                                                'contact_no',
+                                                e.target.value,
+                                            )
+                                        }
                                     />
-                                    {errors.contact_no && <span className="text-sm text-destructive">{errors.contact_no}</span>}
+                                    {errors.contact_no && (
+                                        <span className="text-sm text-destructive">
+                                            {errors.contact_no}
+                                        </span>
+                                    )}
                                 </Field>
 
                                 <Field>
                                     <FieldLabel>Email</FieldLabel>
-                                    <Input 
-                                        type="email" 
-                                        required 
+                                    <Input
+                                        type="email"
+                                        required
                                         value={data.email}
-                                        onChange={e => setData('email', e.target.value)}
+                                        onChange={(e) =>
+                                            setData('email', e.target.value)
+                                        }
                                     />
-                                    {errors.email && <span className="text-sm text-destructive">{errors.email}</span>}
+                                    {errors.email && (
+                                        <span className="text-sm text-destructive">
+                                            {errors.email}
+                                        </span>
+                                    )}
                                 </Field>
 
                                 <Field>
                                     <FieldLabel>Status</FieldLabel>
-                                    <Select 
-                                        value={data.status} 
-                                        onValueChange={value => setData('status', value)}
+                                    <Select
+                                        value={data.status}
+                                        onValueChange={(value) =>
+                                            setData('status', value)
+                                        }
                                     >
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select status" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectGroup>
-                                                {["Single", "Married", "Widowed"].map((label) => (
-                                                    <SelectItem key={label} value={label}>
+                                                {[
+                                                    'Single',
+                                                    'Married',
+                                                    'Widowed',
+                                                ].map((label) => (
+                                                    <SelectItem
+                                                        key={label}
+                                                        value={label}
+                                                    >
                                                         {label}
                                                     </SelectItem>
                                                 ))}
                                             </SelectGroup>
                                         </SelectContent>
                                     </Select>
-                                    {errors.status && <span className="text-sm text-destructive">{errors.status}</span>}
+                                    {errors.status && (
+                                        <span className="text-sm text-destructive">
+                                            {errors.status}
+                                        </span>
+                                    )}
                                 </Field>
 
                                 <Field className="xl:col-span-3">
                                     <FieldLabel>Address</FieldLabel>
-                                    <Textarea 
-                                        rows={4} 
+                                    <Textarea
+                                        rows={4}
                                         value={data.address}
-                                        onChange={e => setData('address', e.target.value)}
+                                        onChange={(e) =>
+                                            setData('address', e.target.value)
+                                        }
                                     />
-                                    {errors.address && <span className="text-sm text-destructive">{errors.address}</span>}
+                                    {errors.address && (
+                                        <span className="text-sm text-destructive">
+                                            {errors.address}
+                                        </span>
+                                    )}
                                 </Field>
 
                                 <Field>
-                                    <FieldLabel>Emergency Contact Person</FieldLabel>
-                                    <Input 
-                                        required 
+                                    <FieldLabel>
+                                        Emergency Contact Person
+                                    </FieldLabel>
+                                    <Input
+                                        required
                                         value={data.emergency_contact_person}
-                                        onChange={e => setData('emergency_contact_person', e.target.value)}
+                                        onChange={(e) =>
+                                            setData(
+                                                'emergency_contact_person',
+                                                e.target.value,
+                                            )
+                                        }
                                     />
-                                    {errors.emergency_contact_person && <span className="text-sm text-destructive">{errors.emergency_contact_person}</span>}
+                                    {errors.emergency_contact_person && (
+                                        <span className="text-sm text-destructive">
+                                            {errors.emergency_contact_person}
+                                        </span>
+                                    )}
                                 </Field>
 
                                 <Field>
-                                    <FieldLabel>Emergency Contact No.</FieldLabel>
-                                    <Input 
-                                        required 
-                                        type="text" 
+                                    <FieldLabel>
+                                        Emergency Contact No.
+                                    </FieldLabel>
+                                    <Input
+                                        required
+                                        type="text"
                                         value={data.emergency_contact_no}
-                                        onChange={e => setData('emergency_contact_no', e.target.value)}
+                                        onChange={(e) =>
+                                            setData(
+                                                'emergency_contact_no',
+                                                e.target.value,
+                                            )
+                                        }
                                     />
-                                    {errors.emergency_contact_no && <span className="text-sm text-destructive">{errors.emergency_contact_no}</span>}
+                                    {errors.emergency_contact_no && (
+                                        <span className="text-sm text-destructive">
+                                            {errors.emergency_contact_no}
+                                        </span>
+                                    )}
                                 </Field>
 
                                 <Field>
                                     <FieldLabel>Blood Type</FieldLabel>
-                                    <Select 
-                                        value={data.blood_type} 
-                                        onValueChange={value => setData('blood_type', value)}
+                                    <Select
+                                        value={data.blood_type}
+                                        onValueChange={(value) =>
+                                            setData('blood_type', value)
+                                        }
                                     >
                                         <SelectTrigger>
                                             <SelectValue placeholder="Select blood type" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectGroup>
-                                                {["A", "A+", "B", "B+", "AB", "O", "O+"].map((label) => (
-                                                    <SelectItem key={label} value={label}>
+                                                {[
+                                                    'A',
+                                                    'A+',
+                                                    'B',
+                                                    'B+',
+                                                    'AB',
+                                                    'O',
+                                                    'O+',
+                                                ].map((label) => (
+                                                    <SelectItem
+                                                        key={label}
+                                                        value={label}
+                                                    >
                                                         {label}
                                                     </SelectItem>
                                                 ))}
                                             </SelectGroup>
                                         </SelectContent>
                                     </Select>
-                                    {errors.blood_type && <span className="text-sm text-destructive">{errors.blood_type}</span>}
+                                    {errors.blood_type && (
+                                        <span className="text-sm text-destructive">
+                                            {errors.blood_type}
+                                        </span>
+                                    )}
                                 </Field>
 
                                 <Field>
                                     <FieldLabel>Height (cm)</FieldLabel>
-                                    <Input 
-                                        type="number" 
+                                    <Input
+                                        type="number"
                                         value={data.height}
-                                        onChange={e => setData('height', e.target.value)}
+                                        onChange={(e) =>
+                                            setData('height', e.target.value)
+                                        }
                                     />
-                                    {errors.height && <span className="text-sm text-destructive">{errors.height}</span>}
+                                    {errors.height && (
+                                        <span className="text-sm text-destructive">
+                                            {errors.height}
+                                        </span>
+                                    )}
                                 </Field>
 
                                 <Field>
                                     <FieldLabel>Weight (kg)</FieldLabel>
-                                    <Input 
-                                        type="number" 
+                                    <Input
+                                        type="number"
                                         value={data.weight}
-                                        onChange={e => setData('weight', e.target.value)}
+                                        onChange={(e) =>
+                                            setData('weight', e.target.value)
+                                        }
                                     />
-                                    {errors.weight && <span className="text-sm text-destructive">{errors.weight}</span>}
+                                    {errors.weight && (
+                                        <span className="text-sm text-destructive">
+                                            {errors.weight}
+                                        </span>
+                                    )}
                                 </Field>
 
                                 <Field>
                                     <FieldLabel>Identifying Marks</FieldLabel>
-                                    <Input 
+                                    <Input
                                         value={data.identifying_marks}
-                                        onChange={e => setData('identifying_marks', e.target.value)}
+                                        onChange={(e) =>
+                                            setData(
+                                                'identifying_marks',
+                                                e.target.value,
+                                            )
+                                        }
                                     />
-                                    {errors.identifying_marks && <span className="text-sm text-destructive">{errors.identifying_marks}</span>}
+                                    {errors.identifying_marks && (
+                                        <span className="text-sm text-destructive">
+                                            {errors.identifying_marks}
+                                        </span>
+                                    )}
                                 </Field>
 
                                 <Field>
                                     <FieldLabel>Eye Color</FieldLabel>
-                                    <Input 
+                                    <Input
                                         value={data.eye_color}
-                                        onChange={e => setData('eye_color', e.target.value)}
+                                        onChange={(e) =>
+                                            setData('eye_color', e.target.value)
+                                        }
                                     />
-                                    {errors.eye_color && <span className="text-sm text-destructive">{errors.eye_color}</span>}
+                                    {errors.eye_color && (
+                                        <span className="text-sm text-destructive">
+                                            {errors.eye_color}
+                                        </span>
+                                    )}
                                 </Field>
 
                                 <Field>
                                     <FieldLabel>Hair Color</FieldLabel>
-                                    <Input 
+                                    <Input
                                         value={data.hair_color}
-                                        onChange={e => setData('hair_color', e.target.value)}
+                                        onChange={(e) =>
+                                            setData(
+                                                'hair_color',
+                                                e.target.value,
+                                            )
+                                        }
                                     />
-                                    {errors.hair_color && <span className="text-sm text-destructive">{errors.hair_color}</span>}
+                                    {errors.hair_color && (
+                                        <span className="text-sm text-destructive">
+                                            {errors.hair_color}
+                                        </span>
+                                    )}
                                 </Field>
-
                             </div>
 
-                            <div className="flex flex-col sm:flex-row gap-3 mt-8">
+                            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                                 <Button type="submit" disabled={processing}>
-                                    {processing ? "Submitting..." : "Submit"}
+                                    {processing ? 'Submitting...' : 'Submit'}
                                 </Button>
-                                <Button variant="outline" type="button" onClick={() => reset()}>
-                                    Cancel
+                                <Button
+                                    variant="outline"
+                                    type="button"
+                                    onClick={() => reset()}
+                                >
+                                    <Link href='/trainees'>Cancel</Link>
                                 </Button>
                             </div>
                         </FieldSet>

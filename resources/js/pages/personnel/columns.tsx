@@ -3,7 +3,7 @@
 import { formatDateToMilitary } from '@/utils/formatDateToMilitary';
 import { ColumnDef } from '@tanstack/react-table';
 
-export type Trainee = {
+export type Personnel = {
     id: number;
     name: string;
     birthday: string;
@@ -20,10 +20,9 @@ export type Trainee = {
     identifying_marks: string;
     eye_color: string;
     hair_color: string;
-    
 };
 
-export const columns: ColumnDef<Trainee>[] = [
+export const columns: ColumnDef<Personnel>[] = [
     {
         accessorKey: 'name',
         header: 'Name',
@@ -47,8 +46,8 @@ export const columns: ColumnDef<Trainee>[] = [
     {
         accessorKey: 'birthday',
         header: 'Birthday',
-         cell: ({ row }) => {
-            return formatDateToMilitary( row.original.birthday)
+        cell: ({ row }) => {
+            return formatDateToMilitary(row.original.birthday);
         },
     },
     {
