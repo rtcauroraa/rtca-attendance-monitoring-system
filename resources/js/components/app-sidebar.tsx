@@ -33,6 +33,11 @@ const mainNavItems: NavItem[] = [
         href: trainees(),
         icon: User,
     },
+    {
+        title: 'Personnel',
+        href: '/personnels',
+        icon: User,
+    },
 ];
 
 const footerNavItems: NavItem[] = [
@@ -46,8 +51,6 @@ const footerNavItems: NavItem[] = [
         href: 'https://laravel.com/docs/starter-kits#react',
         icon: BookOpen,
     },
-
-
 ];
 
 export function AppSidebar() {
