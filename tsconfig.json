@@ -115,6 +115,7 @@
     },
     "include": [
         "resources/js/**/*.ts",
+        "resources/js/**/*",
         "resources/js/**/*.d.ts",
         "resources/js/**/*.tsx"
     ]
