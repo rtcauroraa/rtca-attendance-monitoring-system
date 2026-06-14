@@ -23,4 +23,9 @@ class Trainee extends Model
         'eye_color',
         'hair_color',
     ];
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
 }

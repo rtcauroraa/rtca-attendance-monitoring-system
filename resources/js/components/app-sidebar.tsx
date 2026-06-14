@@ -13,7 +13,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard, trainees, user } from '@/routes';
+import { dashboard, trainees, user, attendance } from '@/routes';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
@@ -33,6 +33,16 @@ const mainNavItems: NavItem[] = [
         href: trainees(),
         icon: User,
     },
+    {
+        title: 'Personnel',
+        href: '/personnels',
+        icon: User,
+    },
+    {
+        title: 'Attendance',
+        href: attendance(),
+        icon: User,
+    },
 ];
 
 const footerNavItems: NavItem[] = [
@@ -46,8 +56,6 @@ const footerNavItems: NavItem[] = [
         href: 'https://laravel.com/docs/starter-kits#react',
         icon: BookOpen,
     },
-
-
 ];
 
 export function AppSidebar() {
