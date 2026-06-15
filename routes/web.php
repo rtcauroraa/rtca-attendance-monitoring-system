@@ -19,6 +19,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('trainees.store');
     Route::get('/trainees', [TraineeController::class, 'index'])
     ->name('trainees');
+    Route::get('/test', [TraineeController::class, 'test'])
+    ->name('test');
     
     // Attendance 
      Route::inertia('attendance', 'attendance/attendance')->name('attendance');
