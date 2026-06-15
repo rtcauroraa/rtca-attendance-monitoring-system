@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 
+use App\Models\Attendance;
 use App\Models\Trainee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -47,6 +48,7 @@ class TraineeController extends Controller
     /**
      * Show the form for creating a new resource.
      */
+
     public function create()
     {
         //  return Inertia::render('/create-trainee');
