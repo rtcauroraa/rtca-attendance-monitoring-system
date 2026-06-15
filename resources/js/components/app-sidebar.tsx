@@ -43,12 +43,6 @@ const mainNavItems: NavItem[] = [
         href: '/personnels',
         icon: User,
     },
-
-    {
-        title: 'Scanner',
-        href: scanner(),
-        icon: User,
-    },
 ];
 
 const footerNavItems: NavItem[] = [

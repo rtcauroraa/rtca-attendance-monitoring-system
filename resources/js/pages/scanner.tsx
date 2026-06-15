@@ -1,5 +1,5 @@
 import React, { Component, useState } from 'react';
-import { Scanner } from '@yudiel/react-qr-scanner';
+import { Scanner, useDevices } from '@yudiel/react-qr-scanner';
 import QRCode from 'react-qr-code';
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
@@ -20,6 +20,9 @@ export default function scanner() {
     const handleChange = (event: any) => {
         setText(event.target.value);
     };
+
+    const devices = useDevices();
+    const [selectedDevice, setSelectedDevice] = useState(null);
     const highlightCodeOnCanvas = (detectedCodes: any, ctx: any) => {
         detectedCodes.forEach((detectedCode: any) => {
             const { boundingBox, cornerPoints } = detectedCode;
@@ -46,15 +49,35 @@ export default function scanner() {
     return (
         <div>
             <h1>QR CODE Scanner</h1>
-            <div className="mx-auto my-4 max-w-sm rounded-lg bg-white p-6 shadow-md">
+            <div className="mx-auto my-4 mb-2 max-w-sm rounded-lg bg-white p-6 text-black shadow-md">
+                <select onChange={(e) => setSelectedDevice(e.target.value)}>
+                    <option value="">Select a camera</option>
+                    {devices.map((device) => (
+                        <option key={device.deviceId} value={device.deviceId}>
+                            {device.label || `Camera ${device.deviceId}`}
+                        </option>
+                    ))}
+                </select>
+
                 <Scanner
+                    onScan={(result) => console.log(result)}
+                    onError={(error) => console.error(error)}
+                    components={{
+                        tracker: highlightCodeOnCanvas,
+                        finder: false,
+                    }}
+                    constraints={{
+                        deviceId: selectedDevice,
+                    }}
+                />
+                {/* <Scanner
                     onScan={handleScan}
                     onError={(error) => console.error(error)}
                     components={{
                         tracker: highlightCodeOnCanvas,
                         finder: false,
                     }}
-                />
+                /> */}
             </div>
 
             <h1>QR CODE Generator</h1>

@@ -6,6 +6,8 @@ use App\Http\Controllers\PersonnelController;
 use App\Http\Controllers\TraineeController;
 
 Route::inertia('/', 'welcome')->name('home');
+Route::inertia('scanner', 'scanner')->name('scanner');
+
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
@@ -25,7 +27,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
      Route::inertia('create-attendance', 'attendance/create-attendance')->name('create-attendance');
 
 
-     Route::inertia('scanner', 'scanner')->name('scanner');
+ 
 });
 
 require __DIR__ . '/settings.php';
