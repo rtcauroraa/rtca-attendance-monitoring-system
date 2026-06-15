@@ -42,31 +42,6 @@ class TraineeController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function test(Request $request)
-    {
-        $query = Attendance::query();
-
-        // ✅ SERVER-SIDE SEARCH
-        if ($request->search) {
-            $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', "%{$request->search}%")
-                    ->orWhere('email', 'like', "%{$request->search}%")
-                    ->orWhere('contact_no', 'like', "%{$request->search}%");
-            });
-        }
-
-        $trainees = $query
-            ->orderBy('created_at', 'desc')
-            ->paginate(10)
-            ->withQueryString();
-            
-        return Inertia::render('trainees/test', [
-            'trainees' => $trainees,
-            'filters' => [
-                'search' => $request->search ?? '',
-            ],
-        ]);
-    }
 
     public function create()
     {

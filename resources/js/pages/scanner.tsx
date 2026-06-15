@@ -20,8 +20,8 @@ export default function scanner() {
     const handleChange = (event: any) => {
         setText(event.target.value);
     };
-    const highlightCodeOnCanvas = (detectedCodes, ctx) => {
-        detectedCodes.forEach((detectedCode) => {
+    const highlightCodeOnCanvas = (detectedCodes: any, ctx: any) => {
+        detectedCodes.forEach((detectedCode: any) => {
             const { boundingBox, cornerPoints } = detectedCode;
 
             // Draw bounding box
@@ -36,7 +36,7 @@ export default function scanner() {
 
             // Draw corner points
             ctx.fillStyle = '#FFFFFF';
-            cornerPoints.forEach((point) => {
+            cornerPoints.forEach((point: any) => {
                 ctx.beginPath();
                 ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI);
                 ctx.fill();
