@@ -6,61 +6,7 @@ import { Link, router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { CloudCog, EyeIcon, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-
-export type Trainee = {
-    id: number;
-    first_name: string;
-    middle_name: string;
-    last_name: string;
-    suffix: string;
-    birthday: string;
-    religion: string;
-    contact_no: string;
-    email: string;
-    status: string;
-    coy: string;
-    address: string;
-    emergency_contact_person: string;
-    emergency_contact_no: string;
-    blood_type: string;
-    height: string;
-    weight: string;
-    identifying_marks: string;
-    eye_color: string;
-    hair_color: string;
-};
-
-function calculateBMI(weightKg: number, heightM: number) {
-    if (!weightKg || !heightM) {
-        return {
-            bmi: null,
-            label: 'Invalid input',
-        };
-    }
-
-    const bmi = weightKg / (heightM * heightM);
-
-    let label = '';
-
-    if (bmi < 18.5) {
-        label = 'Underweight';
-    } else if (bmi < 25) {
-        label = 'Normal weight';
-    } else if (bmi < 30) {
-        label = 'Overweight';
-    } else if (bmi < 35) {
-        label = 'Obese Class I';
-    } else if (bmi < 40) {
-        label = 'Obese Class II';
-    } else {
-        label = 'Obese Class III (Severe)';
-    }
-
-    return {
-        bmi: parseFloat(bmi.toFixed(2)),
-        label: label,
-    };
-}
+import { Trainee } from '@/types/interface';
 
 const handleDelete = (id: number) => {
     toast.warning('Are you sure you want to delete this trainee record?', {
@@ -114,9 +60,9 @@ export const columns: ColumnDef<Trainee>[] = [
         header: 'Contact No',
     },
     {
-        accessorKey: 'status',
-        header: 'Status',
-        cell: ({ row }) => capitalize(row.original.status),
+        accessorKey: 'serial_number',
+        header: 'Serial Number',
+        cell: ({ row }) => capitalize(row.original.serial_number),
     },
     {
         accessorKey: 'coy',
@@ -146,9 +92,7 @@ export const columns: ColumnDef<Trainee>[] = [
         cell: ({ row }) => {
             return (
                 <div>
-                    <div>
-                        {capitalize(row.original.emergency_contact_person)}
-                    </div>
+                    <div>{row.original.emergency_contact_person}</div>
                     <div className="text-xs text-gray-500">
                         {row.original.emergency_contact_no}
                     </div>

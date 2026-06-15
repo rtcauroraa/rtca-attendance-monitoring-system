@@ -10,6 +10,8 @@ class Trainee extends Model
         'first_name',
         'middle_name',
         'last_name',
+        'serial_number',
+        'qr_code',
         'suffix',
         'birthday',
         'religion',

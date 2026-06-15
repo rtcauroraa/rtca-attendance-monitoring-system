@@ -1,0 +1,23 @@
+export type Trainee = {
+    id: number;
+    first_name: string;
+    middle_name: string;
+    last_name: string;
+    suffix: string;
+    serial_number: string;
+    birthday: string;
+    religion: string;
+    contact_no: string;
+    email: string;
+    status: string;
+    coy: string;
+    address: string;
+    emergency_contact_person: string;
+    emergency_contact_no: string;
+    blood_type: string;
+    height: string;
+    weight: string;
+    identifying_marks: string;
+    eye_color: string;
+    hair_color: string;
+}

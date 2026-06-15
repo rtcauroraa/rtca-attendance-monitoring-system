@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,7 +13,8 @@ return new class extends Migration {
             $table->string('first_name');
             $table->string('middle_name');
             $table->string('last_name');
-            $table->string('suffix')->;
+            $table->string('serial_number');
+            $table->string('suffix');
             $table->date('birthday')->nullable();
             $table->string('religion')->nullable();
             $table->string('contact_no')->nullable();
@@ -28,11 +30,11 @@ return new class extends Migration {
             $table->string('blood_type')->nullable();
             $table->string('height')->nullable();
             $table->string('weight')->nullable();
+            $table->string('qr_code')->nullable();
 
             $table->string('identifying_marks')->nullable();
             $table->string('eye_color')->nullable();
             $table->string('hair_color')->nullable();
-
             $table->timestamps();
         });
     }

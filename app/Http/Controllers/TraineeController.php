@@ -8,6 +8,14 @@ use App\Models\Trainee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\Label\LabelAlignment;
+use Endroid\QrCode\Label\Font\OpenSans;
+use Endroid\QrCode\RoundBlockSizeMode;
+use Endroid\QrCode\Writer\PngWriter;
+use Illuminate\Support\Facades\Storage;
 
 class TraineeController extends Controller
 {
@@ -25,6 +33,7 @@ class TraineeController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
                     ->orWhere('middle_name', 'like', "%{$search}%")
+                    ->orWhere('serial_number', 'like', "%{$search}%")
                     ->orWhere('last_name', 'like', "%{$search}%")
                     ->orWhere('status', 'like', "%{$search}%")
                     ->orWhere('coy', 'like', "%{$search}%")
@@ -66,6 +75,9 @@ class TraineeController extends Controller
             'middle_name' => ['required', 'string', 'max:255'],
 
             'last_name' => ['required', 'string', 'max:255'],
+
+            'serial_number' => ['required', 'string', 'max:255'],
+
             'suffix' => ['required', 'in:N/A,Jr.,Sr.,I,II,III'],
 
             'birthday' => ['required', 'date', 'before:today'],
@@ -99,8 +111,37 @@ class TraineeController extends Controller
             'hair_color' => ['required', 'string', 'max:50'],
         ]);
 
-        Trainee::create($validated);
+        $builder = new Builder(
+            writer: new PngWriter(),
+            writerOptions: [],
+            validateResult: false,
+            data: $validated['serial_number'],
+            encoding: new Encoding('UTF-8'),
+            errorCorrectionLevel: ErrorCorrectionLevel::High,
+            size: 300,
+            margin: 10,
+            roundBlockSizeMode: RoundBlockSizeMode::Margin,
+            logoPath: public_path('app-logo.png'),
+            logoResizeToWidth: 50,
+            logoPunchoutBackground: true,
+            labelText: $validated['serial_number'],
+            labelFont: new OpenSans(20),
+            labelAlignment: LabelAlignment::Center
+        );
 
+        $result = $builder->build();
+
+        $filename = 'qrcodes/PCG-Class-119/' . $validated['serial_number'] . '.png';
+
+        Storage::disk('public')->put(
+            $filename,
+            $result->getString()
+        );
+
+        Trainee::create([
+            ...$validated,
+            'qr_code' => $filename, // SAVE TO DB
+        ]);
         return back();
     }
 
@@ -135,6 +176,7 @@ class TraineeController extends Controller
             'middle_name' => ['required', 'string', 'max:255'],
 
             'last_name' => ['required', 'string', 'max:255'],
+            'serial_number' => ['required', 'string', 'max:255'],
             'suffix' => 'required|string',
 
             'birthday' => 'required|date',
@@ -245,6 +287,7 @@ class TraineeController extends Controller
                     'first_name'                     => $rowData['firstname'] ?? null,
                     'middle_name'                     => $rowData['middlename'] ?? null,
                     'last_name'                     => $rowData['lastname'] ?? null,
+                    'serial_number'                     => $rowData['serial_number'] ?? null,
                     'suffix'                     => $rowData['suffix'] ?? null,
                     'birthday'                 => !empty($rowData['birthday']) ? date('Y-m-d', strtotime($rowData['birthday'])) : null,
                     'religion'                 => $rowData['religion'] ?? null,

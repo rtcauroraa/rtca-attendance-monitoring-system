@@ -19,28 +19,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { CloudCog } from 'lucide-react';
 import { toast } from 'sonner';
-interface Trainee {
-    id: number;
-    first_name: string;
-    middle_name: string;
-    last_name: string;
-    suffix: string;
-    birthday: string;
-    religion: string;
-    contact_no: string;
-    email: string;
-    status: string;
-    coy: string;
-    address: string;
-    emergency_contact_person: string;
-    emergency_contact_no: string;
-    blood_type: string;
-    height: string;
-    weight: string;
-    identifying_marks: string;
-    eye_color: string;
-    hair_color: string;
-}
+import { Trainee } from '@/types/interface';
 
 const options = {
     month: 'long',
@@ -58,6 +37,7 @@ export default function EditTrainee({ trainee }: { trainee: Trainee }) {
         first_name: trainee.first_name || '',
         middle_name: trainee.middle_name || '',
         last_name: trainee.last_name || '',
+        serial_number: trainee.serial_number || '',
         suffix: trainee.suffix || '',
         birthday: trainee.birthday || '',
         religion: trainee.religion || '',
@@ -162,6 +142,16 @@ export default function EditTrainee({ trainee }: { trainee: Trainee }) {
                                         value={data.last_name}
                                         onChange={(e) =>
                                             setData('last_name', e.target.value)
+                                        }
+                                    />
+                                </Field>
+
+                                <Field>
+                                    <FieldLabel>Serial Number</FieldLabel>
+                                    <Input
+                                        value={data.serial_number}
+                                        onChange={(e) =>
+                                            setData('serial_number', e.target.value)
                                         }
                                     />
                                 </Field>
@@ -519,7 +509,7 @@ export default function EditTrainee({ trainee }: { trainee: Trainee }) {
                                 <Button type="submit" disabled={processing}>
                                     {processing
                                         ? 'Updating...'
-                                        : 'Update Trainee'}
+                                        : 'Update'}
                                 </Button>
                                 <Button
                                     variant="outline"

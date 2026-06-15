@@ -59,6 +59,7 @@ export default function CreateTrainee() {
         first_name: '',
         middle_name: '',
         last_name: '',
+        serial_number: '',
         suffix: '',
         birthday: '',
         religion: '',
@@ -162,6 +163,27 @@ export default function CreateTrainee() {
                                     {errors.last_name && (
                                         <span className="text-sm text-destructive">
                                             {errors.last_name}
+                                        </span>
+                                    )}
+                                </Field>
+
+                                <Field>
+                                    <FieldLabel>Serial Number</FieldLabel>
+                                    <Input
+                                        placeholder="Enter Serial Number"
+                                        required
+                                        type="number"
+                                        value={data.serial_number}
+                                        onChange={(e) =>
+                                            setData(
+                                                'serial_number',
+                                                e.target.value,
+                                            )
+                                        }
+                                    />
+                                    {errors.serial_number && (
+                                        <span className="text-sm text-destructive">
+                                            {errors.serial_number}
                                         </span>
                                     )}
                                 </Field>
