@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Models\Trainee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -18,10 +19,15 @@ class TraineeController extends Controller
 
         // ✅ SERVER-SIDE SEARCH
         if ($request->search) {
-            $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', "%{$request->search}%")
-                    ->orWhere('email', 'like', "%{$request->search}%")
-                    ->orWhere('contact_no', 'like', "%{$request->search}%");
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('middle_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('status', 'like', "%{$search}%")
+                    ->orWhere('coy', 'like', "%{$search}%")
+                    ->orWhere('emergency_contact_person', 'like', "%{$search}%");
             });
         }
 
@@ -53,7 +59,12 @@ class TraineeController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'first_name' => ['required', 'string', 'max:255'],
+
+            'middle_name' => ['required', 'string', 'max:255'],
+
+            'last_name' => ['required', 'string', 'max:255'],
+            'suffix' => ['required', 'in:N/A,Jr.,Sr.,I,II,III'],
 
             'birthday' => ['required', 'date', 'before:today'],
 
@@ -64,6 +75,8 @@ class TraineeController extends Controller
             'email' => ['required', 'email', 'max:255', 'unique:trainees,email'],
 
             'status' => ['required', 'in:Single,Married,Widowed'],
+
+            'coy' => ['required', 'in:Alpha,Bravo,Charlie,Delta'],
 
             'address' => ['required', 'string', 'max:500'],
 
@@ -113,13 +126,21 @@ class TraineeController extends Controller
      */
     public function update(Request $request, Trainee $trainee)
     {
+
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'first_name' => ['required', 'string', 'max:255'],
+
+            'middle_name' => ['required', 'string', 'max:255'],
+
+            'last_name' => ['required', 'string', 'max:255'],
+            'suffix' => 'required|string',
+
             'birthday' => 'required|date',
             'religion' => 'required|string',
             'contact_no' => 'required|string|max:20',
             'email' => 'required|email|max:255',
             'status' => 'required|string',
+            'coy' => 'required|string',
             'address' => 'required|string',
 
             'emergency_contact_person' => 'required|string|max:255',
@@ -213,24 +234,22 @@ class TraineeController extends Controller
                 }
 
                 // 4. Combine First Name and Last Name if they are separate columns in your CSV
-                $firstName = $rowData['firstname'] ?? '';
-                $lastName = $rowData['lastname'] ?? '';
 
-                $fullName = trim($firstName . ' ' . $lastName);
-                // Fallback to a single "name" header column if that's what your CSV uses
-                if (empty($fullName)) {
-                    $fullName = $rowData['name'] ?? 'Unknown Trainee';
-                }
+
 
 
                 // 5. Structure fields to match your trainees table migration layout
                 $batch[] = [
-                    'name'                     => $fullName,
+                    'first_name'                     => $rowData['firstname'] ?? null,
+                    'middle_name'                     => $rowData['middlename'] ?? null,
+                    'last_name'                     => $rowData['lastname'] ?? null,
+                    'suffix'                     => $rowData['suffix'] ?? null,
                     'birthday'                 => !empty($rowData['birthday']) ? date('Y-m-d', strtotime($rowData['birthday'])) : null,
                     'religion'                 => $rowData['religion'] ?? null,
                     'contact_no'               => $rowData['contactno'] ?? $rowData['contactnumber'] ?? null,
                     'email'                    => $email,
                     'status'                   => $rowData['status'] ?? null,
+                    'coy'                   => $rowData['coy'] ?? null,
                     'address'                  => $rowData['address'] ?? null,
                     'emergency_contact_person' => $rowData['emergencycontactperson'] ?? null,
                     'emergency_contact_no'     => $rowData['emergencycontactno'] ?? null,

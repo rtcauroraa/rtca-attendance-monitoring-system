@@ -9,12 +9,16 @@ import { toast } from 'sonner';
 
 export type Trainee = {
     id: number;
-    name: string;
+    first_name: string;
+    middle_name: string;
+    last_name: string;
+    suffix: string;
     birthday: string;
     religion: string;
     contact_no: string;
     email: string;
     status: string;
+    coy: string;
     address: string;
     emergency_contact_person: string;
     emergency_contact_no: string;
@@ -25,6 +29,38 @@ export type Trainee = {
     eye_color: string;
     hair_color: string;
 };
+
+function calculateBMI(weightKg: number, heightM: number) {
+    if (!weightKg || !heightM) {
+        return {
+            bmi: null,
+            label: 'Invalid input',
+        };
+    }
+
+    const bmi = weightKg / (heightM * heightM);
+
+    let label = '';
+
+    if (bmi < 18.5) {
+        label = 'Underweight';
+    } else if (bmi < 25) {
+        label = 'Normal weight';
+    } else if (bmi < 30) {
+        label = 'Overweight';
+    } else if (bmi < 35) {
+        label = 'Obese Class I';
+    } else if (bmi < 40) {
+        label = 'Obese Class II';
+    } else {
+        label = 'Obese Class III (Severe)';
+    }
+
+    return {
+        bmi: parseFloat(bmi.toFixed(2)),
+        label: label,
+    };
+}
 
 const handleDelete = (id: number) => {
     toast.warning('Are you sure you want to delete this trainee record?', {
@@ -46,15 +82,33 @@ const handleDelete = (id: number) => {
         cancel: { label: 'No', onClick: () => {} },
     });
 };
+const capitalize = (value: string) =>
+    value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
 export const columns: ColumnDef<Trainee>[] = [
     {
-        accessorKey: 'name',
+        id: 'full_name',
         header: 'Name',
+        cell: ({ row }) => {
+            return (
+                <div>
+                    <div>
+                        <div>
+                            {`${row.original.first_name} ${
+                                row.original.middle_name
+                                    ? row.original.middle_name.charAt(0) + '.'
+                                    : ''
+                            } ${row.original.last_name} ${row?.original?.suffix === 'N/A' || !row?.original?.suffix ? '' : row.original.suffix}
+`}
+                        </div>
+                    </div>
+                    <div className="text-xs text-gray-500">
+                        {row.original.email}
+                    </div>
+                </div>
+            );
+        },
     },
-    {
-        accessorKey: 'email',
-        header: 'Email',
-    },
+
     {
         accessorKey: 'contact_no',
         header: 'Contact No',
@@ -62,6 +116,11 @@ export const columns: ColumnDef<Trainee>[] = [
     {
         accessorKey: 'status',
         header: 'Status',
+        cell: ({ row }) => capitalize(row.original.status),
+    },
+    {
+        accessorKey: 'coy',
+        header: 'Coy',
     },
     {
         accessorKey: 'blood_type',
@@ -87,7 +146,9 @@ export const columns: ColumnDef<Trainee>[] = [
         cell: ({ row }) => {
             return (
                 <div>
-                    <div>{row.original.emergency_contact_person}</div>
+                    <div>
+                        {capitalize(row.original.emergency_contact_person)}
+                    </div>
                     <div className="text-xs text-gray-500">
                         {row.original.emergency_contact_no}
                     </div>

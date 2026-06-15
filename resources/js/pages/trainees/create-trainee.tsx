@@ -56,12 +56,16 @@ const religions = [
 
 export default function CreateTrainee() {
     const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
+        first_name: '',
+        middle_name: '',
+        last_name: '',
+        suffix: '',
         birthday: '',
         religion: '',
         contact_no: '',
         email: '',
         status: '',
+        coy: '',
         address: '',
         emergency_contact_person: '',
         emergency_contact_no: '',
@@ -73,7 +77,6 @@ export default function CreateTrainee() {
         hair_color: '',
     });
 
- 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -98,25 +101,67 @@ export default function CreateTrainee() {
                 <div className="mx-auto w-full max-w-7xl">
                     <form onSubmit={submit}>
                         <FieldSet>
-                            <FieldLegend className="mb-6 text-lg font-semibold">
+                            <FieldLegend className="text-lg font-semibold">
                                 Trainee Personal Information
                             </FieldLegend>
-
+                            <FieldDescription>
+                                Fill in the information below to register new
+                                trainee. Click submit when you're done.{' '}
+                            </FieldDescription>
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
                                 {/* Standard Text Input */}
                                 <Field>
-                                    <FieldLabel>Name</FieldLabel>
+                                    <FieldLabel>First Name</FieldLabel>
                                     <Input
-                                        placeholder="Enter name"
+                                        placeholder="Enter First Name"
                                         required
-                                        value={data.name}
+                                        value={data.first_name}
                                         onChange={(e) =>
-                                            setData('name', e.target.value)
+                                            setData(
+                                                'first_name',
+                                                e.target.value,
+                                            )
                                         }
                                     />
-                                    {errors.name && (
+                                    {errors.first_name && (
                                         <span className="text-sm text-destructive">
-                                            {errors.name}
+                                            {errors.first_name}
+                                        </span>
+                                    )}
+                                </Field>
+                                <Field>
+                                    <FieldLabel>Middle Name</FieldLabel>
+                                    <Input
+                                        placeholder="Enter Middle Name"
+                                        required
+                                        value={data.middle_name}
+                                        onChange={(e) =>
+                                            setData(
+                                                'middle_name',
+                                                e.target.value,
+                                            )
+                                        }
+                                    />
+                                    {errors.middle_name && (
+                                        <span className="text-sm text-destructive">
+                                            {errors.middle_name}
+                                        </span>
+                                    )}
+                                </Field>
+
+                                <Field>
+                                    <FieldLabel>Last Name</FieldLabel>
+                                    <Input
+                                        placeholder="Enter Last Name"
+                                        required
+                                        value={data.last_name}
+                                        onChange={(e) =>
+                                            setData('last_name', e.target.value)
+                                        }
+                                    />
+                                    {errors.last_name && (
+                                        <span className="text-sm text-destructive">
+                                            {errors.last_name}
                                         </span>
                                     )}
                                 </Field>
@@ -171,13 +216,13 @@ export default function CreateTrainee() {
                                         </span>
                                     )}
                                 </Field>
-
                                 <Field>
                                     <FieldLabel>Contact No.</FieldLabel>
                                     <Input
                                         required
                                         type="text" // Kept as text or tel to handle leading zeros safely
                                         value={data.contact_no}
+                                        placeholder="Enter Contact Number"
                                         onChange={(e) =>
                                             setData(
                                                 'contact_no',
@@ -191,11 +236,11 @@ export default function CreateTrainee() {
                                         </span>
                                     )}
                                 </Field>
-
                                 <Field>
                                     <FieldLabel>Email</FieldLabel>
                                     <Input
                                         type="email"
+                                        placeholder="name@example.com"
                                         required
                                         value={data.email}
                                         onChange={(e) =>
@@ -210,7 +255,7 @@ export default function CreateTrainee() {
                                 </Field>
 
                                 <Field>
-                                    <FieldLabel>Status</FieldLabel>
+                                    <FieldLabel>Marital Status</FieldLabel>
                                     <Select
                                         value={data.status}
                                         onValueChange={(value) =>
@@ -218,7 +263,7 @@ export default function CreateTrainee() {
                                         }
                                     >
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select status" />
+                                            <SelectValue placeholder="Select Marital Status" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectGroup>
@@ -244,28 +289,50 @@ export default function CreateTrainee() {
                                     )}
                                 </Field>
 
-                                <Field className="xl:col-span-3">
-                                    <FieldLabel>Address</FieldLabel>
-                                    <Textarea
-                                        rows={4}
-                                        value={data.address}
-                                        onChange={(e) =>
-                                            setData('address', e.target.value)
+                                <Field>
+                                    <FieldLabel>Status</FieldLabel>
+                                    <Select
+                                        value={data.suffix}
+                                        onValueChange={(value) =>
+                                            setData('suffix', value)
                                         }
-                                    />
-                                    {errors.address && (
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select Suffix" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                {[
+                                                    'N/A',
+                                                    'Jr.',
+                                                    'Sr.',
+                                                    'II',
+                                                    'III',
+                                                    'IV',
+                                                ].map((label) => (
+                                                    <SelectItem
+                                                        key={label}
+                                                        value={label}
+                                                    >
+                                                        {label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                    {errors.suffix && (
                                         <span className="text-sm text-destructive">
-                                            {errors.address}
+                                            {errors.suffix}
                                         </span>
                                     )}
                                 </Field>
-
                                 <Field>
                                     <FieldLabel>
                                         Emergency Contact Person
                                     </FieldLabel>
                                     <Input
                                         required
+                                        placeholder="Enter Emergency Contact Person"
                                         value={data.emergency_contact_person}
                                         onChange={(e) =>
                                             setData(
@@ -288,6 +355,7 @@ export default function CreateTrainee() {
                                     <Input
                                         required
                                         type="text"
+                                        placeholder="Enter Contact Number"
                                         value={data.emergency_contact_no}
                                         onChange={(e) =>
                                             setData(
@@ -347,6 +415,7 @@ export default function CreateTrainee() {
                                     <Input
                                         type="number"
                                         value={data.height}
+                                        placeholder="Enter Height in cm"
                                         onChange={(e) =>
                                             setData('height', e.target.value)
                                         }
@@ -362,6 +431,7 @@ export default function CreateTrainee() {
                                     <FieldLabel>Weight (kg)</FieldLabel>
                                     <Input
                                         type="number"
+                                        placeholder="Enter Weight in Kg"
                                         value={data.weight}
                                         onChange={(e) =>
                                             setData('weight', e.target.value)
@@ -378,6 +448,7 @@ export default function CreateTrainee() {
                                     <FieldLabel>Identifying Marks</FieldLabel>
                                     <Input
                                         value={data.identifying_marks}
+                                        placeholder="Enter Identifying Marks"
                                         onChange={(e) =>
                                             setData(
                                                 'identifying_marks',
@@ -396,6 +467,7 @@ export default function CreateTrainee() {
                                     <FieldLabel>Eye Color</FieldLabel>
                                     <Input
                                         value={data.eye_color}
+                                        placeholder="Enter Eye Color"
                                         onChange={(e) =>
                                             setData('eye_color', e.target.value)
                                         }
@@ -411,6 +483,7 @@ export default function CreateTrainee() {
                                     <FieldLabel>Hair Color</FieldLabel>
                                     <Input
                                         value={data.hair_color}
+                                        placeholder="Enter Hair Color"
                                         onChange={(e) =>
                                             setData(
                                                 'hair_color',
@@ -424,8 +497,57 @@ export default function CreateTrainee() {
                                         </span>
                                     )}
                                 </Field>
+                                <Field>
+                                    <FieldLabel>Coy</FieldLabel>
+                                    <Select
+                                        value={data.coy}
+                                        onValueChange={(value) =>
+                                            setData('coy', value)
+                                        }
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select Company" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                {[
+                                                    'Alpha',
+                                                    'Bravo',
+                                                    'Charlie',
+                                                    'Delta',
+                                                ].map((label) => (
+                                                    <SelectItem
+                                                        key={label}
+                                                        value={label}
+                                                    >
+                                                        {label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                    {errors.coy && (
+                                        <span className="text-sm text-destructive">
+                                            {errors.coy}
+                                        </span>
+                                    )}
+                                </Field>
                             </div>
-
+                            <Field className="xl:col-span-3">
+                                <FieldLabel>Address</FieldLabel>
+                                <Textarea
+                                    rows={4}
+                                    value={data.address}
+                                    onChange={(e) =>
+                                        setData('address', e.target.value)
+                                    }
+                                />
+                                {errors.address && (
+                                    <span className="text-sm text-destructive">
+                                        {errors.address}
+                                    </span>
+                                )}
+                            </Field>
                             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                                 <Button type="submit" disabled={processing}>
                                     {processing ? 'Submitting...' : 'Submit'}
@@ -435,7 +557,7 @@ export default function CreateTrainee() {
                                     type="button"
                                     onClick={() => reset()}
                                 >
-                                    <Link href='/trainees'>Cancel</Link>
+                                    <Link href="/trainees">Cancel</Link>
                                 </Button>
                             </div>
                         </FieldSet>
