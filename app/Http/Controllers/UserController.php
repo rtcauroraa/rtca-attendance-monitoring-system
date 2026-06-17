@@ -4,23 +4,46 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rules\Password;
+use Inertia\Inertia;
 
 class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Inertia::render('/user');
+        $query = User::query();        
+        // ✅ SERVER-SIDE SEARCH
+        if ($request->search) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->search}%")
+                    ->orWhere('email', 'like', "%{$request->search}%")
+                    ->orWhere('contact_no', 'like', "%{$request->search}%");
+            });
+        }
+
+        $users = $query
+            ->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->withQueryString();
+
+        return Inertia::render('users/user', [
+            'users' => $users,
+            'filters' => [
+                'search' => $request->search ?? '',
+            ],
+        ]);
     }
+    
 
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
-    return Inertia::render('/create-user');
+        return Inertia::render('/create-user');
     }
 
     /**
@@ -28,7 +51,15 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+          $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'password' => ['required', 'confirmed', Password::defaults()],
+            'email' => ['required', 'email', 'max:255', 'unique:trainees,email'],
+        ]);
+
+        User::create($validated);
+
+        return back();
     }
 
     /**
@@ -42,9 +73,10 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(User $user)
+    public function edit($id)
     {
-        //
+       $user = User::findOrFail($id);
+        return Inertia::render('users/edit-user',['user'=>$user]);
     }
 
     /**
@@ -58,8 +90,8 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user)
+    public function destroy($id)
     {
-        //
+        User::where('id', $id)->delete();
     }
 }

@@ -54,10 +54,11 @@ const religions = [
     'Prefer not to say',
 ];
 
-export default function CreateUser() {
+export default function EditUser({ user }: any) {
+    console.log(user);
     const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
-        email: '',
+        name: user?.name,
+        email: user?.email,
         password: '',
         password_confirmation: '',
     });
@@ -170,7 +171,7 @@ export default function CreateUser() {
 
                             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                                 <Button type="submit" disabled={processing}>
-                                    {processing ? 'Submitting...' : 'Submit'}
+                                    {processing ? 'Updating...' : 'Update'}
                                 </Button>
                                 <Button
                                     variant="outline"

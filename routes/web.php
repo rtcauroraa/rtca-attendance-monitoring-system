@@ -10,13 +10,19 @@ use App\Http\Controllers\UserController;
 Route::inertia('/', 'welcome')->name('home');
 
 
-Route::middleware(['auth', 'verified', 'role:Admin'])->group(function () {
-    Route::inertia('/dashboard', 'dashboard')->name('dashboard');
-    Route::inertia('/user', 'users/user')->name('user');
-    Route::inertia('/create-user', 'users/create-user')->name('create-user');
-    Route::inertia('/create-trainee', 'trainees/create-trainee')->name('create-trainee');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::inertia('dashboard', 'dashboard')->name('dashboard');
+    Route::inertia('create-trainee', 'trainees/create-trainee')->name('create-trainee');
+    
+    Route::get('/users', [UserController::class, 'index'])->name('users');
+    Route::inertia('create-user', 'users/create-user')->name('create-user');
+    Route::post('/users', [UserController::class, 'store']);
+    Route::get('/users/{id}/edit',[UserController::class, 'edit']);
+    Route::delete('/users/{id}', [UserController::class, 'destroy']);
+ 
+    // Route::resource('personnels', PersonnelController::class);
+    Route::get('/personnels', [PersonnelController::class, 'index'])->name('personnel');
 
-    Route::resource('personnels', PersonnelController::class);
 
     Route::post('/trainees', [TraineeController::class, 'store'])
         ->name('trainees.store');

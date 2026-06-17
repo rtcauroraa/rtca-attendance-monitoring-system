@@ -24,8 +24,7 @@ class TraineeController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Trainee::query();
-
+        $query = Trainee::query();        
         // ✅ SERVER-SIDE SEARCH
         if ($request->search) {
             $search = $request->search;
