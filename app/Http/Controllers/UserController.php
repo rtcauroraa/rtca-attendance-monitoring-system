@@ -13,8 +13,7 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $query = User::query();
-
+        $query = User::query();        
         // ✅ SERVER-SIDE SEARCH
         if ($request->search) {
             $query->where(function ($q) use ($request) {

@@ -7,6 +7,7 @@ import { columns } from './columns';
 import { useState } from 'react';
 
 export default function User({ users, filters }: any) {
+    console.log(users);
     const [search, setSearch] = useState(filters?.search || '');
 
     // ✅ SERVER SEARCH TRIGGER
@@ -61,7 +62,7 @@ export default function User({ users, filters }: any) {
                 </div>
 
                 {/* TABLE (NO LOCAL FILTERING) */}
-                <DataTable columns={columns} data={users} />
+                <DataTable columns={columns} data={users.data} />
 
                 {/* PAGINATION */}
                 <div className="flex justify-center gap-2 pt-4">

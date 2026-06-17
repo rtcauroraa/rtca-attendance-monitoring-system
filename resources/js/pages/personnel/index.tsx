@@ -83,7 +83,7 @@ export default function Personnel({ personnels, filters }: any) {
                 </div>
 
                 {/* TABLE (NO LOCAL FILTERING) */}
-                <DataTable columns={columns} data={personnels} />
+                <DataTable columns={columns} data={personnels.data} />
 
                 {/* PAGINATION */}
                 <div className="flex justify-center gap-2 pt-4">
