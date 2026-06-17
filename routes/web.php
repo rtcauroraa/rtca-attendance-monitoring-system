@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttendanceController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\PersonnelController;
@@ -17,6 +18,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/users', [UserController::class, 'index'])->name('users');
     Route::inertia('create-user', 'users/create-user')->name('create-user');
     Route::post('/users', [UserController::class, 'store']);
+    Route::put('/users', [UserController::class, 'update']);
     Route::get('/users/{id}/edit',[UserController::class, 'edit']);
     Route::delete('/users/{id}', [UserController::class, 'destroy']);
  
@@ -28,9 +30,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('trainees.store');
     Route::get('/trainees', [TraineeController::class, 'index'])
     ->name('trainees');
+    Route::post('/import-trainees', [TraineeController::class, 'import'])
+    ->name('import-trainees');
     
     // Attendance 
-     Route::inertia('attendance', 'attendance/attendance')->name('attendance');
+     Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance');
      Route::inertia('create-attendance', 'attendance/create-attendance')->name('create-attendance');
 
 

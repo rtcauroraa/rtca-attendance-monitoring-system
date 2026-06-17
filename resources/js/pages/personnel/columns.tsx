@@ -5,6 +5,7 @@ import { formatDateToMilitary } from '@/utils/formatDateToMilitary';
 import imageUtility from '@/utils/imageUtility';
 import { Link, router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
+import { format } from 'date-fns';
 import { EyeIcon, Pencil, Trash2 } from 'lucide-react';
 import { AspectRatio } from 'radix-ui';
 import { toast } from 'sonner';
@@ -90,7 +91,16 @@ export const columns: ColumnDef<Personnel>[] = [
         accessorKey: 'email',
         header: 'Email',
     },
-
+    {
+        accessorKey: 'created_at',
+        header: 'Date Created',
+        cell: ({ row }) => {
+            const dateValue = row.getValue('created_at');
+            return dateValue
+                ? format(new Date(dateValue), 'dd, MMMM yyyy hh:mm a')
+                : 'N/A';
+        },
+    },
     {
         id: 'action',
         header: 'Action',

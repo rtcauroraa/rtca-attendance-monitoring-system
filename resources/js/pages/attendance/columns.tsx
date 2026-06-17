@@ -1,5 +1,6 @@
 'use client';
 import { ColumnDef } from '@tanstack/react-table';
+import { format } from 'date-fns';
 
 export type Attendance = {
     id: number;
@@ -24,11 +25,17 @@ export const columns: ColumnDef<Attendance>[] = [
         header: 'Liberty Status',
     },
     {
-        accessorKey: 'Liberty Status',
-        header: 'liberty_status',
+        accessorKey: 'Reason For Rejection',
+        header: 'reason_for_rejection',
     },
     {
-        accessorKey: 'reason_for_rejection',
-        header: 'Reason For Rejection',
+        accessorKey: 'created_at',
+        header: 'Date Created',
+        cell: ({ row }) => {
+            const dateValue = row.getValue('created_at');
+            return dateValue
+                ? format(new Date(dateValue), 'dd, MMMM yyyy hh:mm a')
+                : 'N/A';
+        },
     },
 ];
