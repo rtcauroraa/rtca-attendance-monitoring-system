@@ -43,7 +43,7 @@ class UserController extends Controller
      */
     public function create()
     {
-    return Inertia::render('/create-user');
+        return Inertia::render('/create-user');
     }
 
     /**
@@ -73,9 +73,10 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(User $user)
+    public function edit($id)
     {
-        //
+       $user = User::findOrFail($id);
+        return Inertia::render('users/edit-user',['user'=>$user]);
     }
 
     /**
