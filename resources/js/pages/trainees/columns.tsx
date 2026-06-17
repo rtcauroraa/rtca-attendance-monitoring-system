@@ -75,10 +75,23 @@ export const columns: ColumnDef<Trainee>[] = [
             );
         },
     },
+
     // {
     //     accessorKey: 'id',
     //     header: 'ID',
     // },
+    {
+        accessorKey: 'id',
+        header: 'Profile',
+        cell: ({ row }) => (
+            <img
+                // src={imageUtility.getProfile(row.original.profile)}
+                src="https://www.pngall.com/wp-content/uploads/5/Profile-PNG-File.png"
+                alt="Photo"
+                className="aspect-square h-20 w-20 rounded-lg border object-cover shadow-sm"
+            />
+        ),
+    },
     {
         accessorKey: 'lastname',
         header: 'Last Name',
