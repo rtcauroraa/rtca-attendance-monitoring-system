@@ -53,13 +53,14 @@ export const columns: ColumnDef<Personnel>[] = [
     {
         accessorKey: 'profile',
         header: 'Profile',
-        // cell: ({ row }) => (
-        //     <img
-        //         src={imageUtility.getProfile(row.original.profile)}
-        //         alt="Photo"
-        //         className="h-20 w-20 aspect-square rounded-lg object-cover border shadow-sm"
-        //     />
-        // ),
+        cell: ({ row }) => (
+            <img
+                // src={imageUtility.getProfile(row.original.profile)}
+                src="https://www.pngall.com/wp-content/uploads/5/Profile-PNG-File.png"
+                alt="Photo"
+                className="aspect-square h-20 w-20 rounded-lg border object-cover shadow-sm"
+            />
+        ),
     },
     {
         accessorKey: 'rank',

@@ -56,7 +56,11 @@ const religions = [
 
 export default function CreateTrainee() {
     const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
+        // name: '',
+        lastname: '',
+        firstname: '',
+        middlename: '',
+        suffix: '',
         birthday: '',
         religion: '',
         contact_no: '',
@@ -73,7 +77,6 @@ export default function CreateTrainee() {
         hair_color: '',
     });
 
- 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -105,6 +108,73 @@ export default function CreateTrainee() {
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
                                 {/* Standard Text Input */}
                                 <Field>
+                                    <FieldLabel>Last Name</FieldLabel>
+                                    <Input
+                                        placeholder="Enter Last Name"
+                                        required
+                                        value={data.lastname}
+                                        onChange={(e) =>
+                                            setData('lastname', e.target.value)
+                                        }
+                                    />
+                                    {errors.lastname && (
+                                        <span className="text-sm text-destructive">
+                                            {errors.lastname}
+                                        </span>
+                                    )}
+                                </Field>
+                                <Field>
+                                    <FieldLabel>First Name</FieldLabel>
+                                    <Input
+                                        placeholder="Enter First Name"
+                                        required
+                                        value={data.firstname}
+                                        onChange={(e) =>
+                                            setData('firstname', e.target.value)
+                                        }
+                                    />
+                                    {errors.firstname && (
+                                        <span className="text-sm text-destructive">
+                                            {errors.firstname}
+                                        </span>
+                                    )}
+                                </Field>
+                                <Field>
+                                    <FieldLabel>Middle Name</FieldLabel>
+                                    <Input
+                                        placeholder="Enter Middle Name"
+                                        required
+                                        value={data.middlename}
+                                        onChange={(e) =>
+                                            setData(
+                                                'middlename',
+                                                e.target.value,
+                                            )
+                                        }
+                                    />
+                                    {errors.middlename && (
+                                        <span className="text-sm text-destructive">
+                                            {errors.middlename}
+                                        </span>
+                                    )}
+                                </Field>
+                                <Field>
+                                    <FieldLabel>Suffix</FieldLabel>
+                                    <Input
+                                        placeholder="Enter Suffix (Jr., Sr., N/A)"
+                                        required
+                                        value={data.suffix}
+                                        onChange={(e) =>
+                                            setData('suffix', e.target.value)
+                                        }
+                                    />
+                                    {errors.suffix && (
+                                        <span className="text-sm text-destructive">
+                                            {errors.suffix}
+                                        </span>
+                                    )}
+                                </Field>
+                                {/* <Field>
                                     <FieldLabel>Name</FieldLabel>
                                     <Input
                                         placeholder="Enter name"
@@ -119,7 +189,7 @@ export default function CreateTrainee() {
                                             {errors.name}
                                         </span>
                                     )}
-                                </Field>
+                                </Field> */}
 
                                 {/* Date Input */}
                                 <Field>
@@ -175,6 +245,7 @@ export default function CreateTrainee() {
                                 <Field>
                                     <FieldLabel>Contact No.</FieldLabel>
                                     <Input
+                                        placeholder="Enter Contact No"
                                         required
                                         type="text" // Kept as text or tel to handle leading zeros safely
                                         value={data.contact_no}
@@ -197,6 +268,7 @@ export default function CreateTrainee() {
                                     <Input
                                         type="email"
                                         required
+                                        placeholder="Enter Email"
                                         value={data.email}
                                         onChange={(e) =>
                                             setData('email', e.target.value)
@@ -248,6 +320,7 @@ export default function CreateTrainee() {
                                     <FieldLabel>Address</FieldLabel>
                                     <Textarea
                                         rows={4}
+                                        placeholder="Enter Address"
                                         value={data.address}
                                         onChange={(e) =>
                                             setData('address', e.target.value)
@@ -265,6 +338,7 @@ export default function CreateTrainee() {
                                         Emergency Contact Person
                                     </FieldLabel>
                                     <Input
+                                        placeholder="Enter Emergency Contact Person"
                                         required
                                         value={data.emergency_contact_person}
                                         onChange={(e) =>
@@ -286,6 +360,7 @@ export default function CreateTrainee() {
                                         Emergency Contact No.
                                     </FieldLabel>
                                     <Input
+                                        placeholder="Enter Emergency Contact No"
                                         required
                                         type="text"
                                         value={data.emergency_contact_no}
@@ -345,6 +420,7 @@ export default function CreateTrainee() {
                                 <Field>
                                     <FieldLabel>Height (cm)</FieldLabel>
                                     <Input
+                                        placeholder="Enter Height (cm)"
                                         type="number"
                                         value={data.height}
                                         onChange={(e) =>
@@ -362,6 +438,7 @@ export default function CreateTrainee() {
                                     <FieldLabel>Weight (kg)</FieldLabel>
                                     <Input
                                         type="number"
+                                        placeholder="Enter Height (kg)"
                                         value={data.weight}
                                         onChange={(e) =>
                                             setData('weight', e.target.value)
@@ -378,6 +455,7 @@ export default function CreateTrainee() {
                                     <FieldLabel>Identifying Marks</FieldLabel>
                                     <Input
                                         value={data.identifying_marks}
+                                        placeholder="Enter Identifyng Marks"
                                         onChange={(e) =>
                                             setData(
                                                 'identifying_marks',
@@ -395,6 +473,7 @@ export default function CreateTrainee() {
                                 <Field>
                                     <FieldLabel>Eye Color</FieldLabel>
                                     <Input
+                                        placeholder="Eye Color"
                                         value={data.eye_color}
                                         onChange={(e) =>
                                             setData('eye_color', e.target.value)
@@ -410,6 +489,7 @@ export default function CreateTrainee() {
                                 <Field>
                                     <FieldLabel>Hair Color</FieldLabel>
                                     <Input
+                                        placeholder="Enter Hair Color"
                                         value={data.hair_color}
                                         onChange={(e) =>
                                             setData(
@@ -435,7 +515,7 @@ export default function CreateTrainee() {
                                     type="button"
                                     onClick={() => reset()}
                                 >
-                                    <Link href='/trainees'>Cancel</Link>
+                                    <Link href="/trainees">Cancel</Link>
                                 </Button>
                             </div>
                         </FieldSet>
