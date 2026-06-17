@@ -4,16 +4,39 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Inertia::render('/user');
+        $query = User::query();
+
+        // ✅ SERVER-SIDE SEARCH
+        if ($request->search) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->search}%")
+                    ->orWhere('email', 'like', "%{$request->search}%")
+                    ->orWhere('contact_no', 'like', "%{$request->search}%");
+            });
+        }
+
+        $users = $query
+            ->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->withQueryString();
+
+        return Inertia::render('users/user', [
+            'users' => $users,
+            'filters' => [
+                'search' => $request->search ?? '',
+            ],
+        ]);
     }
+    
 
     /**
      * Show the form for creating a new resource.

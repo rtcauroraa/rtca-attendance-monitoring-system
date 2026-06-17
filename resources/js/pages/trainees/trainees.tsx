@@ -66,7 +66,7 @@ export default function Trainee({ trainees, filters }: any) {
                 <div className="flex justify-between">
                     <div className="flex items-center gap-5">
                         <Input
-                            placeholder="Search trainees..."
+                            placeholder="Search Trainee..."
                             value={search}
                             onChange={(e) => handleSearch(e.target.value)}
                             className="max-w-sm"

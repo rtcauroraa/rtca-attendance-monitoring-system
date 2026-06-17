@@ -27,75 +27,49 @@ import { AspectRatio } from 'radix-ui';
 
 export const columns: ColumnDef<Personnel>[] = [
     {
-    accessorKey: 'profile',
-    header: 'Profile',
-    cell: ({ row }) => (
-        <img
-            src={imageUtility.getProfile(row.original.profile)}
-            alt="Photo"
-            className="h-20 w-20 aspect-square rounded-lg object-cover border shadow-sm"
-        />
-    ),
-},
+        accessorKey: 'profile',
+        header: 'Profile',
+        // cell: ({ row }) => (
+        //     <img
+        //         src={imageUtility.getProfile(row.original.profile)}
+        //         alt="Photo"
+        //         className="h-20 w-20 aspect-square rounded-lg object-cover border shadow-sm"
+        //     />
+        // ),
+    },
     {
         accessorKey: 'rank',
         header: 'Rank',
-         cell: ({ row }) => row.original.rank?.rankCode
+        // cell: ({ row }) => row.original.rank?.rankCode,
     },
     {
-        accessorKey: 'lastName',
+        accessorKey: 'lastname',
         header: 'Last Name',
     },
-     {
-        accessorKey: 'firstName',
+    {
+        accessorKey: 'firstname',
         header: 'First Name',
     },
-     {
-        accessorKey: 'middleName',
+    {
+        accessorKey: 'middlename',
         header: 'Middle Name',
+    },
+    {
+        accessorKey: 'suffix',
+        header: 'Suffix',
+    },
+    {
+        accessorKey: 'serialno',
+        header: 'Serial No',
+        cell: ({ row }) => `${row.original.serialno} PCG`,
     },
     {
         accessorKey: 'email',
         header: 'Email',
     },
-    {
-        accessorKey: 'contact_no',
-        header: 'Contact No',
-    },
+
     {
         accessorKey: 'status',
         header: 'Status',
-    },
-    {
-        accessorKey: 'blood_type',
-        header: 'Blood Type',
-    },
-    {
-        accessorKey: 'birthday',
-        header: 'Birthday',
-        cell: ({ row }) => {
-            return formatDateToMilitary(row.original.birthday);
-        },
-    },
-    {
-        id: 'physical',
-        header: 'Physical',
-        cell: ({ row }) => {
-            return `${row.original.height} cm / ${row.original.weight} kg`;
-        },
-    },
-    {
-        id: 'emergency',
-        header: 'Emergency Contact',
-        cell: ({ row }) => {
-            return (
-                <div>
-                    <div>{row.original.emergencyContactPerson}</div>
-                    <div className="text-xs text-gray-500">
-                        {row.original.emergencyContactNo}
-                    </div>
-                </div>
-            );
-        },
     },
 ];

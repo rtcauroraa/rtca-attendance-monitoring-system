@@ -11,11 +11,38 @@ class PersonnelController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-          return Inertia::render('personnel/index', [
-            'personnels' => Personnel::latest()->get(),
+        //   return Inertia::render('personnel/index', [
+        //     'personnels' => Personnel::latest()->get(),
+        // ]);
+
+        $query = Personnel::query();
+        // $personnels = Personnel::latest()->get();
+
+        // ✅ SERVER-SIDE SEARCH
+        if ($request->search) {
+            $query = Personnel::query();
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', "%{$request->search}%")
+                    ->orWhere('email', 'like', "%{$request->search}%")
+                    ->orWhere('contact_no', 'like', "%{$request->search}%");
+            });      
+        }
+
+        $personnels = $query
+            ->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->withQueryString();
+
+        
+        return Inertia::render('personnel/index', [
+            'personnels' => $personnels,
+            'filters' => [
+                'search' => $request->search ?? '',
+            ],
         ]);
+
     }
 
     /**

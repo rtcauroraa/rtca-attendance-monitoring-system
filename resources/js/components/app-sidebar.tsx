@@ -13,7 +13,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard, trainees, user, attendance, scanner } from '@/routes';
+import { dashboard, trainees, attendance, scanner, personnel } from '@/routes';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
@@ -24,7 +24,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Users',
-        href: user(),
+        href: '/users',
         icon: User,
     },
 
@@ -33,14 +33,15 @@ const mainNavItems: NavItem[] = [
         href: trainees(),
         icon: User,
     },
+
     {
-        title: 'Attendance',
-        href: attendance(),
+        title: 'Personnel',
+        href: personnel(),
         icon: User,
     },
     {
-        title: 'Personnel',
-        href: '/personnels',
+        title: 'Attendance',
+        href: attendance(),
         icon: User,
     },
 ];

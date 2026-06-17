@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\PersonnelController;
 use App\Http\Controllers\TraineeController;
+use App\Http\Controllers\UserController;
 
 Route::inertia('/', 'welcome')->name('home');
 Route::inertia('scanner', 'scanner')->name('scanner');
@@ -11,11 +12,14 @@ Route::inertia('scanner', 'scanner')->name('scanner');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
-    Route::inertia('user', 'users/user')->name('user');
     Route::inertia('create-user', 'users/create-user')->name('create-user');
     Route::inertia('create-trainee', 'trainees/create-trainee')->name('create-trainee');
+    
+    Route::get('/users', [UserController::class, 'index'])->name('users');
+ 
+    // Route::resource('personnels', PersonnelController::class);
+    Route::get('/personnels', [PersonnelController::class, 'index'])->name('personnel');
 
-    Route::resource('personnels', PersonnelController::class);
 
     Route::post('/trainees', [TraineeController::class, 'store'])
         ->name('trainees.store');

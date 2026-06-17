@@ -1,7 +1,8 @@
 import { DataTable } from '@/components/ui/data-table';
 import PersonnelService from '@/services/personnel-service';
-import { Link, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { useQuery } from '@tanstack/react-query';
+import { personnel } from '@/routes';
 import {
     Key,
     ReactElement,
@@ -13,71 +14,99 @@ import {
 import { columns } from './columns';
 import SaveDialog from './save-dialog';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
-export default function Index() {
+export default function Personnel({ personnels, filters }: any) {
+    const [search, setSearch] = useState(filters?.search || '');
 
-    const [openSaveDialog,setOpenSaveDialog] = useState<boolean>(false)
-    const { data: personnels } = useQuery({
-        queryKey: ["personnels"],
-        queryFn: PersonnelService.GetAll,
-        initialData: []
-    })
+    // ✅ SERVER SEARCH TRIGGER
+    const handleSearch = (value: string) => {
+        setSearch(value);
 
+        router.get(
+            '/personnels',
+            { search: value },
+            {
+                preserveState: true,
+                replace: true,
+            },
+        );
+    };
 
+    const [openSaveDialog, setOpenSaveDialog] = useState<boolean>(false);
+    // const { data: personnels } = useQuery({
+    //     queryKey: ['personnels'],
+    //     queryFn: PersonnelService.GetAll,
+    //     initialData: [],
+    // });
 
     return (
-        <div className="p-6">
-            <h1 className="mb-4 text-2xl font-bold">Manage Personnel</h1>
+        <>
+            <Head title="Personnels" />
 
-<SaveDialog open={openSaveDialog}/>
-            <Button
-             onClick={()=>setOpenSaveDialog(true)}
-            >
-                Create Personnel
-            </Button>
-            <DataTable columns={columns} data={personnels} 
-            globalFilter={''} setGlobalFilter={function (value: string): void {
-                throw new Error('Function not implemented.');
-            }} />
-            {/* <table className="mt-4 w-full border">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>RANK</th>
-                        <th>LASTNAME</th>
-                        <th>FIRSTNAME</th>
-                        <th>MIDDLENAME</th>
-                        <th>SERIAL NO</th>
-                        <th>DUTY STATUS</th>
-                        <th>EMAIL</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
+            <div className="flex flex-col gap-4 p-4">
+                {/* SEARCH */}
+                <div className="flex justify-between">
+                    <div className="flex items-center gap-5">
+                        <Input
+                            placeholder="Search Personnel..."
+                            value={search}
+                            onChange={(e) => handleSearch(e.target.value)}
+                            className="max-w-sm"
+                        />
+                        {/* <input
+                            type="file"
+                            accept=".csv"
+                            ref={fileInputRef}
+                            onChange={handleFileChange}
+                            className="hidden"
+                        />
+                        <Button
+                            className="cursor-pointer"
+                            type="button"
+                            disabled={processing}
+                            onClick={handleButtonClick}
+                        >
+                            {processing
+                                ? 'Processing Import...'
+                                : ' Import CSV'}
+                        </Button>  */}
+                    </div>
 
-                <tbody>
-                    {personnels.map((personnel: any) => (
-                        <tr key={personnel.id}>
-                            <td>{personnel.id}</td>
-                            <td>{personnel.rank}</td>
-                            <td>{personnel.lastname}</td>
-                            <td>{personnel.firstname}</td>
-                            <td>{personnel.middlename}</td>
-                            <td>{personnel.serialno} PCG</td>
-                            <td>{personnel.duty_status}</td>
-                            <td>{personnel.email}</td>
-                            <td>
-                                <Link
-                                    href={`/personnels/${personnel.id}/edit`}
-                                    className="mr-2 text-blue-500"
-                                >
-                                    Edit
-                                </Link>
+                    <div>
+                        <SaveDialog open={openSaveDialog} />
+                        <Button onClick={() => setOpenSaveDialog(true)}>
+                            Add Personnel
+                        </Button>
+                        {/* <Link href="/create-trainee">Add Trainee</Link> */}
+                    </div>
+                </div>
 
-                            </td>
-                        </tr>
+                {/* TABLE (NO LOCAL FILTERING) */}
+                <DataTable columns={columns} data={personnels} />
+
+                {/* PAGINATION */}
+                <div className="flex justify-center gap-2 pt-4">
+                    {personnels.links.map((link: any, i: number) => (
+                        <Link
+                            key={i}
+                            href={link.url ?? ''}
+                            className={`rounded border px-3 py-1 ${
+                                link.active ? 'bg-black text-white' : ''
+                            }`}
+                            dangerouslySetInnerHTML={{ __html: link.label }}
+                        />
                     ))}
-                </tbody>
-            </table> */}
-        </div>
+                </div>
+            </div>
+        </>
     );
 }
+Personnel.layout = {
+    breadcrumbs: [
+        {
+            title: 'Manage Personnels',
+            href: personnel(),
+        },
+    ],
+};
