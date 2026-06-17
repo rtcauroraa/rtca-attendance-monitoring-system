@@ -1,27 +1,69 @@
-import React, { Component, useState } from 'react';
+import React, { Component, useRef, useState } from 'react';
 import { Scanner, useDevices } from '@yudiel/react-qr-scanner';
 import QRCode from 'react-qr-code';
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import { router } from '@inertiajs/react';
 
 export default function scanner() {
-    const handleScan = (detectedCodes: any) => {
-        console.log('Detected codes:', detectedCodes);
-        // detectedCodes is an array of IDetectedBarcode objects
-        detectedCodes.forEach((code: any) => {
-            console.log(`Format: ${code.format}, Value: ${code.rawValue}`);
-        });
+    const [modalOpen, setModalOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [person, setPerson] = useState<any>(null);
+    const [type, setType] = useState<string | null>(null);
+    const scanLockRef = useRef(false);
+    const [scannerKey, setScannerKey] = useState(0);
+    const lastQRRef = useRef<string | null>(null);
+    const handleScan = (results: any) => {
+        const raw = results?.[0]?.rawValue;
+        if (!raw) return;
+
+        if (scanLockRef.current) return; // 🔥 HARD BLOCK
+        if (lastQRRef.current === raw) return;
+        lastQRRef.current = raw;
+        scanLockRef.current = true; // LOCK IMMEDIATELY
+
+        const [type, id] = raw.split('_');
+
+        router.get(
+            `/scan/${type}/${id}`,
+            {},
+            {
+                preserveState: true,
+                preserveScroll: true,
+                onSuccess: (page) => {
+                    setPerson(page.props.data);
+                    setType(type);
+                    setModalOpen(true);
+                },
+            },
+        );
+    };
+    const closeModal = () => {
+        setModalOpen(false);
+        setPerson(null);
+        setType(null);
+
+        scanLockRef.current = false;
+
+        lastQRRef.current = null;
+
+        setTimeout(() => {
+            setScannerKey((prev) => prev + 1); // 🔥 fully resets scanner engine
+        }, 300);
     };
 
-    // 1. Declare the state variable
-    const [text, setText] = useState('');
-
-    // 2. Handle the change event
-    const handleChange = (event: any) => {
-        setText(event.target.value);
-    };
-
-    const devices = useDevices();
     const [selectedDevice, setSelectedDevice] = useState(null);
     const highlightCodeOnCanvas = (detectedCodes: any, ctx: any) => {
         detectedCodes.forEach((detectedCode: any) => {
@@ -47,58 +89,66 @@ export default function scanner() {
         });
     };
     return (
-        <div>
-            <h1>QR CODE Scanner</h1>
-            <div className="mx-auto my-4 mb-2 max-w-sm rounded-lg bg-white p-6 text-black shadow-md">
-                <select onChange={(e) => setSelectedDevice(e.target.value)}>
-                    <option value="">Select a camera</option>
-                    {devices.map((device) => (
-                        <option key={device.deviceId} value={device.deviceId}>
-                            {device.label || `Camera ${device.deviceId}`}
-                        </option>
-                    ))}
-                </select>
+        <div className="flex min-h-screen items-center justify-center bg-gray-100">
+            <div className="m-5 mt-[-50px] w-full max-w-sm rounded-lg bg-white p-6 text-black shadow-md">
+                <AlertDialog open={modalOpen} onOpenChange={setModalOpen}>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>
+                                {loading
+                                    ? 'Loading...'
+                                    : person
+                                      ? `CCGNO ${person.first_name ?? ''} ${person.middle_name ?? ''} ${person.last_name ?? ''}`.trim()
+                                      : 'No Data Found'}
+                            </AlertDialogTitle>
 
-                <Scanner
-                    onScan={(result) => console.log(result)}
-                    onError={(error) => console.error(error)}
-                    components={{
-                        tracker: highlightCodeOnCanvas,
-                        finder: false,
-                    }}
-                    constraints={{
-                        deviceId: selectedDevice,
-                    }}
-                />
-                {/* <Scanner
-                    onScan={handleScan}
-                    onError={(error) => console.error(error)}
-                    components={{
-                        tracker: highlightCodeOnCanvas,
-                        finder: false,
-                    }}
-                /> */}
-            </div>
+                            <AlertDialogDescription>
+                                {type === 'Trainee' && 'Select action below.'}
+                                {type === 'Personnel' &&
+                                    'Personnel record detected.'}
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
 
-            <h1>QR CODE Generator</h1>
-            <div className="bg-white px-2 py-2 text-black">
-                <Field>
-                    <FieldLabel htmlFor="input-field-qrcodeinput">
-                        Enter Text
-                    </FieldLabel>
-                    <Input
-                        id="input-field-qrcodeinput"
-                        type="text"
-                        value={text}
-                        onChange={handleChange}
-                        placeholder="Enter your qrcodeinput"
+                        {!loading && person && (
+                            <div className="flex flex-col gap-2 py-2">
+                                {type === 'Trainee' && (
+                                    <>
+                                        <Button>LIBERTY</Button>
+                                        <Button>LEAVE</Button>
+                                        <Button>OB</Button>
+                                        <Button variant="outline">
+                                            VIEW PROFILE
+                                        </Button>
+                                    </>
+                                )}
+
+                                {type === 'Personnel' && (
+                                    <Button variant="outline">
+                                        VIEW PROFILE
+                                    </Button>
+                                )}
+                            </div>
+                        )}
+
+                        <AlertDialogFooter>
+                            <AlertDialogCancel onClick={closeModal}>
+                                Close
+                            </AlertDialogCancel>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+                <div className="flex justify-center">
+                    <Scanner
+                        onScan={handleScan}
+                        key={scannerKey}
+                        onError={(error) => console.error(error)}
+                        components={{
+                            tracker: highlightCodeOnCanvas,
+                            finder: false,
+                        }}
+                        constraints={{ deviceId: selectedDevice }}
                     />
-                    <FieldDescription>
-                        Please enter text for QR CODE generator.
-                    </FieldDescription>
-                </Field>
-
-                <QRCode value={text} />
+                </div>
             </div>
         </div>
     );

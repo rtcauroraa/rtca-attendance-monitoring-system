@@ -3,17 +3,18 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\PersonnelController;
+use App\Http\Controllers\ScanController;
 use App\Http\Controllers\TraineeController;
+use App\Http\Controllers\UserController;
 
 Route::inertia('/', 'welcome')->name('home');
-Route::inertia('scanner', 'scanner')->name('scanner');
 
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'dashboard')->name('dashboard');
-    Route::inertia('user', 'users/user')->name('user');
-    Route::inertia('create-user', 'users/create-user')->name('create-user');
-    Route::inertia('create-trainee', 'trainees/create-trainee')->name('create-trainee');
+Route::middleware(['auth', 'verified', 'role:Admin'])->group(function () {
+    Route::inertia('/dashboard', 'dashboard')->name('dashboard');
+    Route::inertia('/user', 'users/user')->name('user');
+    Route::inertia('/create-user', 'users/create-user')->name('create-user');
+    Route::inertia('/create-trainee', 'trainees/create-trainee')->name('create-trainee');
 
     Route::resource('personnels', PersonnelController::class);
 
@@ -28,9 +29,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/trainees/{trainee}/delete', [TraineeController::class, 'destroy'])
         ->name('trainees.destroy');
     Route::post('/import-trainees', [TraineeController::class, 'storeCSV']);
-    
+
     Route::inertia('attendance', 'attendance/attendance')->name('attendance');
     Route::inertia('create-attendance', 'attendance/create-attendance')->name('create-attendance');
 });
+
+Route::middleware(['auth', 'verified', 'role:User'])->group(function () {
+    Route::inertia('/scanner', 'scanner')->name('scanner');
+    Route::get('/scan/{type}/{id}', [ScanController::class, 'qr_code'])
+        ->name('scan.show');
+});
+
 
 require __DIR__ . '/settings.php';
