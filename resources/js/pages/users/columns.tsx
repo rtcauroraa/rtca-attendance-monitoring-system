@@ -34,7 +34,7 @@ const handleDelete = (id: number) => {
         action: {
             label: 'Yes',
             onClick: () => {
-                router.delete(`/users/${id}/delete`, {
+                router.delete(`/users/${id}`, {
                     onSuccess: () => {
                         toast.success('User deleted successfully.');
                     },

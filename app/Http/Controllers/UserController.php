@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 
 class UserController extends Controller
@@ -50,7 +51,15 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+          $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'password' => ['required', 'confirmed', Password::defaults()],
+            'email' => ['required', 'email', 'max:255', 'unique:trainees,email'],
+        ]);
+
+        User::create($validated);
+
+        return back();
     }
 
     /**
@@ -80,8 +89,8 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user)
+    public function destroy($id)
     {
-        //
+        User::where('id', $id)->delete();
     }
 }

@@ -16,6 +16,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('create-trainee', 'trainees/create-trainee')->name('create-trainee');
     
     Route::get('/users', [UserController::class, 'index'])->name('users');
+    Route::post('/users', [UserController::class, 'store']);
+    Route::delete('/users/{id}', [UserController::class, 'destroy']);
  
     // Route::resource('personnels', PersonnelController::class);
     Route::get('/personnels', [PersonnelController::class, 'index'])->name('personnel');
