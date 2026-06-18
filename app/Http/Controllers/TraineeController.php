@@ -40,7 +40,7 @@ class TraineeController extends Controller
         }
 
         $trainees = $query
-            ->orderBy('created_at', 'desc')
+        ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->withQueryString();
 
@@ -119,7 +119,7 @@ class TraineeController extends Controller
             size: 300,
             margin: 10,
             roundBlockSizeMode: RoundBlockSizeMode::Margin,
-            logoPath: public_path('rtc-aurora-logo'),
+            logoPath: public_path('rtc-aurora-logo.png'),
             logoResizeToWidth: 50,
             logoPunchoutBackground: true,
             labelText: $validated['serial_number'],
@@ -245,7 +245,37 @@ class TraineeController extends Controller
             'hair_color' => 'required|string',
         ]);
 
-        $trainee->update($validated);
+          $builder = new Builder(
+            writer: new PngWriter(),
+            writerOptions: [],
+            validateResult: false,
+            data: 'Trainee_' . $validated['serial_number'],
+            encoding: new Encoding('UTF-8'),
+            errorCorrectionLevel: ErrorCorrectionLevel::High,
+            size: 300,
+            margin: 10,
+            roundBlockSizeMode: RoundBlockSizeMode::Margin,
+            logoPath: public_path('rtc-aurora-logo.png'),
+            logoResizeToWidth: 50,
+            logoPunchoutBackground: true,
+            labelText: $validated['serial_number'],
+            labelFont: new OpenSans(20),
+            labelAlignment: LabelAlignment::Center
+        );
+
+        $result = $builder->build();
+
+        $filename = 'qrcodes/PCG-Class-119/' . $validated['serial_number'] . '.png';
+
+        Storage::disk('public')->put(
+            $filename,
+            $result->getString()
+        );
+    
+        $trainee->update([
+             ...$validated,
+            'qr_code' => $filename, // SAVE TO DB
+        ]);
 
         return back();
     }
