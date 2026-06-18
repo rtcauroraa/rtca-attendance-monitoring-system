@@ -28,7 +28,8 @@ class AttendanceController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->withQueryString();
-      
+
+        
         return Inertia::render('attendance/attendance', [
             'attendance' => $attendance,
             'filters' => [

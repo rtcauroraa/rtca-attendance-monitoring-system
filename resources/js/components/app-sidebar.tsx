@@ -20,7 +20,14 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard, trainees, attendance, scanner, personnel } from '@/routes';
+import {
+    dashboard,
+    trainees,
+    attendance,
+    scanner,
+    personnel,
+    users,
+} from '@/routes';
 import type { NavItem } from '@/types';
 import { usePage } from '@inertiajs/react';
 
@@ -54,7 +61,7 @@ export function AppSidebar() {
                   },
                   {
                       title: 'Users',
-                      href: '/user',
+                      href: users(),
                       icon: User,
                   },
                   {

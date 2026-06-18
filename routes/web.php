@@ -37,7 +37,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('trainees.destroy');
     Route::post('/import-trainees', [TraineeController::class, 'storeCSV']);
 
-    Route::inertia('attendance', 'attendance/attendance')->name('attendance');
+    Route::get('/attendance',[AttendanceController::class,'index'])->name('attendance');
     Route::inertia('create-attendance', 'attendance/create-attendance')->name('create-attendance');
 });
 
