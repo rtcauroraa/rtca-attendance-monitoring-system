@@ -5,6 +5,7 @@ import { formatDateToMilitary } from '@/utils/formatDateToMilitary';
 import imageUtility from '@/utils/imageUtility';
 import { Link, router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
+import { format } from 'date-fns';
 import { EyeIcon, Pencil, Trash2 } from 'lucide-react';
 import { AspectRatio } from 'radix-ui';
 import { toast } from 'sonner';
@@ -52,13 +53,14 @@ export const columns: ColumnDef<Personnel>[] = [
     {
         accessorKey: 'profile',
         header: 'Profile',
-        // cell: ({ row }) => (
-        //     <img
-        //         src={imageUtility.getProfile(row.original.profile)}
-        //         alt="Photo"
-        //         className="h-20 w-20 aspect-square rounded-lg object-cover border shadow-sm"
-        //     />
-        // ),
+        cell: ({ row }) => (
+            <img
+                // src={imageUtility.getProfile(row.original.profile)}
+                src="https://www.pngall.com/wp-content/uploads/5/Profile-PNG-File.png"
+                alt="Photo"
+                className="aspect-square h-20 w-20 rounded-lg border object-cover shadow-sm"
+            />
+        ),
     },
     {
         accessorKey: 'rank',
@@ -90,7 +92,16 @@ export const columns: ColumnDef<Personnel>[] = [
         accessorKey: 'email',
         header: 'Email',
     },
-
+    {
+        accessorKey: 'created_at',
+        header: 'Date Created',
+        cell: ({ row }) => {
+            const dateValue = row.getValue('created_at');
+            return dateValue
+                ? format(new Date(dateValue), 'dd, MMMM yyyy hh:mm a')
+                : 'N/A';
+        },
+    },
     {
         id: 'action',
         header: 'Action',

@@ -28,7 +28,6 @@ class TraineeController extends Controller
         // ✅ SERVER-SIDE SEARCH
         if ($request->search) {
             $search = $request->search;
-
             $query->where(function ($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
                     ->orWhere('middle_name', 'like', "%{$search}%")
@@ -142,6 +141,54 @@ class TraineeController extends Controller
             'qr_code' => $filename, // SAVE TO DB
         ]);
         return back();
+    }
+
+    public function import(Request $request)
+    {
+        // 1. Validate that the uploaded file is indeed a CSV
+        $request->validate([
+            'csv_file' => 'required|file|mimes:csv,txt|max:2048',
+        ]);
+
+        // 2. Retrieve the file
+        $file = $request->file('csv_file');
+
+        // 3. Parse the CSV using PHP's native fgetcsv
+        if (($handle = fopen($file->getRealPath(), 'r')) !== false) {
+            // Skip the header row if your CSV has one
+            fgetcsv($handle); 
+
+            while (($row = fgetcsv($handle)) !== false) {
+                // Map columns and insert/update your Trainee model
+            $fullname = $row[0] . " " . $row[1] . " " . $row[2];
+        
+            Trainee::create([
+                'lastname' => $row[0],
+                'firstname' => $row[1],
+                'middlename' => $row[2],
+                'suffix' => $row[3],
+                'birthday' => $row[4],
+                'religion' => $row[5],
+                 'address' => $row[6],
+                'contact_no' => $row[7],
+                'emergency_contact_person' => $row[8],
+                'email' => $row[9],
+                'emergency_contact_no' =>  $row[7],
+                'status' => $row[10],
+                'company' => $row[11],
+                'blood_type' =>  $row[12],
+                'height' =>  $row[13],
+                'weight' =>  $row[14],
+                'identifying_marks' => $row[15],
+                'eye_color' => $row[16],
+                'hair_color' => $row[17],
+            ]);
+            }
+            fclose($handle);
+        }
+
+        // 4. Return an appropriate Inertia response or redirect
+        return redirect()->back()->with('success', 'Trainees imported successfully.');
     }
 
 

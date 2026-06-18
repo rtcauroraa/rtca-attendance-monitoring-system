@@ -56,7 +56,8 @@ const religions = [
 
 export default function EditUser({ user }: any) {
     console.log(user);
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { data, setData, put, processing, errors, reset } = useForm({
+        id: user?.id,
         name: user?.name,
         email: user?.email,
         password: '',
@@ -66,9 +67,9 @@ export default function EditUser({ user }: any) {
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        post('/users', {
+        put('/users', {
             onSuccess: () => {
-                toast.success('User has been created successfully.', {
+                toast.success('User has been updated successfully.', {
                     description: formattedDateTime,
                     duration: 4000,
                     position: 'top-center',
@@ -93,6 +94,13 @@ export default function EditUser({ user }: any) {
                             </FieldLegend>
 
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+                                <Input
+                                    hidden
+                                    value={data.id}
+                                    onChange={(e) =>
+                                        setData('id', e.target.value)
+                                    }
+                                />
                                 {/* Standard Text Input */}
                                 <Field>
                                     <FieldLabel>Name</FieldLabel>
@@ -135,7 +143,6 @@ export default function EditUser({ user }: any) {
                                     <Input
                                         placeholder="Enter Password"
                                         type="password"
-                                        required
                                         value={data.password}
                                         onChange={(e) =>
                                             setData('password', e.target.value)
@@ -152,7 +159,6 @@ export default function EditUser({ user }: any) {
                                     <Input
                                         placeholder="Enter Confirm Password"
                                         type="password"
-                                        required
                                         value={data.password_confirmation}
                                         onChange={(e) =>
                                             setData(

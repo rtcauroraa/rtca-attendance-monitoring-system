@@ -20,6 +20,7 @@ class Trainee extends Model
         'status',
         'coy',
         'address',
+        'company',
         'emergency_contact_person',
         'emergency_contact_no',
         'blood_type',

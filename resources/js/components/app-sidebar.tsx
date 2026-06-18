@@ -24,7 +24,6 @@ import { dashboard, trainees, attendance, scanner, personnel } from '@/routes';
 import type { NavItem } from '@/types';
 import { usePage } from '@inertiajs/react';
 
-
 const footerNavItems: NavItem[] = [
     {
         title: 'Repository',
@@ -42,8 +41,8 @@ export function AppSidebar() {
     const { auth } = usePage().props as any;
 
     const roles = auth?.user?.roles ?? [];
-    const isUser = roles[0].name === 'User';
-    const isAdmin = roles[0].name === 'Admin';
+    const isUser = roles[0]?.name === 'User';
+    const isAdmin = roles[0]?.name === 'Admin';
 
     const mainNavItems: NavItem[] = [
         ...(isAdmin

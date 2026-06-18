@@ -9,7 +9,6 @@ return new class extends Migration {
     {
         Schema::create('trainees', function (Blueprint $table) {
             $table->id();
-
             $table->string('first_name');
             $table->string('middle_name');
             $table->string('last_name');
@@ -26,6 +25,12 @@ return new class extends Migration {
 
             $table->string('emergency_contact_person')->nullable();
             $table->string('emergency_contact_no')->nullable();
+
+            $table->string('lastname')->nullable();
+            $table->string('firstname')->nullable();
+            $table->string('middlename')->nullable();
+            $table->string('suffix')->nullable();
+            $table->string('company')->nullable();
 
             $table->string('blood_type')->nullable();
             $table->string('height')->nullable();

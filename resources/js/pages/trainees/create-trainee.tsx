@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 
-const options = {
+const options: any = {
     month: 'long',
     day: 'numeric',
     year: 'numeric',
@@ -265,8 +265,8 @@ export default function CreateTrainee() {
                                     <FieldLabel>Email</FieldLabel>
                                     <Input
                                         type="email"
-                                        placeholder="name@example.com"
                                         required
+                                        placeholder="Enter Email"
                                         value={data.email}
                                         onChange={(e) =>
                                             setData('email', e.target.value)
@@ -356,11 +356,11 @@ export default function CreateTrainee() {
                                         Emergency Contact Person
                                     </FieldLabel>
                                     <Input
+                                        placeholder="Enter Emergency Contact Person"
                                         required
                                         maxLength={11}
                                         pattern="[0-9]{11}"
                                         inputMode="numeric"
-                                        placeholder="Enter Emergency Contact Person"
                                         value={data.emergency_contact_person}
                                         onChange={(e) =>
                                             setData(
@@ -381,9 +381,9 @@ export default function CreateTrainee() {
                                         Emergency Contact No.
                                     </FieldLabel>
                                     <Input
+                                        placeholder="Enter Emergency Contact No"
                                         required
                                         type="text"
-                                        placeholder="Enter Contact Number"
                                         value={data.emergency_contact_no}
                                         onChange={(e) =>
                                             setData(
@@ -441,9 +441,9 @@ export default function CreateTrainee() {
                                 <Field>
                                     <FieldLabel>Height (cm)</FieldLabel>
                                     <Input
+                                        placeholder="Enter Height (cm)"
                                         type="number"
                                         value={data.height}
-                                        placeholder="Enter Height in cm"
                                         onChange={(e) =>
                                             setData('height', e.target.value)
                                         }
@@ -510,8 +510,8 @@ export default function CreateTrainee() {
                                 <Field>
                                     <FieldLabel>Hair Color</FieldLabel>
                                     <Input
-                                        value={data.hair_color}
                                         placeholder="Enter Hair Color"
+                                        value={data.hair_color}
                                         onChange={(e) =>
                                             setData(
                                                 'hair_color',

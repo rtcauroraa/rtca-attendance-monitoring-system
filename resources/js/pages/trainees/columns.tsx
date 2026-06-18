@@ -43,6 +43,7 @@ const capitalize = (value: string) =>
 
 export const columns: ColumnDef<Trainee>[] = [
     {
+<<<<<<< HEAD
         id: 'full_name',
         header: 'Name',
         cell: ({ row }) => {
@@ -64,6 +65,57 @@ export const columns: ColumnDef<Trainee>[] = [
                 </div>
             );
         },
+=======
+        id: 'action',
+        header: 'Action',
+        cell: ({ row }) => {
+            return (
+                <div className="flex items-center gap-3">
+                    <Link
+                        href={`trainees/${row.original.id}/edit`}
+                        className="text-green-600 hover:text-green-800"
+                    >
+                        <EyeIcon size={14} />
+                    </Link>
+                    <Link
+                        href={`trainees/${row.original.id}/edit`}
+                        className="text-blue-600 hover:text-blue-800"
+                    >
+                        <Pencil size={14} />
+                    </Link>
+                    <Link
+                        onClick={() => handleDelete(row.original.id)}
+                        className="text-red-600 hover:text-red-800"
+                    >
+                        <Trash2 size={14} />
+                    </Link>
+                </div>
+            );
+        },
+    },
+    // {
+    //     accessorKey: 'id',
+    //     header: 'ID',
+    // },
+    {
+        accessorKey: 'lastname',
+        header: 'Last Name',
+    },
+    {
+        accessorKey: 'firstname',
+        header: 'First Name',
+    },
+    {
+        accessorKey: 'middlename',
+        header: 'Middle Name',
+    },
+    {
+        accessorKey: 'suffix',
+        header: 'Suffix',
+        cell: ({ row }) => {
+            return `${row.original.suffix.toUpperCase()}`;
+        },
+>>>>>>> 4759eadcd0f1608938629dc646ffac25db364a3d
     },
 
     {
@@ -71,6 +123,7 @@ export const columns: ColumnDef<Trainee>[] = [
         header: 'Contact No',
     },
     {
+<<<<<<< HEAD
         accessorKey: 'serial_number',
         header: 'Serial Number',
         cell: ({ row }) => capitalize(row.original.serial_number),
@@ -78,10 +131,26 @@ export const columns: ColumnDef<Trainee>[] = [
     {
         accessorKey: 'coy',
         header: 'Coy',
+=======
+        accessorKey: 'company',
+        header: 'Company',
+    },
+    {
+        accessorKey: 'status',
+        header: 'Status',
+        cell: ({ row }) => {
+            return `${row.original.status.toUpperCase()}`;
+        },
+>>>>>>> 4759eadcd0f1608938629dc646ffac25db364a3d
     },
     {
         accessorKey: 'blood_type',
         header: 'Blood Type',
+        cell: ({ row }) => {
+            return row.original?.blood_type === ''
+                ? 'N/A'
+                : row.original?.blood_type.toLocaleUpperCase();
+        },
     },
     {
         accessorKey: 'birthday',
@@ -111,6 +180,7 @@ export const columns: ColumnDef<Trainee>[] = [
             );
         },
     },
+<<<<<<< HEAD
 
     {
         id: 'action',
@@ -392,4 +462,6 @@ export const columns: ColumnDef<Trainee>[] = [
             );
         },
     },
+=======
+>>>>>>> 4759eadcd0f1608938629dc646ffac25db364a3d
 ];
