@@ -26,12 +26,6 @@ return new class extends Migration {
             $table->string('emergency_contact_person')->nullable();
             $table->string('emergency_contact_no')->nullable();
 
-            $table->string('lastname')->nullable();
-            $table->string('firstname')->nullable();
-            $table->string('middlename')->nullable();
-            $table->string('suffix')->nullable();
-            $table->string('company')->nullable();
-
             $table->string('blood_type')->nullable();
             $table->string('height')->nullable();
             $table->string('weight')->nullable();
