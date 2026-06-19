@@ -1,11 +1,11 @@
 import React, { Component, useRef, useState } from 'react';
 import { Scanner, useDevices } from '@yudiel/react-qr-scanner';
-import QRCode from 'react-qr-code';
-import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
+import { useForm, usePage } from '@inertiajs/react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { router } from '@inertiajs/react';
 import { formatDateToMilitary } from '@/utils/formatDateToMilitary';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -32,6 +32,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { toast } from 'sonner';
+import { CheckCheck, TriangleAlertIcon } from 'lucide-react';
 export default function ScannerPage() {
     const [modalOpen, setModalOpen] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -67,20 +69,6 @@ export default function ScannerPage() {
         );
     };
 
-    const closeModal = () => {
-        setModalOpen(false);
-        setPerson(null);
-        setType(null);
-
-        scanLockRef.current = false;
-
-        lastQRRef.current = null;
-
-        setTimeout(() => {
-            setScannerKey((prev) => prev + 1); // 🔥 fully resets scanner engine
-        }, 300);
-    };
-
     const [selectedDevice, setSelectedDevice] = useState(null);
     const highlightCodeOnCanvas = (detectedCodes: any, ctx: any) => {
         detectedCodes.forEach((detectedCode: any) => {
@@ -106,17 +94,14 @@ export default function ScannerPage() {
         });
     };
 
-    const [openAshoreAboard, setOpenAshoreAboard] = useState(false);
+    const [openLiberty, setOpenLiberty] = useState(false);
     const [openAshoreForm, setOpenAshoreForm] = useState(false);
+    const [openAboardForm, setOpenAboardForm] = useState(false);
 
-    const handleAshoreClick = () => {
-        setOpenAshoreAboard(false);
-
-        // Small delay prevents dialog animation conflicts
-        setTimeout(() => {
-            setOpenAshoreForm(true);
-        }, 100);
-    };
+    const { data, setData, post, processing, reset } = useForm({
+        duration: '',
+        time: '',
+    });
 
     const durationOptions = Array.from({ length: 16 }, (_, index) => {
         const date = new Date();
@@ -132,14 +117,90 @@ export default function ScannerPage() {
 
         return {
             value: index.toString(),
+            days: index,
             label:
                 index === 0
                     ? `Today Only (${formattedDate})`
                     : `${index} Day${index > 1 ? 's' : ''} (${formattedDate})`,
-            date,
         };
     });
-    const [duration, setDuration] = useState('');
+
+    const closeModal = () => {
+        setModalOpen(false);
+        setPerson(null);
+        setType(null);
+        reset();
+
+        scanLockRef.current = false;
+        lastQRRef.current = null;
+        scanLockRef.current = false;
+        setOpenAshoreAboard(false);
+        setOpenAshoreForm(false);
+
+        lastQRRef.current = null;
+
+        setTimeout(() => {
+            setScannerKey((prev) => prev + 1); // 🔥 fully resets scanner engine
+        }, 300);
+    };
+
+    const submitAshore = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        router.post(
+            `/ashore-post/${person?.id}`,
+            {
+                duration: data.duration,
+                time: data.time,
+                trainee_id: person?.id,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+
+                onSuccess: () => {
+                    toast.success('Ashore pass created successfully.', {
+                        position: 'top-center',
+                        style: {
+                            '--normal-bg': 'var(--background)',
+                            '--normal-text':
+                                'light-dark(var(--color-green-600), var(--color-green-400))',
+                            '--normal-border':
+                                'light-dark(var(--color-green-600), var(--color-green-400))',
+                        } as React.CSSProperties,
+                    });
+                    closeModal();
+                },
+
+                onError: (errors) => {
+                    if (errors.ashore) {
+                        toast.error(errors.ashore, {
+                            position: 'top-center',
+                            style: {
+                                '--normal-bg': 'var(--background)',
+                                '--normal-text': 'var(--destructive)',
+                                '--normal-border': 'var(--destructive)',
+                            } as React.CSSProperties,
+                            icon: <TriangleAlertIcon />,
+                        });
+                        closeModal();
+                        return;
+                    }
+
+                    toast.error('Please fill in all required fields.', {
+                        position: 'top-center',
+                        style: {
+                            '--normal-bg': 'var(--background)',
+                            '--normal-text': 'var(--destructive)',
+                            '--normal-border': 'var(--destructive)',
+                        } as React.CSSProperties,
+                        icon: <TriangleAlertIcon />,
+                    });
+                },
+            },
+        );
+    };
+
     return (
         <div className="flex min-h-screen items-center justify-center bg-gray-100">
             <div className="m-5 mt-[-50px] w-full max-w-sm rounded-lg bg-white p-6 text-black shadow-md">
@@ -157,7 +218,7 @@ export default function ScannerPage() {
                                         ]
                                             .filter(Boolean)
                                             .join(' ')}`
-                                      : 'No Data Found'}
+                                      : ''}
                             </AlertDialogTitle>
 
                             <AlertDialogDescription>
@@ -173,59 +234,82 @@ export default function ScannerPage() {
                                     <>
                                         {/* Liberty */}
                                         <Dialog
-                                            open={openAshoreAboard}
-                                            onOpenChange={setOpenAshoreAboard}
+                                            open={openLiberty}
+                                            onOpenChange={setOpenLiberty}
                                         >
                                             <DialogTrigger asChild>
                                                 <Button>LIBERTY</Button>
                                             </DialogTrigger>
 
-                                            <DialogContent className="w-[300px]">
+                                            <DialogContent className="w-[400px]">
                                                 <DialogHeader>
                                                     <DialogTitle>
-                                                        Select Status
+                                                        Please Choose Action
                                                     </DialogTitle>
                                                 </DialogHeader>
 
-                                                <div className="my-2 grid gap-2">
+                                                <div className="flex flex-col gap-2">
                                                     <Button
-                                                        onClick={
-                                                            handleAshoreClick
-                                                        }
+                                                        onClick={() => {
+                                                            setOpenLiberty(
+                                                                false,
+                                                            );
+                                                            setOpenAshoreForm(
+                                                                true,
+                                                            );
+                                                        }}
                                                     >
-                                                        Ashore
+                                                        ASHORE
                                                     </Button>
 
-                                                    <Button>Aboard</Button>
+                                                    <Button
+                                                        onClick={() => {
+                                                            setOpenLiberty(
+                                                                false,
+                                                            );
+                                                            setOpenAboardForm(
+                                                                true,
+                                                            );
+                                                        }}
+                                                    >
+                                                        ABOARD
+                                                    </Button>
                                                 </div>
                                             </DialogContent>
                                         </Dialog>
 
-                                        {/* SECOND DIALOG */}
                                         <Dialog
                                             open={openAshoreForm}
                                             onOpenChange={setOpenAshoreForm}
                                         >
-                                            <DialogContent className="w-[300px]">
-                                                <DialogHeader>
-                                                    <DialogTitle>
-                                                        Ashore Details
-                                                    </DialogTitle>
-                                                </DialogHeader>
+                                            <DialogContent className="w-[400px]">
+                                                <form onSubmit={submitAshore}>
+                                                    <DialogHeader>
+                                                        <DialogTitle>
+                                                            Ashore Details
+                                                        </DialogTitle>
+                                                    </DialogHeader>
 
-                                                <div className="space-y-4">
+                                                    {/* Duration */}
                                                     <div className="space-y-2">
                                                         <label className="text-sm font-medium">
                                                             Duration
                                                         </label>
 
                                                         <Select
-                                                            value={duration}
-                                                            onValueChange={
-                                                                setDuration
+                                                            value={
+                                                                data.duration
+                                                            }
+                                                            onValueChange={(
+                                                                value,
+                                                            ) =>
+                                                                setData(
+                                                                    'duration',
+                                                                    value,
+                                                                )
                                                             }
                                                         >
-                                                            <SelectTrigger className="w-full">
+                                                            <SelectTrigger className='w-full'>
                                                                 <SelectValue placeholder="Select Duration" />
                                                             </SelectTrigger>
 
@@ -251,15 +335,29 @@ export default function ScannerPage() {
                                                             </SelectContent>
                                                         </Select>
                                                     </div>
+
+                                                    {/* Time */}
                                                     <div>
                                                         <label className="mb-1 block text-sm">
                                                             Time
                                                         </label>
-                                                        <Input type="time" />
+
+                                                        <Input
+                                                            type="time"
+                                                            value={data.time}
+                                                            onChange={(e) =>
+                                                                setData(
+                                                                    'time',
+                                                                    e.target
+                                                                        .value,
+                                                                )
+                                                            }
+                                                        />
                                                     </div>
 
-                                                    <div className="flex justify-end gap-2">
+                                                    <div className="flex justify-end gap-2 mt-4">
                                                         <Button
+                                                            type="button"
                                                             variant="outline"
                                                             onClick={() =>
                                                                 setOpenAshoreForm(
@@ -270,12 +368,38 @@ export default function ScannerPage() {
                                                             Cancel
                                                         </Button>
 
-                                                        <Button>Submit</Button>
+                                                        <Button
+                                                            type="submit"
+                                                            disabled={
+                                                                processing
+                                                            }
+                                                        >
+                                                            {processing
+                                                                ? 'Submitting...'
+                                                                : 'Submit'}
+                                                        </Button>
                                                     </div>
-                                                </div>
+                                                </form>
                                             </DialogContent>
                                         </Dialog>
-                                        {/* Liberty */}
+
+                                        <Dialog
+                                            open={openAboardForm}
+                                            onOpenChange={setOpenAboardForm}
+                                        >
+                                            <DialogContent className="w-[400px]">
+                                                <DialogHeader>
+                                                    <DialogTitle>
+                                                        Aboard Details
+                                                    </DialogTitle>
+                                                </DialogHeader>
+
+                                                {/* Put your Aboard form here */}
+                                            </DialogContent>
+                                        </Dialog>
+
+                                        {/* SECOND DIALOG */}
+
                                         <Button>LEAVE</Button>
                                         <Button>OFFICIAL BUSINESS</Button>
                                         <Dialog>

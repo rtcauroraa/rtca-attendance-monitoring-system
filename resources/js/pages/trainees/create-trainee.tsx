@@ -1,7 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 
+<<<<<<< HEAD
 const options: any = {
+=======
+const options:any = {
+>>>>>>> 66556ca562ee05b871d0d6115077509283438523
     month: 'long',
     day: 'numeric',
     year: 'numeric',

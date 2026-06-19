@@ -19,7 +19,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { CloudCog } from 'lucide-react';
 import { toast } from 'sonner';
-import { Trainee } from '@/types/interface';
+import { Trainee } from '@/@types/Trainees';
 
 const options = {
     month: 'long',
