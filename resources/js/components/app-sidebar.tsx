@@ -1,5 +1,12 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid, User } from 'lucide-react';
+import {
+    BookOpen,
+    FolderGit2,
+    LayoutGrid,
+    Scan,
+    ScanBarcodeIcon,
+    User,
+} from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -13,38 +20,16 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard, trainees, attendance, scanner, personnel } from '@/routes';
+import {
+    dashboard,
+    trainees,
+    attendance,
+    scanner,
+    personnel,
+    users,
+} from '@/routes';
 import type { NavItem } from '@/types';
-
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Users',
-        href: '/users',
-        icon: User,
-    },
-
-    {
-        title: 'Trainees',
-        href: trainees(),
-        icon: User,
-    },
-
-    {
-        title: 'Personnel',
-        href: personnel(),
-        icon: User,
-    },
-    {
-        title: 'Attendance',
-        href: attendance(),
-        icon: User,
-    },
-];
+import { usePage } from '@inertiajs/react';
 
 const footerNavItems: NavItem[] = [
     {
@@ -60,6 +45,53 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+    const { auth } = usePage().props as any;
+
+    const roles = auth?.user?.roles ?? [];
+    const isUser = roles[0]?.name === 'User';
+    const isAdmin = roles[0]?.name === 'Admin';
+
+    const mainNavItems: NavItem[] = [
+        ...(isAdmin
+            ? [
+                  {
+                      title: 'Dashboard',
+                      href: dashboard(),
+                      icon: LayoutGrid,
+                  },
+                  {
+                      title: 'Users',
+                      href: users(),
+                      icon: User,
+                  },
+                  {
+                      title: 'Trainees',
+                      href: trainees(),
+                      icon: User,
+                  },
+                  {
+                      title: 'Attendance',
+                      href: attendance(),
+                      icon: User,
+                  },
+                  {
+                      title: 'Personnel',
+                      href: '/personnels',
+                      icon: User,
+                  },
+              ]
+            : []),
+
+        ...(isUser
+            ? [
+                  {
+                      title: 'Scanner',
+                      href: scanner(),
+                      icon: ScanBarcodeIcon,
+                  },
+              ]
+            : []),
+    ];
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>

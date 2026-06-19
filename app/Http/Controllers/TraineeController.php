@@ -2,11 +2,20 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Models\Attendance;
 use App\Models\Trainee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\Label\LabelAlignment;
+use Endroid\QrCode\Label\Font\OpenSans;
+use Endroid\QrCode\RoundBlockSizeMode;
+use Endroid\QrCode\Writer\PngWriter;
+use Illuminate\Support\Facades\Storage;
 
 class TraineeController extends Controller
 {
@@ -18,18 +27,20 @@ class TraineeController extends Controller
         $query = Trainee::query();        
         // ✅ SERVER-SIDE SEARCH
         if ($request->search) {
-            $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', "%{$request->search}%")
-                    ->orWhere('email', 'like', "%{$request->search}%")
-                    ->orWhere('company', 'like', "%{$request->search}%")
-                    ->orWhere('status', 'like', "%{$request->search}%")
-                    ->orWhere('blood_type', 'like', "%{$request->search}%")
-                    ->orWhere('contact_no', 'like', "%{$request->search}%");
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('middle_name', 'like', "%{$search}%")
+                    ->orWhere('serial_number', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('status', 'like', "%{$search}%")
+                    ->orWhere('coy', 'like', "%{$search}%")
+                    ->orWhere('emergency_contact_person', 'like', "%{$search}%");
             });
         }
 
         $trainees = $query
-            ->orderBy('created_at', 'desc')
+        ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->withQueryString();
 
@@ -57,7 +68,15 @@ class TraineeController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'first_name' => ['required', 'string', 'max:255'],
+
+            'middle_name' => ['required', 'string', 'max:255'],
+
+            'last_name' => ['required', 'string', 'max:255'],
+
+            'serial_number' => ['required', 'string', 'max:255'],
+
+            'suffix' => ['required', 'in:N/A,Jr.,Sr.,I,II,III'],
 
             'birthday' => ['required', 'date', 'before:today'],
 
@@ -68,6 +87,8 @@ class TraineeController extends Controller
             'email' => ['required', 'email', 'max:255', 'unique:trainees,email'],
 
             'status' => ['required', 'in:Single,Married,Widowed'],
+
+            'coy' => ['required', 'in:Alpha,Bravo,Charlie,Delta'],
 
             'address' => ['required', 'string', 'max:500'],
 
@@ -88,8 +109,37 @@ class TraineeController extends Controller
             'hair_color' => ['required', 'string', 'max:50'],
         ]);
 
-        Trainee::create($validated);
+        $builder = new Builder(
+            writer: new PngWriter(),
+            writerOptions: [],
+            validateResult: false,
+            data: 'Trainee_' . $validated['serial_number'],
+            encoding: new Encoding('UTF-8'),
+            errorCorrectionLevel: ErrorCorrectionLevel::High,
+            size: 300,
+            margin: 10,
+            roundBlockSizeMode: RoundBlockSizeMode::Margin,
+            logoPath: public_path('rtc-aurora-logo.png'),
+            logoResizeToWidth: 50,
+            logoPunchoutBackground: true,
+            labelText: $validated['serial_number'],
+            labelFont: new OpenSans(20),
+            labelAlignment: LabelAlignment::Center
+        );
 
+        $result = $builder->build();
+
+        $filename = 'qrcodes/PCG-Class-119/' . $validated['serial_number'] . '.png';
+
+        Storage::disk('public')->put(
+            $filename,
+            $result->getString()
+        );
+
+        Trainee::create([
+            ...$validated,
+            'qr_code' => $filename, // SAVE TO DB
+        ]);
         return back();
     }
 
@@ -165,13 +215,22 @@ class TraineeController extends Controller
      */
     public function update(Request $request, Trainee $trainee)
     {
+
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'first_name' => ['required', 'string', 'max:255'],
+
+            'middle_name' => ['required', 'string', 'max:255'],
+
+            'last_name' => ['required', 'string', 'max:255'],
+            'serial_number' => ['required', 'string', 'max:255'],
+            'suffix' => 'required|string',
+
             'birthday' => 'required|date',
             'religion' => 'required|string',
             'contact_no' => 'required|string|max:20',
             'email' => 'required|email|max:255',
             'status' => 'required|string',
+            'coy' => 'required|string',
             'address' => 'required|string',
 
             'emergency_contact_person' => 'required|string|max:255',
@@ -186,7 +245,37 @@ class TraineeController extends Controller
             'hair_color' => 'required|string',
         ]);
 
-        $trainee->update($validated);
+          $builder = new Builder(
+            writer: new PngWriter(),
+            writerOptions: [],
+            validateResult: false,
+            data: 'Trainee_' . $validated['serial_number'],
+            encoding: new Encoding('UTF-8'),
+            errorCorrectionLevel: ErrorCorrectionLevel::High,
+            size: 300,
+            margin: 10,
+            roundBlockSizeMode: RoundBlockSizeMode::Margin,
+            logoPath: public_path('rtc-aurora-logo.png'),
+            logoResizeToWidth: 50,
+            logoPunchoutBackground: true,
+            labelText: $validated['serial_number'],
+            labelFont: new OpenSans(20),
+            labelAlignment: LabelAlignment::Center
+        );
+
+        $result = $builder->build();
+
+        $filename = 'qrcodes/PCG-Class-119/' . $validated['serial_number'] . '.png';
+
+        Storage::disk('public')->put(
+            $filename,
+            $result->getString()
+        );
+    
+        $trainee->update([
+             ...$validated,
+            'qr_code' => $filename, // SAVE TO DB
+        ]);
 
         return back();
     }
@@ -214,7 +303,6 @@ class TraineeController extends Controller
             'csv_file' => 'required|file|mimes:csv,txt|max:10240',
         ]);
 
-        // Fix for servers reading files with Mac/Windows mixed line-endings
         ini_set('auto_detect_line_endings', true);
 
         $file = $request->file('csv_file');
@@ -222,15 +310,16 @@ class TraineeController extends Controller
 
         if (($handle = fopen($filePath, 'r')) !== false) {
 
-            // 1. Read the very first row as headers and clean them up
+            // 1. Headers
             $rawHeaders = fgetcsv($handle, 0, ',');
 
             if (!$rawHeaders) {
                 fclose($handle);
-                return redirect()->back()->withErrors(['csv_file' => 'The CSV file is empty or unreadable.']);
+                return redirect()->back()->withErrors([
+                    'csv_file' => 'The CSV file is empty or unreadable.'
+                ]);
             }
 
-            // Normalize headers: lowercase, remove spaces, trim whitespace
             $headers = array_map(function ($header) {
                 return strtolower(str_replace([' ', '_', '-'], '', trim($header)));
             }, $rawHeaders);
@@ -238,72 +327,110 @@ class TraineeController extends Controller
             $batch = [];
             $now = now();
 
-            // 2. Loop through each subsequent data row
+            // 2. preload existing serials
+            $existingSerials = Trainee::pluck('serial_number')
+                ->filter()
+                ->toArray();
+
+            $existingSerials = array_flip($existingSerials);
+
             while (($row = fgetcsv($handle, 0, ',')) !== false) {
 
-                // Skip empty lines or trailing rows
                 if (empty(array_filter($row))) {
                     continue;
                 }
 
-                // Pad or slice row array to match the header length perfectly
                 if (count($row) < count($headers)) {
                     $row = array_pad($row, count($headers), null);
                 } elseif (count($row) > count($headers)) {
                     $row = array_slice($row, 0, count($headers));
                 }
 
-                // Combine headers with row values safely
                 $rowData = array_combine($headers, $row);
 
-                // 3. Extract email safely (adjust the key if your CSV header is named differently)
+                // 3. SERIAL FIRST (VERY IMPORTANT)
+                $serial = $rowData['serialnumber'] ?? null;
+
+                if (empty($serial)) {
+                    continue;
+                }
+
+                // 4. SKIP DUPLICATE
+                if (isset($existingSerials[$serial])) {
+                    continue;
+                }
+
+                // 5. EMAIL VALIDATION
                 $email = isset($rowData['email']) ? trim($rowData['email']) : null;
 
-                // Skip row if email is blank or invalid to avoid database unique constraint crashes
                 if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
                     continue;
                 }
 
-                // 4. Combine First Name and Last Name if they are separate columns in your CSV
-                $firstName = $rowData['firstname'] ?? '';
-                $lastName = $rowData['lastname'] ?? '';
+                // 6. GENERATE QR ONLY FOR VALID RECORDS
+                $builder = new Builder(
+                    writer: new PngWriter(),
+                    writerOptions: [],
+                    validateResult: false,
+                    data: 'Trainee_' . $serial,
+                    encoding: new Encoding('UTF-8'),
+                    errorCorrectionLevel: ErrorCorrectionLevel::High,
+                    size: 300,
+                    margin: 10,
+                    roundBlockSizeMode: RoundBlockSizeMode::Margin,
+                    logoPath: public_path('rtc-aurora-logo.png'),
+                    logoResizeToWidth: 50,
+                    logoPunchoutBackground: true,
+                    labelFont: new OpenSans(20),
+                    labelAlignment: LabelAlignment::Center
+                );
 
-                $fullName = trim($firstName . ' ' . $lastName);
-                // Fallback to a single "name" header column if that's what your CSV uses
-                if (empty($fullName)) {
-                    $fullName = $rowData['name'] ?? 'Unknown Trainee';
-                }
+                $result = $builder->build();
 
+                $filename = 'qrcodes/PCG-Class-119/' . $serial . '.png';
 
-                // 5. Structure fields to match your trainees table migration layout
+                Storage::disk('public')->put($filename, $result->getString());
+
+                // 7. ADD TO BATCH
                 $batch[] = [
-                    'name'                     => $fullName,
-                    'birthday'                 => !empty($rowData['birthday']) ? date('Y-m-d', strtotime($rowData['birthday'])) : null,
-                    'religion'                 => $rowData['religion'] ?? null,
-                    'contact_no'               => $rowData['contactno'] ?? $rowData['contactnumber'] ?? null,
-                    'email'                    => $email,
-                    'status'                   => $rowData['status'] ?? null,
-                    'address'                  => $rowData['address'] ?? null,
+                    'first_name' => $rowData['firstname'] ?? null,
+                    'middle_name' => $rowData['middlename'] ?? null,
+                    'last_name' => $rowData['lastname'] ?? null,
+                    'serial_number' => $serial,
+                    'suffix' => $rowData['suffix'] ?? null,
+                    'birthday' => !empty($rowData['birthday'])
+                        ? date('Y-m-d', strtotime($rowData['birthday']))
+                        : null,
+                    'religion' => $rowData['religion'] ?? null,
+                    'contact_no' => $rowData['contactno'] ?? $rowData['contactnumber'] ?? null,
+                    'email' => $email,
+                    'status' => $rowData['status'] ?? null,
+                    'coy' => $rowData['coy'] ?? null,
+                    'address' => $rowData['address'] ?? null,
                     'emergency_contact_person' => $rowData['emergencycontactperson'] ?? null,
-                    'emergency_contact_no'     => $rowData['emergencycontactno'] ?? null,
-                    'blood_type'               => $rowData['bloodtype'] ?? null,
-                    'height'                   => $rowData['heightcm'] ?? $rowData['height'] ?? null,
-                    'weight'                   => $rowData['weightkg'] ?? $rowData['weight'] ?? null,
-                    'identifying_marks'        => $rowData['identifyingmarks'] ?? null,
-                    'eye_color'                => $rowData['eyecolor'] ?? null,
-                    'hair_color'               => $rowData['haircolor'] ?? null,
-                    'created_at'               => $now,
-                    'updated_at'               => $now,
+                    'emergency_contact_no' => $rowData['emergencycontactno'] ?? null,
+                    'blood_type' => $rowData['bloodtype'] ?? null,
+                    'height' => $rowData['heightcm'] ?? $rowData['height'] ?? null,
+                    'weight' => $rowData['weightkg'] ?? $rowData['weight'] ?? null,
+                    'identifying_marks' => $rowData['identifyingmarks'] ?? null,
+                    'eye_color' => $rowData['eyecolor'] ?? null,
+                    'hair_color' => $rowData['haircolor'] ?? null,
+                    'qr_code' => $filename,
+                    'created_at' => $now,
+                    'updated_at' => $now,
                 ];
 
-                // Save to database in chunks of 500 rows to keep server memory usage low
+                // 8. MARK AS EXISTING (IMPORTANT)
+                $existingSerials[$serial] = true;
+
+                // 9. BATCH INSERT
                 if (count($batch) >= 500) {
                     Trainee::insert($batch);
                     $batch = [];
                 }
             }
 
-            // Save remaining trailing entries
+            // 10. FINAL INSERT
             if (!empty($batch)) {
                 Trainee::insert($batch);
             }

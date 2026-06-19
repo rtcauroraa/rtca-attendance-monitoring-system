@@ -31,7 +31,11 @@ class TraineeSeeder extends Seeder
 
         for ($i = 1; $i <= 20; $i++) {
             Trainee::create([
-                'name' => "Trainee $i",
+                'last_name' => "Trainee $i",
+                'first_name' => "Trainee $i",
+                'middle_name' => "Trainee $i",
+                'serial_number' => "$i",
+                'suffix' => "N/A",
                 'birthday' => Carbon::now()->subYears(rand(18, 35))->subDays(rand(1, 365)),
                 'religion' => $religions[array_rand($religions)],
                 'contact_no' => '09' . rand(100000000, 999999999),

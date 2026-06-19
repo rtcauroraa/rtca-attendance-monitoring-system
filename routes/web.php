@@ -4,11 +4,11 @@ use App\Http\Controllers\AttendanceController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\PersonnelController;
+use App\Http\Controllers\ScanController;
 use App\Http\Controllers\TraineeController;
 use App\Http\Controllers\UserController;
 
 Route::inertia('/', 'welcome')->name('home');
-Route::inertia('scanner', 'scanner')->name('scanner');
 
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -28,17 +28,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/trainees', [TraineeController::class, 'store'])
         ->name('trainees.store');
-    Route::get('/trainees', [TraineeController::class, 'index'])
-    ->name('trainees');
-    Route::post('/import-trainees', [TraineeController::class, 'import'])
-    ->name('import-trainees');
-    
-    // Attendance 
-     Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance');
-     Route::inertia('create-attendance', 'attendance/create-attendance')->name('create-attendance');
+    Route::get('/trainees', [TraineeController::class, 'index'])->name('trainees');
+    Route::get('/trainees/{trainee}/edit', [TraineeController::class, 'edit'])
+        ->name('trainees-edit');
+    Route::put('/trainees/{trainee}/update', [TraineeController::class, 'update'])
+        ->name('trainees-update');
+    Route::delete('/trainees/{trainee}/delete', [TraineeController::class, 'destroy'])
+        ->name('trainees.destroy');
+    Route::post('/import-trainees', [TraineeController::class, 'storeCSV']);
 
-
- 
+    Route::get('/attendance',[AttendanceController::class,'index'])->name('attendance');
+    Route::inertia('create-attendance', 'attendance/create-attendance')->name('create-attendance');
 });
+
+Route::middleware(['auth', 'verified', 'role:User'])->group(function () {
+    Route::inertia('/scanner', 'scanner')->name('scanner');
+    Route::get('/scan/{type}/{id}', [ScanController::class, 'qr_code'])
+        ->name('scan.show');
+});
+
 
 require __DIR__ . '/settings.php';

@@ -7,15 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 class Trainee extends Model
 {
   protected $fillable = [
-        'lastname',
-        'firstname',
-        'middlename',
+        'first_name',
+        'middle_name',
+        'last_name',
+        'serial_number',
+        'qr_code',
         'suffix',
         'birthday',
         'religion',
         'contact_no',
         'email',
         'status',
+        'coy',
         'address',
         'company',
         'emergency_contact_person',
