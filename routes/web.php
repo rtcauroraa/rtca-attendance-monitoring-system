@@ -1,10 +1,5 @@
 <?php
-
-<<<<<<< HEAD
-use App\Http\Controllers\AttendanceController;
-=======
 use App\Http\Controllers\AshorePassesController;
->>>>>>> 66556ca562ee05b871d0d6115077509283438523
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\PersonnelController;
@@ -22,12 +17,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/users', [UserController::class, 'index'])->name('users');
     Route::inertia('create-user', 'users/create-user')->name('create-user');
     Route::post('/users', [UserController::class, 'store']);
-<<<<<<< HEAD
-    Route::put('/users', [UserController::class, 'update']);
-    Route::get('/users/{id}/edit',[UserController::class, 'edit']);
-=======
     Route::get('/users/{id}/edit', [UserController::class, 'edit']);
->>>>>>> 66556ca562ee05b871d0d6115077509283438523
     Route::delete('/users/{id}', [UserController::class, 'destroy']);
 
     // Route::resource('personnels', PersonnelController::class);
