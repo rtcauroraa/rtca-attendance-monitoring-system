@@ -3,10 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Trainee extends Model
 {
-  protected $fillable = [
+    protected $fillable = [
         'first_name',
         'middle_name',
         'last_name',
@@ -33,5 +34,12 @@ class Trainee extends Model
     public function attendances()
     {
         return $this->hasMany(Attendance::class);
+    }
+
+    public function ashorePasses(): HasOne
+    {
+        return $this->hasOne(AshorePass::class)
+            ->where('status', 'active')
+            ->latestOfMany();
     }
 }

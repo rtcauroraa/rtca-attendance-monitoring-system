@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 
-const options = {
+const options:any = {
     month: 'long',
     day: 'numeric',
     year: 'numeric',
