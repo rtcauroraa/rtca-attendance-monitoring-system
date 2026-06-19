@@ -144,6 +144,7 @@ export const columns: ColumnDef<Trainee>[] = [
                         >
                             <DialogHeader>
                                 <DialogTitle>Trainee Details</DialogTitle>
+                                <img src="{{ asset('storage/qrcodes/PCG-Class-119/2330.png') }}" alt="My Image" width="300"/>
                             </DialogHeader>
                             <div className="flex flex-col items-center border-t pt-4">
                                 {trainee.qr_code ? (

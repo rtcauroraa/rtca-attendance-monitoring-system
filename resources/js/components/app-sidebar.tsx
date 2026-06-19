@@ -3,6 +3,7 @@ import {
     BookOpen,
     FolderGit2,
     LayoutGrid,
+    NotebookIcon,
     Scan,
     ScanBarcodeIcon,
     User,
@@ -78,6 +79,11 @@ export function AppSidebar() {
                       title: 'Personnel',
                       href: '/personnels',
                       icon: User,
+                  },
+                   {
+                      title: 'Ashore Passes',
+                      href: '/ashore-passes',
+                      icon: NotebookIcon,
                   },
               ]
             : []),

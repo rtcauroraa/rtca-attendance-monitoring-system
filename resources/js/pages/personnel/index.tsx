@@ -92,7 +92,7 @@ export default function Personnel({ personnels, filters }: any) {
                             key={i}
                             href={link.url ?? ''}
                             className={`rounded border px-3 py-1 ${
-                                link.active ? 'bg-black text-white' : ''
+                                link.active ? 'bg-[#173796] text-white' : ''
                             }`}
                             dangerouslySetInnerHTML={{ __html: link.label }}
                         />
