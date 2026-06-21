@@ -11,7 +11,6 @@ import { columns } from './columns';
 export default function Index({ ashorePasses, filters }: any) {
     const [search, setSearch] = useState(filters?.search || '');
 
-
     const handleSearch = (value: string) => {
         setSearch(value);
 
@@ -38,7 +37,6 @@ export default function Index({ ashorePasses, filters }: any) {
                             onChange={(e) => handleSearch(e.target.value)}
                             className="max-w-sm"
                         />
-                     
                     </div>
 
                     {/* <Button asChild>

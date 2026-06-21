@@ -75,10 +75,12 @@ export function AppSidebar() {
                       icon: User,
                   },
                    {
-                      title: 'Ashore Passes',
+                      title: 'Liberty Passes',
                       href: '/ashore-passes',
                       icon: NotebookIcon,
                   },
+
+                    
               ]
             : []),
 

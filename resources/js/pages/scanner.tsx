@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { router } from '@inertiajs/react';
 import { formatDateToMilitary } from '@/utils/formatDateToMilitary';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import Tabs02 from '@/pages/tabs-02';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -134,7 +134,6 @@ export default function ScannerPage() {
         scanLockRef.current = false;
         lastQRRef.current = null;
         scanLockRef.current = false;
-        setOpenAshoreAboard(false);
         setOpenAshoreForm(false);
 
         lastQRRef.current = null;
@@ -201,6 +200,14 @@ export default function ScannerPage() {
         );
     };
 
+    const [pendingAboardId, setPendingAboardId] = useState<number | null>(null);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+
+    const handleAboardClick = (personID: number) => {
+        setPendingAboardId(personID);
+        setConfirmOpen(true);
+    };
+
     return (
         <div className="flex min-h-screen items-center justify-center bg-gray-100">
             <div className="m-5 mt-[-50px] w-full max-w-sm rounded-lg bg-white p-6 text-black shadow-md">
@@ -250,6 +257,7 @@ export default function ScannerPage() {
 
                                                 <div className="flex flex-col gap-2">
                                                     <Button
+                                                        className="secondary"
                                                         onClick={() => {
                                                             setOpenLiberty(
                                                                 false,
@@ -259,25 +267,116 @@ export default function ScannerPage() {
                                                             );
                                                         }}
                                                     >
-                                                        ASHORE
+                                                        Ashore
                                                     </Button>
 
                                                     <Button
-                                                        onClick={() => {
-                                                            setOpenLiberty(
-                                                                false,
-                                                            );
-                                                            setOpenAboardForm(
-                                                                true,
-                                                            );
-                                                        }}
+                                                        onClick={() =>
+                                                            handleAboardClick(
+                                                                person.id,
+                                                            )
+                                                        }
                                                     >
-                                                        ABOARD
+                                                        Aboard
                                                     </Button>
                                                 </div>
                                             </DialogContent>
                                         </Dialog>
+                                        <AlertDialog
+                                            open={confirmOpen}
+                                            onOpenChange={setConfirmOpen}
+                                        >
+                                            <AlertDialogContent>
+                                                <AlertDialogHeader>
+                                                    <AlertDialogTitle>
+                                                        Confirm Aboard Action
+                                                    </AlertDialogTitle>
 
+                                                    <AlertDialogDescription>
+                                                        Are you sure this
+                                                        trainee is now aboard?
+                                                    </AlertDialogDescription>
+                                                </AlertDialogHeader>
+
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel
+                                                        onClick={() =>
+                                                            setConfirmOpen(
+                                                                false,
+                                                            )
+                                                        }
+                                                    >
+                                                        Cancel
+                                                    </AlertDialogCancel>
+
+                                                    <AlertDialogAction
+                                                        onClick={() => {
+                                                            if (
+                                                                !pendingAboardId
+                                                            )
+                                                                return;
+
+                                                            router.post(
+                                                                `/aboard-post/${pendingAboardId}`,
+                                                                {},
+                                                                {
+                                                                    preserveState: true,
+                                                                    preserveScroll: true,
+                                                                    onSuccess:
+                                                                        () => {
+                                                                            toast.success(
+                                                                                'Trainee marked as aboard',
+                                                                                {
+                                                                                    position:
+                                                                                        'top-center',
+                                                                                    style: {
+                                                                                        '--normal-bg':
+                                                                                            'var(--background)',
+                                                                                        '--normal-text':
+                                                                                            'light-dark(var(--color-green-600), var(--color-green-400))',
+                                                                                        '--normal-border':
+                                                                                            'light-dark(var(--color-green-600), var(--color-green-400))',
+                                                                                    } as React.CSSProperties,
+                                                                                },
+                                                                            );
+                                                                            closeModal();
+                                                                        },
+                                                                    onError: (
+                                                                        errors,
+                                                                    ) => {
+                                                                        toast.error(
+                                                                            errors.ashore ||
+                                                                                'Error occurred',
+                                                                            {
+                                                                                position:
+                                                                                    'top-center',
+                                                                                style: {
+                                                                                    '--normal-bg':
+                                                                                        'var(--background)',
+                                                                                    '--normal-text':
+                                                                                        'var(--destructive)',
+                                                                                    '--normal-border':
+                                                                                        'var(--destructive)',
+                                                                                } as React.CSSProperties,
+                                                                                icon: (
+                                                                                    <TriangleAlertIcon />
+                                                                                ),
+                                                                            },
+                                                                        );
+                                                                    },
+                                                                },
+                                                            );
+
+                                                            setConfirmOpen(
+                                                                false,
+                                                            );
+                                                        }}
+                                                    >
+                                                        Confirm
+                                                    </AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
                                         <Dialog
                                             open={openAshoreForm}
                                             onOpenChange={setOpenAshoreForm}
@@ -309,7 +408,7 @@ export default function ScannerPage() {
                                                                 )
                                                             }
                                                         >
-                                                            <SelectTrigger className='w-full'>
+                                                            <SelectTrigger className="w-full">
                                                                 <SelectValue placeholder="Select Duration" />
                                                             </SelectTrigger>
 
@@ -355,7 +454,7 @@ export default function ScannerPage() {
                                                         />
                                                     </div>
 
-                                                    <div className="flex justify-end gap-2 mt-4">
+                                                    <div className="mt-4 flex justify-end gap-2">
                                                         <Button
                                                             type="button"
                                                             variant="outline"
@@ -383,299 +482,10 @@ export default function ScannerPage() {
                                             </DialogContent>
                                         </Dialog>
 
-                                        <Dialog
-                                            open={openAboardForm}
-                                            onOpenChange={setOpenAboardForm}
-                                        >
-                                            <DialogContent className="w-[400px]">
-                                                <DialogHeader>
-                                                    <DialogTitle>
-                                                        Aboard Details
-                                                    </DialogTitle>
-                                                </DialogHeader>
-
-                                                {/* Put your Aboard form here */}
-                                            </DialogContent>
-                                        </Dialog>
-
                                         {/* SECOND DIALOG */}
 
                                         <Button>LEAVE</Button>
                                         <Button>OFFICIAL BUSINESS</Button>
-                                        <Dialog>
-                                            <DialogTrigger asChild>
-                                                <Button variant="outline">
-                                                    VIEW PROFILE
-                                                </Button>
-                                            </DialogTrigger>
-                                            <DialogContent
-                                                onOpenAutoFocus={(e) => {
-                                                    e.preventDefault();
-                                                    document
-                                                        .getElementById(
-                                                            'dialog-title-focus',
-                                                        )
-                                                        ?.focus();
-                                                }}
-                                                className="max-h-[90dvh] max-w-[90vw] overflow-y-auto sm:max-w-[800px]"
-                                            >
-                                                <DialogHeader>
-                                                    <DialogTitle>
-                                                        Trainee Details
-                                                    </DialogTitle>
-                                                </DialogHeader>
-
-                                                {/* DETAILS */}
-
-                                                <div
-                                                    className="grid grid-cols-1 gap-4 md:grid-cols-2"
-                                                    id="dialog-title-focus"
-                                                    tabIndex={-1}
-                                                >
-                                                    <div>
-                                                        <label className="text-xs text-gray-500">
-                                                            Full Name
-                                                        </label>
-                                                        <input
-                                                            readOnly
-                                                            value={`${person?.first_name} ${person?.middle_name ?? ''} ${person?.last_name} ${person?.suffix && person?.suffix !== 'N/A' ? person?.suffix : ''}`}
-                                                            className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                        />
-                                                    </div>
-                                                    {/* SERIAL NUMBER */}
-                                                    <div>
-                                                        <label className="text-xs text-gray-500">
-                                                            Email
-                                                        </label>
-                                                        <input
-                                                            readOnly
-                                                            value={
-                                                                person?.email ??
-                                                                ''
-                                                            }
-                                                            className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                        />
-                                                    </div>
-                                                </div>
-
-                                                <div className="space-y-4 text-sm">
-                                                    {/* NAME */}
-
-                                                    {/* EMAIL */}
-
-                                                    {/* SERIAL NUMBER */}
-
-                                                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                                        <div>
-                                                            <label className="text-xs text-gray-500">
-                                                                Company Coy
-                                                            </label>
-                                                            <input
-                                                                readOnly
-                                                                value={
-                                                                    person?.coy ??
-                                                                    ''
-                                                                }
-                                                                className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                            />
-                                                        </div>
-                                                        {/* SERIAL NUMBER */}
-                                                        <div>
-                                                            <label className="text-xs text-gray-500">
-                                                                Serial Number
-                                                            </label>
-                                                            <input
-                                                                readOnly
-                                                                value={
-                                                                    person?.serial_number ??
-                                                                    ''
-                                                                }
-                                                                className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                                        <div>
-                                                            <label className="text-xs text-gray-500">
-                                                                Religion
-                                                            </label>
-                                                            <input
-                                                                readOnly
-                                                                value={
-                                                                    person?.religion ??
-                                                                    ''
-                                                                }
-                                                                className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                            />
-                                                        </div>
-                                                        {/* SERIAL NUMBER */}
-                                                        <div>
-                                                            <label className="text-xs text-gray-500">
-                                                                Marital Status
-                                                            </label>
-                                                            <input
-                                                                readOnly
-                                                                value={
-                                                                    person?.status ??
-                                                                    ''
-                                                                }
-                                                                className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                            />
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                                        <div>
-                                                            <label className="text-xs text-gray-500">
-                                                                Contact Number
-                                                            </label>
-                                                            <input
-                                                                readOnly
-                                                                value={
-                                                                    person?.contact_no ??
-                                                                    ''
-                                                                }
-                                                                className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                            />
-                                                        </div>
-
-                                                        {/* BIRTHDAY */}
-                                                        <div>
-                                                            <label className="text-xs text-gray-500">
-                                                                Birthday
-                                                            </label>
-                                                            <input
-                                                                readOnly
-                                                                value={formatDateToMilitary(
-                                                                    person?.birthday,
-                                                                )}
-                                                                className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                            />
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                                        <div>
-                                                            <label className="text-xs text-gray-500">
-                                                                Emergency
-                                                                Contact Person
-                                                            </label>
-                                                            <input
-                                                                readOnly
-                                                                value={
-                                                                    person?.emergency_contact_person ??
-                                                                    ''
-                                                                }
-                                                                className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                            />
-                                                        </div>
-
-                                                        {/* BIRTHDAY */}
-                                                        <div>
-                                                            <label className="text-xs text-gray-500">
-                                                                Emergeny Contact
-                                                                Number
-                                                            </label>
-                                                            <input
-                                                                readOnly
-                                                                value={
-                                                                    person?.emergency_contact_no
-                                                                }
-                                                                className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                            />
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                                                        <div>
-                                                            <label className="text-xs text-gray-500">
-                                                                Height
-                                                            </label>
-                                                            <input
-                                                                readOnly
-                                                                value={`${person?.height} cm`}
-                                                                className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                            />
-                                                        </div>
-                                                        {/* BIRTHDAY */}
-                                                        <div>
-                                                            <label className="text-xs text-gray-500">
-                                                                Weight
-                                                            </label>
-                                                            <input
-                                                                readOnly
-                                                                value={`${person?.weight} kg`}
-                                                                className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <label className="text-xs text-gray-500">
-                                                                Weight
-                                                            </label>
-                                                            <input
-                                                                readOnly
-                                                                value={
-                                                                    person?.blood_type
-                                                                }
-                                                                className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                            />
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                                                        <div>
-                                                            <label className="text-xs text-gray-500">
-                                                                Eye Color
-                                                            </label>
-                                                            <input
-                                                                readOnly
-                                                                value={`${person?.eye_color}`}
-                                                                className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                            />
-                                                        </div>
-                                                        {/* BIRTHDAY */}
-                                                        <div>
-                                                            <label className="text-xs text-gray-500">
-                                                                Hair Color
-                                                            </label>
-                                                            <input
-                                                                readOnly
-                                                                value={
-                                                                    person?.hair_color
-                                                                }
-                                                                className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <label className="text-xs text-gray-500">
-                                                                Identifying
-                                                                Marks
-                                                            </label>
-                                                            <input
-                                                                readOnly
-                                                                value={
-                                                                    person?.identifying_marks
-                                                                }
-                                                                className="w-full overflow-x-auto rounded border bg-gray-100 px-3 py-2"
-                                                            />
-                                                        </div>
-                                                    </div>
-
-                                                    <div>
-                                                        <label className="text-xs text-gray-500">
-                                                            Address
-                                                        </label>
-                                                        <input
-                                                            readOnly
-                                                            value={
-                                                                person?.address
-                                                            }
-                                                            className="w-full overflow-x-auto rounded border bg-gray-100 px-3 py-2"
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </DialogContent>
-                                        </Dialog>
                                     </>
                                 )}
 
@@ -684,6 +494,274 @@ export default function ScannerPage() {
                                         VIEW PROFILE
                                     </Button>
                                 )}
+
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button variant="outline">
+                                            VIEW PROFILE
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent
+                                        onOpenAutoFocus={(e) => {
+                                            e.preventDefault();
+                                            document
+                                                .getElementById(
+                                                    'dialog-title-focus',
+                                                )
+                                                ?.focus();
+                                        }}
+                                        className="max-h-[90dvh] max-w-[90vw] overflow-y-auto sm:max-w-[800px]"
+                                    >
+                                        <DialogHeader>
+                                            <DialogTitle>
+                                                Trainee Details
+                                            </DialogTitle>
+                                        </DialogHeader>
+
+                                        {/* DETAILS */}
+
+                                        <div
+                                            className="grid grid-cols-1 gap-4 md:grid-cols-2"
+                                            id="dialog-title-focus"
+                                            tabIndex={-1}
+                                        >
+                                            <div>
+                                                <label className="text-xs text-gray-500">
+                                                    Full Name
+                                                </label>
+                                                <input
+                                                    readOnly
+                                                    value={`${person?.first_name} ${person?.middle_name ?? ''} ${person?.last_name} ${person?.suffix && person?.suffix !== 'N/A' ? person?.suffix : ''}`}
+                                                    className="w-full rounded border bg-gray-100 px-3 py-2"
+                                                />
+                                            </div>
+                                            {/* SERIAL NUMBER */}
+                                            <div>
+                                                <label className="text-xs text-gray-500">
+                                                    Email
+                                                </label>
+                                                <input
+                                                    readOnly
+                                                    value={person?.email ?? ''}
+                                                    className="w-full rounded border bg-gray-100 px-3 py-2"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-4 text-sm">
+                                            {/* NAME */}
+
+                                            {/* EMAIL */}
+
+                                            {/* SERIAL NUMBER */}
+
+                                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                                <div>
+                                                    <label className="text-xs text-gray-500">
+                                                        Company Coy
+                                                    </label>
+                                                    <input
+                                                        readOnly
+                                                        value={
+                                                            person?.coy ?? ''
+                                                        }
+                                                        className="w-full rounded border bg-gray-100 px-3 py-2"
+                                                    />
+                                                </div>
+                                                {/* SERIAL NUMBER */}
+                                                <div>
+                                                    <label className="text-xs text-gray-500">
+                                                        Serial Number
+                                                    </label>
+                                                    <input
+                                                        readOnly
+                                                        value={
+                                                            person?.serial_number ??
+                                                            ''
+                                                        }
+                                                        className="w-full rounded border bg-gray-100 px-3 py-2"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                                <div>
+                                                    <label className="text-xs text-gray-500">
+                                                        Religion
+                                                    </label>
+                                                    <input
+                                                        readOnly
+                                                        value={
+                                                            person?.religion ??
+                                                            ''
+                                                        }
+                                                        className="w-full rounded border bg-gray-100 px-3 py-2"
+                                                    />
+                                                </div>
+                                                {/* SERIAL NUMBER */}
+                                                <div>
+                                                    <label className="text-xs text-gray-500">
+                                                        Marital Status
+                                                    </label>
+                                                    <input
+                                                        readOnly
+                                                        value={
+                                                            person?.status ?? ''
+                                                        }
+                                                        className="w-full rounded border bg-gray-100 px-3 py-2"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                                <div>
+                                                    <label className="text-xs text-gray-500">
+                                                        Contact Number
+                                                    </label>
+                                                    <input
+                                                        readOnly
+                                                        value={
+                                                            person?.contact_no ??
+                                                            ''
+                                                        }
+                                                        className="w-full rounded border bg-gray-100 px-3 py-2"
+                                                    />
+                                                </div>
+
+                                                {/* BIRTHDAY */}
+                                                <div>
+                                                    <label className="text-xs text-gray-500">
+                                                        Birthday
+                                                    </label>
+                                                    <input
+                                                        readOnly
+                                                        value={formatDateToMilitary(
+                                                            person?.birthday,
+                                                        )}
+                                                        className="w-full rounded border bg-gray-100 px-3 py-2"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                                <div>
+                                                    <label className="text-xs text-gray-500">
+                                                        Emergency Contact Person
+                                                    </label>
+                                                    <input
+                                                        readOnly
+                                                        value={
+                                                            person?.emergency_contact_person ??
+                                                            ''
+                                                        }
+                                                        className="w-full rounded border bg-gray-100 px-3 py-2"
+                                                    />
+                                                </div>
+
+                                                {/* BIRTHDAY */}
+                                                <div>
+                                                    <label className="text-xs text-gray-500">
+                                                        Emergeny Contact Number
+                                                    </label>
+                                                    <input
+                                                        readOnly
+                                                        value={
+                                                            person?.emergency_contact_no
+                                                        }
+                                                        className="w-full rounded border bg-gray-100 px-3 py-2"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                                                <div>
+                                                    <label className="text-xs text-gray-500">
+                                                        Height
+                                                    </label>
+                                                    <input
+                                                        readOnly
+                                                        value={`${person?.height} cm`}
+                                                        className="w-full rounded border bg-gray-100 px-3 py-2"
+                                                    />
+                                                </div>
+                                                {/* BIRTHDAY */}
+                                                <div>
+                                                    <label className="text-xs text-gray-500">
+                                                        Weight
+                                                    </label>
+                                                    <input
+                                                        readOnly
+                                                        value={`${person?.weight} kg`}
+                                                        className="w-full rounded border bg-gray-100 px-3 py-2"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="text-xs text-gray-500">
+                                                        Weight
+                                                    </label>
+                                                    <input
+                                                        readOnly
+                                                        value={
+                                                            person?.blood_type
+                                                        }
+                                                        className="w-full rounded border bg-gray-100 px-3 py-2"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                                                <div>
+                                                    <label className="text-xs text-gray-500">
+                                                        Eye Color
+                                                    </label>
+                                                    <input
+                                                        readOnly
+                                                        value={`${person?.eye_color}`}
+                                                        className="w-full rounded border bg-gray-100 px-3 py-2"
+                                                    />
+                                                </div>
+                                                {/* BIRTHDAY */}
+                                                <div>
+                                                    <label className="text-xs text-gray-500">
+                                                        Hair Color
+                                                    </label>
+                                                    <input
+                                                        readOnly
+                                                        value={
+                                                            person?.hair_color
+                                                        }
+                                                        className="w-full rounded border bg-gray-100 px-3 py-2"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="text-xs text-gray-500">
+                                                        Identifying Marks
+                                                    </label>
+                                                    <input
+                                                        readOnly
+                                                        value={
+                                                            person?.identifying_marks
+                                                        }
+                                                        className="w-full overflow-x-auto rounded border bg-gray-100 px-3 py-2"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <label className="text-xs text-gray-500">
+                                                    Address
+                                                </label>
+                                                <input
+                                                    readOnly
+                                                    value={person?.address}
+                                                    className="w-full overflow-x-auto rounded border bg-gray-100 px-3 py-2"
+                                                />
+                                            </div>
+                                            <hr className="my-4 border-t border-gray-300" />
+
+                                            <Tabs02 />
+                                        </div>
+                                    </DialogContent>
+                                </Dialog>
                             </div>
                         )}
 

@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\AshoreAboardPass;
 use App\Models\AshorePass;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
@@ -17,7 +18,7 @@ class UpdateAshorePassStatus extends Command
      */
     public function handle()
     {
-        AshorePass::query()->update([
+        AshoreAboardPass::query()->update([
             'status' => DB::raw("
             CASE 
                 WHEN expires_at < NOW() THEN 'expired'

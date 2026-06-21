@@ -6,6 +6,7 @@ export type AshorePasses = {
     duration_days: number;
     issued_at: Date;
     expires_at: Date;
+    aboard_at: Date;
     status: string;
     trainee: Trainee;
 };

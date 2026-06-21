@@ -77,7 +77,7 @@ export const columns: ColumnDef<AshorePasses>[] = [
     },
     {
         accessorKey: 'coy',
-        header: 'Coy',
+        header: 'Company',
         cell: ({ row }) => row.original.trainee.coy,
     },
     {
@@ -100,6 +100,12 @@ export const columns: ColumnDef<AshorePasses>[] = [
         accessorKey: 'expires_aat',
         header: 'Expires In',
         cell: ({ row }) => row.original.expires_at,
+    },
+
+    {
+        accessorKey: 'aboard_at',
+        header: 'Aboard At',
+        cell: ({ row }) => row.original?.aboard_at,
     },
 
     {

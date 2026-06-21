@@ -20,6 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
+
+   
         $middleware->web(append: [
             HandleAppearance::class,
             HandleInertiaRequests::class,
@@ -35,7 +37,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectTo(
             guests: '/login',
             users: function ($request) {
-                if ($request->user()->getRoleNames()->first() === 'User') {
+                if ($request->user()->hasRole('User')) {
                     return '/scanner';
                 }
                 return '/dashboard';

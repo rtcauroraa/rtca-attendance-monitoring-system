@@ -4,9 +4,9 @@ import { trainees } from '@/routes';
 import { formatDateToMilitary } from '@/utils/formatDateToMilitary';
 import { Link, router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
-import { CloudCog, EyeIcon, Pencil, Trash2 } from 'lucide-react';
+import { ArrowUpDown, CloudCog, EyeIcon, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { Trainee } from '@/types/interface';
+import { Trainee } from '@/@types/Trainees';
 import {
     Dialog,
     DialogContent,
@@ -44,19 +44,33 @@ const capitalize = (value: string) =>
 export const columns: ColumnDef<Trainee>[] = [
     {
         id: 'full_name',
-        header: 'Name',
+        accessorFn: (row) =>
+            `${row.last_name} ${row.first_name} ${row.middle_name ?? ''}`,
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === 'asc')
+                }
+            >
+                Name
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+        ),
         cell: ({ row }) => {
             return (
                 <div>
                     <div>
-                        <div>
-                            {`${row.original.first_name} ${
-                                row.original.middle_name
-                                    ? row.original.middle_name.charAt(0) + '.'
-                                    : ''
-                            } ${row.original.last_name} ${row?.original?.suffix === 'N/A' || !row?.original?.suffix ? '' : row.original.suffix}
-`}
-                        </div>
+                        {`${row.original.first_name} ${
+                            row.original.middle_name
+                                ? row.original.middle_name.charAt(0) + '.'
+                                : ''
+                        } ${row.original.last_name} ${
+                            row.original.suffix === 'N/A' ||
+                            !row.original.suffix
+                                ? ''
+                                : row.original.suffix
+                        }`}
                     </div>
                     <div className="text-xs text-gray-500">
                         {row.original.email}
@@ -65,23 +79,51 @@ export const columns: ColumnDef<Trainee>[] = [
             );
         },
     },
-
     {
         accessorKey: 'contact_no',
         header: 'Contact No',
     },
     {
         accessorKey: 'serial_number',
-        header: 'Serial Number',
-        cell: ({ row }) => capitalize(row.original.serial_number),
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === 'asc')
+                }
+            >
+                Serial Number
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+        ),
     },
     {
         accessorKey: 'coy',
-        header: 'Coy',
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === 'asc')
+                }
+            >
+                Coy
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+        ),
     },
     {
         accessorKey: 'blood_type',
-        header: 'Blood Type',
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === 'asc')
+                }
+            >
+                Blood Type
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+        ),
     },
     {
         accessorKey: 'birthday',
@@ -92,14 +134,32 @@ export const columns: ColumnDef<Trainee>[] = [
     },
     {
         id: 'physical',
-        header: 'Physical',
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === 'asc')
+                }
+            >
+                Physical
+            </Button>
+        ),
         cell: ({ row }) => {
             return `${row.original.height} cm / ${row.original.weight} kg`;
         },
     },
     {
         id: 'emergency',
-        header: 'Emergency Contact',
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === 'asc')
+                }
+            >
+                Emergency Contact
+            </Button>
+        ),
         cell: ({ row }) => {
             return (
                 <div>
@@ -139,7 +199,11 @@ export const columns: ColumnDef<Trainee>[] = [
                         >
                             <DialogHeader>
                                 <DialogTitle>Trainee Details</DialogTitle>
-                                <img src="{{ asset('storage/qrcodes/PCG-Class-119/2330.png') }}" alt="My Image" width="300"/>
+                                <img
+                                    src="{{ asset('storage/qrcodes/PCG-Class-119/2330.png') }}"
+                                    alt="My Image"
+                                    width="300"
+                                />
                             </DialogHeader>
                             <div className="flex flex-col items-center border-t pt-4">
                                 {trainee.qr_code ? (

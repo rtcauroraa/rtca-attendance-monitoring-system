@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ashore_passes', function (Blueprint $table) {
+        Schema::create('ashore_aboard_passes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('trainee_id')->constrained()->cascadeOnDelete();
             $table->integer('duration_days');
             $table->dateTime('issued_at');
             $table->dateTime('expires_at');
-            $table->enum('status', ['active', 'expired', 'cancelled'])->default('active');
+            $table->dateTime('aboard_at')->nullable();
+            $table->enum('status', ['active', 'aboard', 'expired', 'cancelled'])->default('active');
             $table->timestamps();
         });
     }

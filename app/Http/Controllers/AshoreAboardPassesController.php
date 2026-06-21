@@ -2,20 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AshorePass;
-use App\Models\AshorePasses;
+use App\Models\AshoreAboardPass;
 use App\Models\Trainee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
-class AshorePassesController extends Controller
+class AshoreAboardPassesController extends Controller
 {
     public function index(Request $request)
     {
         $search = $request->search;
 
-        $ashorePasses = AshorePass::with('trainee')
+        $ashorePasses = AshoreAboardPass::with('trainee')
             ->when($search, function ($query) use ($search) {
                 $query->whereHas('trainee', function ($q) use ($search) {
                     $q->where('first_name', 'like', "%{$search}%")
@@ -28,7 +27,7 @@ class AshorePassesController extends Controller
             ->latest()
             ->get();
 
-        return Inertia::render('ashore-passes/index', [
+        return Inertia::render('ashoreaboard-passes/index', [
             'ashorePasses' => $ashorePasses,
             'filters' => [
                 'search' => $search,
@@ -49,7 +48,7 @@ class AshorePassesController extends Controller
             ]);
         }
 
-        $active = AshorePass::where('trainee_id', $trainee->id)
+        $active = AshoreAboardPass::where('trainee_id', $trainee->id)
             ->where('status', 'active')
             ->first();
 
@@ -66,7 +65,7 @@ class AshorePassesController extends Controller
             ->setTime($hour, $minute, 0);
 
         DB::transaction(function () use ($trainee, $request, $expiresAt) {
-            AshorePass::create([
+            AshoreAboardPass::create([
                 'trainee_id' => $trainee->id,
                 'duration_days' => $request->duration,
                 'issued_at' => now(),
@@ -76,5 +75,27 @@ class AshorePassesController extends Controller
         });
 
         return back()->with('success', 'Ashore pass created successfully');
+    }
+
+    public function updateToAboard(Request $request, Trainee $trainee)
+    {
+        $pass = AshoreAboardPass::where('trainee_id', $trainee->id)
+            ->where('status', 'active')
+            ->whereNull('aboard_at')
+            ->latest()
+            ->first();
+
+        if (!$pass) {
+            return back()->withErrors([
+                'ashore' => 'No active ashore pass found for this trainee.',
+            ]);
+        }
+
+        $pass->update([
+            'aboard_at' => now(),
+            'status' => 'aboard',
+        ]);
+
+        return back()->with('success', 'Trainee successfully marked as aboard.');
     }
 }

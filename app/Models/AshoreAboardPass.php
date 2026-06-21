@@ -5,13 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class AshorePass extends Model
+class AshoreAboardPass extends Model
 {
     protected $fillable = [
         'trainee_id',
         'duration_days',
         'issued_at',
         'expires_at',
+        'aboard_at',
         'status',
     ];
 
