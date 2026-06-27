@@ -75,7 +75,7 @@ export function AppSidebar() {
                       icon: User,
                   },
                    {
-                      title: 'Liberty Passes',
+                      title: 'Passes',
                       href: '/ashore-passes',
                       icon: NotebookIcon,
                   },

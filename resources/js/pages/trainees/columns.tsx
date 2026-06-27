@@ -49,6 +49,7 @@ export const columns: ColumnDef<Trainee>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
+                className="w-full justify-start px-0"
                 onClick={() =>
                     column.toggleSorting(column.getIsSorted() === 'asc')
                 }
@@ -59,7 +60,7 @@ export const columns: ColumnDef<Trainee>[] = [
         ),
         cell: ({ row }) => {
             return (
-                <div>
+                <div  className="text-start">
                     <div>
                         {`${row.original.first_name} ${
                             row.original.middle_name

@@ -54,6 +54,9 @@ export default function Trainee({ trainees, filters }: any) {
                     // alert('Trainees imported successfully!');
                     setData('csv_file', null); // Reset file input state
                 },
+                onError: (skipped) => {
+                    console.log('Validation errors:', skipped);
+                },
             });
         }
     }, [data.csv_file]);

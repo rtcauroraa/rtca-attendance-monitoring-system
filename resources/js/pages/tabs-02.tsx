@@ -1,120 +1,71 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import {
-  AnimatePresence,
-  Transition,
-  Variant,
-  motion,
-  MotionProps,
-} from "motion/react";
-import { cn } from "@/lib/utils";
+import React, { useMemo, useState } from 'react';
+import { cn } from '@/lib/utils';
+import { AnimatePresence, motion } from 'motion/react';
+import { DataTable } from '@/components/ui/data-table';
+import { columns } from './columns';
 
-type TransitionPanelProps = {
-  children: React.ReactNode[];
-  className?: string;
-  transition?: Transition;
-  activeIndex: number;
-  variants?: { enter: Variant; center: Variant; exit: Variant };
-} & MotionProps;
+type Movement = {
+    id: number;
+    type: 'LIBERTY' | 'LEAVE' | 'OFFICIAL_BUSINESS';
+    mode: 'ASHORE' | 'ABOARD';
+    duration?: number;
+    time?: string;
+    issued_at: string;
+    expires_at?: string;
+    returned_at?: string | null;
+    status: 'ACTIVE' | 'COMPLETED' | 'EXPIRED';
+};
 
-function TransitionPanel({
-  children,
-  className,
-  transition,
-  variants,
-  activeIndex,
-  ...motionProps
-}: TransitionPanelProps) {
-  return (
-    <div className={cn("relative", className)}>
-      <AnimatePresence
-        initial={false}
-        mode="popLayout"
-        custom={motionProps.custom}
-      >
-        <motion.div
-          key={activeIndex}
-          variants={variants}
-          transition={transition}
-          initial="enter"
-          animate="center"
-          exit="exit"
-          {...motionProps}
-        >
-          {children[activeIndex]}
-        </motion.div>
-      </AnimatePresence>
-    </div>
-  );
-}
+const TABS = ['LIBERTY', 'LEAVE', 'OFFICIAL_BUSINESS'] as const;
 
-const ITEMS = [
-  {
-    title: "AI Table Builder",
-    subtitle: "Transforming Data into Insights",
-    content:
-      "Quickly generate interactive tables powered by AI. Import data, auto-format columns, and enable features like sorting, filtering, and pagination without writing manual code. Perfect for dashboards, admin panels, and data-heavy applications.",
-  },
-  {
-    title: "AI Form Builder",
-    subtitle: "Streamlined Form Creation",
-    content:
-      "Design complex forms effortlessly with AI. From simple contact forms to multi-step onboarding flows, the builder handles validation, conditional logic, and responsive layouts — helping you collect accurate data faster.",
-  },
-  {
-    title: "AI Chart Builder",
-    subtitle: "Visualizing Data Intelligently",
-    content:
-      "Turn raw numbers into beautiful, interactive charts with AI assistance. Choose from line, bar, pie, or advanced visualizations, and let the builder suggest the best chart type for your dataset to highlight key insights instantly.",
-  },
-];
+export default function Tabs02({ movements }: { movements: Movement[] }) {
+    const [activeTab, setActiveTab] =
+        useState<(typeof TABS)[number]>('LIBERTY');
 
-export default function TransitionTabMotion() {
-  const [activeIndex, setActiveIndex] = useState(0);
+    const filtered = useMemo(() => {
+        return movements.filter((m) => m.type === activeTab);
+    }, [movements, activeTab]);
 
-  return (
-    <div>
-      {/* Tabs */}
-      <div className="mb-4 flex space-x-2">
-        {ITEMS.map(({ title }, index) => {
-          const isActive = activeIndex === index;
-          return (
-            <button
-              key={title}
-              onClick={() => setActiveIndex(index)}
-              className={cn(
-                "rounded-md px-4 py-2 text-sm font-medium transition-colors",
-                isActive ? "bg-primary text-background" : "text-foreground"
-              )}
-            >
-              {title}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Transition Content */}
-      <div className="overflow-hidden ">
-        <TransitionPanel
-          activeIndex={activeIndex}
-          transition={{ duration: 0.2, ease: "easeInOut" }}
-          variants={{
-            enter: { opacity: 0, y: -50, filter: "blur(4px)" },
-            center: { opacity: 1, y: 0, filter: "blur(0px)" },
-            exit: { opacity: 0, y: 50, filter: "blur(4px)" },
-          }}
-        >
-          {ITEMS.map(({ subtitle, content }, index) => (
-            <div key={index} className="py-2">
-              <p className="mb-2 text-base font-medium text-foreground">
-                {subtitle}
-              </p>
-              <p className="text-sm text-muted-foreground">{content}</p>
+    return (
+        <div>
+            {/* Tabs Header */}
+            <div className="mb-4 flex gap-2">
+                {TABS.map((tab) => (
+                    <button
+                        key={tab}
+                        onClick={() => setActiveTab(tab)}
+                        className={cn(
+                            'rounded px-3 py-1 text-xs transition',
+                            activeTab === tab
+                                ? 'bg-black text-white'
+                                : 'bg-gray-200 text-gray-700',
+                        )}
+                    >
+                        {tab.replace('_', ' ')}
+                    </button>
+                ))}
             </div>
-          ))}
-        </TransitionPanel>
-      </div>
-    </div>
-  );
+
+            {/* Animated Content */}
+            <div className="relative min-h-[120px]">
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={activeTab}
+                        initial={{ opacity: 0, y: -20, filter: 'blur(4px)' }}
+                        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                        exit={{ opacity: 0, y: 20, filter: 'blur(4px)' }}
+                        transition={{ duration: 0.2, ease: 'easeInOut' }}
+                    >
+                        {filtered.length === 0 ? (
+                            <p className="text-sm text-gray-500">No records.</p>
+                        ) : (
+                            <DataTable columns={columns} data={filtered} />
+                        )}
+                    </motion.div>
+                </AnimatePresence>
+            </div>
+        </div>
+    );
 }

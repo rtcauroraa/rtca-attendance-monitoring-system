@@ -1,11 +1,12 @@
-import React, { Component, useRef, useState } from 'react';
-import { Scanner, useDevices } from '@yudiel/react-qr-scanner';
-import { useForm, usePage } from '@inertiajs/react';
+import React, { useRef, useState } from 'react';
+import { Scanner } from '@yudiel/react-qr-scanner';
+import { useForm, router } from '@inertiajs/react';
+
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { router } from '@inertiajs/react';
 import { formatDateToMilitary } from '@/utils/formatDateToMilitary';
 import Tabs02 from '@/pages/tabs-02';
+
 import {
     AlertDialog,
     AlertDialogAction,
@@ -15,16 +16,17 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-    AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+
 import {
     Select,
     SelectContent,
@@ -32,80 +34,37 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+
 import { toast } from 'sonner';
-import { CheckCheck, TriangleAlertIcon } from 'lucide-react';
+import { AlertCircle, TriangleAlertIcon } from 'lucide-react';
+
 export default function ScannerPage() {
     const [modalOpen, setModalOpen] = useState(false);
-    const [loading, setLoading] = useState(false);
     const [person, setPerson] = useState<any>(null);
     const [type, setType] = useState<string | null>(null);
+
     const scanLockRef = useRef(false);
-    const [scannerKey, setScannerKey] = useState(0);
     const lastQRRef = useRef<string | null>(null);
+    const [scannerKey, setScannerKey] = useState(0);
 
-    const handleScan = (results: any) => {
-        const raw = results?.[0]?.rawValue;
-        if (!raw) return;
+    const [selectedDevice] = useState(null);
 
-        if (scanLockRef.current) return; // 🔥 HARD BLOCK
-        if (lastQRRef.current === raw) return;
-        lastQRRef.current = raw;
-        scanLockRef.current = true; // LOCK IMMEDIATELY
+    // 🔥 ACTION TYPE (LIBERTY / LEAVE / OFFICIAL BUSINESS)
+    const [activeAction, setActiveAction] = useState<string | null>(null);
 
-        const [type, id] = raw.split('_');
-
-        router.get(
-            `/scan/${type}/${id}`,
-            {},
-            {
-                preserveState: true,
-                preserveScroll: true,
-                onSuccess: (page) => {
-                    setPerson(page.props.data);
-                    setType(type);
-                    setModalOpen(true);
-                },
-            },
-        );
-    };
-
-    const [selectedDevice, setSelectedDevice] = useState(null);
-    const highlightCodeOnCanvas = (detectedCodes: any, ctx: any) => {
-        detectedCodes.forEach((detectedCode: any) => {
-            const { boundingBox, cornerPoints } = detectedCode;
-
-            // Draw bounding box
-            ctx.strokeStyle = '#00FF00';
-            ctx.lineWidth = 4;
-            ctx.strokeRect(
-                boundingBox.x,
-                boundingBox.y,
-                boundingBox.width,
-                boundingBox.height,
-            );
-
-            // Draw corner points
-            ctx.fillStyle = '#FFFFFF';
-            cornerPoints.forEach((point: any) => {
-                ctx.beginPath();
-                ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI);
-                ctx.fill();
-            });
-        });
-    };
-
-    const [openLiberty, setOpenLiberty] = useState(false);
+    const [openActionDialog, setOpenActionDialog] = useState(false);
     const [openAshoreForm, setOpenAshoreForm] = useState(false);
-    const [openAboardForm, setOpenAboardForm] = useState(false);
 
-    const { data, setData, post, processing, reset } = useForm({
+    const [pendingAboardId, setPendingAboardId] = useState<number | null>(null);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+
+    const { data, setData, reset, processing } = useForm({
         duration: '',
         time: '',
     });
 
     const durationOptions = Array.from({ length: 16 }, (_, index) => {
         const date = new Date();
-
         date.setDate(date.getDate() + index);
 
         const formattedDate = date.toLocaleDateString('en-US', {
@@ -117,7 +76,6 @@ export default function ScannerPage() {
 
         return {
             value: index.toString(),
-            days: index,
             label:
                 index === 0
                     ? `Today Only (${formattedDate})`
@@ -129,36 +87,42 @@ export default function ScannerPage() {
         setModalOpen(false);
         setPerson(null);
         setType(null);
+        setActiveAction(null);
+
         reset();
 
         scanLockRef.current = false;
         lastQRRef.current = null;
-        scanLockRef.current = false;
-        setOpenAshoreForm(false);
 
-        lastQRRef.current = null;
+        setOpenAshoreForm(false);
+        setOpenActionDialog(false);
+        router.visit('/scanner', {
+            replace: true,
+            preserveState: true,
+        });
 
         setTimeout(() => {
-            setScannerKey((prev) => prev + 1); // 🔥 fully resets scanner engine
+            setScannerKey((prev) => prev + 1);
         }, 300);
     };
 
+    // ✅ ASHORE (UNCHANGED BACKEND)
     const submitAshore = (e: React.FormEvent) => {
         e.preventDefault();
 
         router.post(
-            `/ashore-post/${person?.id}`,
+            `/trainee-movement/${person?.id}`,
             {
+                type: activeAction, // LIBERTY | LEAVE | OFFICIAL_BUSINESS
+                mode: 'ASHORE',
                 duration: data.duration,
                 time: data.time,
-                trainee_id: person?.id,
             },
             {
                 preserveState: true,
                 preserveScroll: true,
-
                 onSuccess: () => {
-                    toast.success('Ashore pass created successfully.', {
+                    toast.success('Passes recorded successfully.', {
                         position: 'top-center',
                         style: {
                             '--normal-bg': 'var(--background)',
@@ -182,7 +146,7 @@ export default function ScannerPage() {
                             } as React.CSSProperties,
                             icon: <TriangleAlertIcon />,
                         });
-                        closeModal();
+
                         return;
                     }
 
@@ -200,300 +164,162 @@ export default function ScannerPage() {
         );
     };
 
-    const [pendingAboardId, setPendingAboardId] = useState<number | null>(null);
-    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [notFoundDialogOpen, setNotFoundDialogOpen] = useState(false);
+    // ✅ ABOARD (UNCHANGED BACKEND)
+    const handleAboard = () => {
+        router.post(
+            `/trainee-movement/${person?.id}`,
+            {
+                type: activeAction,
+                mode: 'ABOARD',
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                onSuccess: () => {
+                    toast.success('Trainee returned successfully.');
+                    closeModal();
+                },
 
-    const handleAboardClick = (personID: number) => {
-        setPendingAboardId(personID);
-        setConfirmOpen(true);
+                onError: (errors) => {
+                    if (errors?.noMovement) {
+                        toast.error(errors.noMovement, {
+                            position: 'top-center',
+                            style: {
+                                '--normal-bg': 'var(--background)',
+                                '--normal-text': 'var(--destructive)',
+                                '--normal-border': 'var(--destructive)',
+                            } as React.CSSProperties,
+                            icon: <TriangleAlertIcon />,
+                        });
+                    } else {
+                        toast.error('Error making aboard', {
+                            position: 'top-center',
+                            style: {
+                                '--normal-bg': 'var(--background)',
+                                '--normal-text': 'var(--destructive)',
+                                '--normal-border': 'var(--destructive)',
+                            } as React.CSSProperties,
+                            icon: <TriangleAlertIcon />,
+                        });
+                    }
+                },
+            },
+        );
+    };
+    const handleScan = (results: any) => {
+        closeModal();
+        setNotFoundDialogOpen(false);
+        const raw = results?.[0]?.rawValue;
+        if (!raw) return;
+
+        if (scanLockRef.current) return;
+        scanLockRef.current = true;
+
+        const [type, id] = raw.split('_');
+
+        router.get(
+            `/scan/${type}/${id}`,
+            {},
+            {
+                preserveState: true,
+                onSuccess: (page) => {
+                    setPerson(page.props.data);
+                    setType(type);
+                    setModalOpen(true);
+                },
+                onError: (errors) => {
+                    setPerson(null);
+                    setNotFoundDialogOpen(true);
+                    router.visit('/scanner', {
+                        replace: true,
+                        preserveState: true,
+                    });
+                },
+                onFinish: () => {
+                    scanLockRef.current = false; // 🔥 ALWAYS RESET
+                },
+            },
+        );
+    };
+
+    const durationLabel = (action: string | null) => {
+        if (action === 'LIBERTY') return 'LIBERTY ACTION';
+        if (action === 'LEAVE') return 'LEAVE ACTION';
+        if (action === 'OFFICIAL_BUSINESS') return 'OFFICIAL BUSINESS';
+        return '';
+    };
+
+    const highlightCodeOnCanvas = (detectedCodes: any, ctx: any) => {
+        detectedCodes.forEach((detectedCode: any) => {
+            const { boundingBox } = detectedCode;
+
+            // Draw bounding box
+            ctx.strokeStyle = '#00FF00';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(
+                boundingBox.x,
+                boundingBox.y,
+                boundingBox.width,
+                boundingBox.height,
+            );
+        });
     };
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-gray-100">
-            <div className="m-5 mt-[-50px] w-full max-w-sm rounded-lg bg-white p-6 text-black shadow-md">
+            <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow-md">
+                {/* MAIN SCAN RESULT MODAL */}
                 <AlertDialog open={modalOpen} onOpenChange={setModalOpen}>
                     <AlertDialogContent>
                         <AlertDialogHeader>
                             <AlertDialogTitle>
-                                {loading
-                                    ? 'Loading...'
-                                    : person
-                                      ? `${type === 'person' ? 'CCGNO ' : ''}${[
-                                            person.first_name,
-                                            person.middle_name,
-                                            person.last_name,
-                                        ]
-                                            .filter(Boolean)
-                                            .join(' ')}`
-                                      : ''}
+                                {person &&
+                                    `${person.first_name} ${person.middle_name ?? ''} ${person.last_name}`}
                             </AlertDialogTitle>
 
                             <AlertDialogDescription>
-                                {type === 'Trainee' && 'Select action below.'}
-                                {type === 'Personnel' &&
-                                    'Personnel record detected.'}
+                                Select action below
                             </AlertDialogDescription>
                         </AlertDialogHeader>
 
-                        {!loading && person && (
-                            <div className="flex flex-col gap-2 py-2">
+                        {person && (
+                            <div className="flex flex-col gap-2">
+                                {/* LIBERTY */}
                                 {type === 'Trainee' && (
                                     <>
-                                        {/* Liberty */}
-                                        <Dialog
-                                            open={openLiberty}
-                                            onOpenChange={setOpenLiberty}
+                                        <Button
+                                            onClick={() => {
+                                                setActiveAction('LIBERTY');
+                                                setOpenActionDialog(true);
+                                            }}
                                         >
-                                            <DialogTrigger asChild>
-                                                <Button>LIBERTY</Button>
-                                            </DialogTrigger>
+                                            LIBERTY
+                                        </Button>
 
-                                            <DialogContent className="w-[400px]">
-                                                <DialogHeader>
-                                                    <DialogTitle>
-                                                        Please Choose Action
-                                                    </DialogTitle>
-                                                </DialogHeader>
-
-                                                <div className="flex flex-col gap-2">
-                                                    <Button
-                                                        className="secondary"
-                                                        onClick={() => {
-                                                            setOpenLiberty(
-                                                                false,
-                                                            );
-                                                            setOpenAshoreForm(
-                                                                true,
-                                                            );
-                                                        }}
-                                                    >
-                                                        Ashore
-                                                    </Button>
-
-                                                    <Button
-                                                        onClick={() =>
-                                                            handleAboardClick(
-                                                                person.id,
-                                                            )
-                                                        }
-                                                    >
-                                                        Aboard
-                                                    </Button>
-                                                </div>
-                                            </DialogContent>
-                                        </Dialog>
-                                        <AlertDialog
-                                            open={confirmOpen}
-                                            onOpenChange={setConfirmOpen}
+                                        <Button
+                                            onClick={() => {
+                                                setActiveAction('LEAVE');
+                                                setOpenActionDialog(true);
+                                            }}
                                         >
-                                            <AlertDialogContent>
-                                                <AlertDialogHeader>
-                                                    <AlertDialogTitle>
-                                                        Confirm Aboard Action
-                                                    </AlertDialogTitle>
+                                            LEAVE
+                                        </Button>
 
-                                                    <AlertDialogDescription>
-                                                        Are you sure this
-                                                        trainee is now aboard?
-                                                    </AlertDialogDescription>
-                                                </AlertDialogHeader>
-
-                                                <AlertDialogFooter>
-                                                    <AlertDialogCancel
-                                                        onClick={() =>
-                                                            setConfirmOpen(
-                                                                false,
-                                                            )
-                                                        }
-                                                    >
-                                                        Cancel
-                                                    </AlertDialogCancel>
-
-                                                    <AlertDialogAction
-                                                        onClick={() => {
-                                                            if (
-                                                                !pendingAboardId
-                                                            )
-                                                                return;
-
-                                                            router.post(
-                                                                `/aboard-post/${pendingAboardId}`,
-                                                                {},
-                                                                {
-                                                                    preserveState: true,
-                                                                    preserveScroll: true,
-                                                                    onSuccess:
-                                                                        () => {
-                                                                            toast.success(
-                                                                                'Trainee marked as aboard',
-                                                                                {
-                                                                                    position:
-                                                                                        'top-center',
-                                                                                    style: {
-                                                                                        '--normal-bg':
-                                                                                            'var(--background)',
-                                                                                        '--normal-text':
-                                                                                            'light-dark(var(--color-green-600), var(--color-green-400))',
-                                                                                        '--normal-border':
-                                                                                            'light-dark(var(--color-green-600), var(--color-green-400))',
-                                                                                    } as React.CSSProperties,
-                                                                                },
-                                                                            );
-                                                                            closeModal();
-                                                                        },
-                                                                    onError: (
-                                                                        errors,
-                                                                    ) => {
-                                                                        toast.error(
-                                                                            errors.ashore ||
-                                                                                'Error occurred',
-                                                                            {
-                                                                                position:
-                                                                                    'top-center',
-                                                                                style: {
-                                                                                    '--normal-bg':
-                                                                                        'var(--background)',
-                                                                                    '--normal-text':
-                                                                                        'var(--destructive)',
-                                                                                    '--normal-border':
-                                                                                        'var(--destructive)',
-                                                                                } as React.CSSProperties,
-                                                                                icon: (
-                                                                                    <TriangleAlertIcon />
-                                                                                ),
-                                                                            },
-                                                                        );
-                                                                    },
-                                                                },
-                                                            );
-
-                                                            setConfirmOpen(
-                                                                false,
-                                                            );
-                                                        }}
-                                                    >
-                                                        Confirm
-                                                    </AlertDialogAction>
-                                                </AlertDialogFooter>
-                                            </AlertDialogContent>
-                                        </AlertDialog>
-                                        <Dialog
-                                            open={openAshoreForm}
-                                            onOpenChange={setOpenAshoreForm}
+                                        <Button
+                                            onClick={() => {
+                                                setActiveAction(
+                                                    'OFFICIAL_BUSINESS',
+                                                );
+                                                setOpenActionDialog(true);
+                                            }}
                                         >
-                                            <DialogContent className="w-[400px]">
-                                                <form onSubmit={submitAshore}>
-                                                    <DialogHeader>
-                                                        <DialogTitle>
-                                                            Ashore Details
-                                                        </DialogTitle>
-                                                    </DialogHeader>
-
-                                                    {/* Duration */}
-                                                    <div className="space-y-2">
-                                                        <label className="text-sm font-medium">
-                                                            Duration
-                                                        </label>
-
-                                                        <Select
-                                                            value={
-                                                                data.duration
-                                                            }
-                                                            onValueChange={(
-                                                                value,
-                                                            ) =>
-                                                                setData(
-                                                                    'duration',
-                                                                    value,
-                                                                )
-                                                            }
-                                                        >
-                                                            <SelectTrigger className="w-full">
-                                                                <SelectValue placeholder="Select Duration" />
-                                                            </SelectTrigger>
-
-                                                            <SelectContent>
-                                                                {durationOptions.map(
-                                                                    (
-                                                                        option,
-                                                                    ) => (
-                                                                        <SelectItem
-                                                                            key={
-                                                                                option.value
-                                                                            }
-                                                                            value={
-                                                                                option.value
-                                                                            }
-                                                                        >
-                                                                            {
-                                                                                option.label
-                                                                            }
-                                                                        </SelectItem>
-                                                                    ),
-                                                                )}
-                                                            </SelectContent>
-                                                        </Select>
-                                                    </div>
-
-                                                    {/* Time */}
-                                                    <div>
-                                                        <label className="mb-1 block text-sm">
-                                                            Time
-                                                        </label>
-
-                                                        <Input
-                                                            type="time"
-                                                            value={data.time}
-                                                            onChange={(e) =>
-                                                                setData(
-                                                                    'time',
-                                                                    e.target
-                                                                        .value,
-                                                                )
-                                                            }
-                                                        />
-                                                    </div>
-
-                                                    <div className="mt-4 flex justify-end gap-2">
-                                                        <Button
-                                                            type="button"
-                                                            variant="outline"
-                                                            onClick={() =>
-                                                                setOpenAshoreForm(
-                                                                    false,
-                                                                )
-                                                            }
-                                                        >
-                                                            Cancel
-                                                        </Button>
-
-                                                        <Button
-                                                            type="submit"
-                                                            disabled={
-                                                                processing
-                                                            }
-                                                        >
-                                                            {processing
-                                                                ? 'Submitting...'
-                                                                : 'Submit'}
-                                                        </Button>
-                                                    </div>
-                                                </form>
-                                            </DialogContent>
-                                        </Dialog>
-
-                                        {/* SECOND DIALOG */}
-
-                                        <Button>LEAVE</Button>
-                                        <Button>OFFICIAL BUSINESS</Button>
+                                            OFFICIAL BUSINESS
+                                        </Button>
                                     </>
                                 )}
 
-                                {type === 'Personnel' && (
-                                    <Button variant="outline">
-                                        VIEW PROFILE
-                                    </Button>
-                                )}
+                                {/* VIEW PROFILE (UNCHANGED) */}
 
                                 <Dialog>
                                     <DialogTrigger asChild>
@@ -758,7 +584,11 @@ export default function ScannerPage() {
                                             </div>
                                             <hr className="my-4 border-t border-gray-300" />
 
-                                            <Tabs02 />
+                                            <Tabs02
+                                                movements={
+                                                    person?.movements || []
+                                                }
+                                            />
                                         </div>
                                     </DialogContent>
                                 </Dialog>
@@ -773,16 +603,162 @@ export default function ScannerPage() {
                     </AlertDialogContent>
                 </AlertDialog>
 
+                <Dialog
+                    open={notFoundDialogOpen}
+                    onOpenChange={setNotFoundDialogOpen}
+                >
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle className="flex items-center gap-x-2 text-red-600">
+                                <AlertCircle />
+                                No Trainee Found
+                            </DialogTitle>
+
+                            <DialogDescription>
+                                The scanned QR code does not match any trainee
+                                in the system.
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        <div className="flex justify-end">
+                            <Button
+                                onClick={() => setNotFoundDialogOpen(false)}
+                            >
+                                Close
+                            </Button>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+                {/* ACTION DIALOG (LIBERTY / LEAVE / OFFICIAL BUSINESS) */}
+                <Dialog
+                    open={openActionDialog}
+                    onOpenChange={setOpenActionDialog}
+                >
+                    <DialogContent className="w-[80vw] md:max-w-[400px]">
+                        <DialogHeader>
+                            <DialogTitle>
+                                {durationLabel(activeAction)}
+                            </DialogTitle>
+                        </DialogHeader>
+
+                        <div className="flex flex-col gap-2">
+                            <Button
+                                onClick={() => {
+                                    setOpenActionDialog(false);
+                                    setOpenAshoreForm(true);
+                                    setOpenActionDialog(false);
+                                }}
+                            >
+                                Ashore
+                            </Button>
+
+                            <Button
+                                onClick={() => {
+                                    setPendingAboardId(person?.id);
+                                    setConfirmOpen(true);
+                                    setOpenActionDialog(false);
+                                }}
+                            >
+                                Aboard
+                            </Button>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+
+                {/* ABOARD CONFIRM */}
+                <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+                    <AlertDialogContent size="sm">
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Confirm Aboard</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Mark trainee as aboard?
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleAboard}>
+                                Confirm
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+
+                {/* ASHORE FORM (UNCHANGED BACKEND ROUTE) */}
+                <Dialog open={openAshoreForm} onOpenChange={setOpenAshoreForm}>
+                    <DialogContent
+                        className="w-[400px]"
+                        showCloseButton={false}
+                    >
+                        <form onSubmit={submitAshore}>
+                            <DialogHeader>
+                                <DialogTitle>Ashore Details</DialogTitle>
+                            </DialogHeader>
+
+                            {/* Duration */}
+                            <Select
+                                value={data.duration}
+                                onValueChange={(v) => setData('duration', v)}
+                            >
+                                <SelectTrigger className="my-3 w-full">
+                                    <SelectValue placeholder="Select Duration" />
+                                </SelectTrigger>
+
+                                <SelectContent>
+                                    {durationOptions.map((opt) => (
+                                        <SelectItem
+                                            key={opt.value}
+                                            value={opt.value}
+                                        >
+                                            {opt.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+
+                            {/* Time */}
+                            <Input
+                                type="time"
+                                value={data.time}
+                                onChange={(e) =>
+                                    setData('time', e.target.value)
+                                }
+                            />
+
+                            <div className="mt-4 flex justify-end gap-2">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => setOpenAshoreForm(false)}
+                                >
+                                    Cancel
+                                </Button>
+
+                                <Button type="submit" disabled={processing}>
+                                    Submit
+                                </Button>
+                            </div>
+                        </form>
+                    </DialogContent>
+                </Dialog>
+
+                {/* SCANNER */}
                 <div className="flex justify-center">
                     <Scanner
-                        onScan={handleScan}
                         key={scannerKey}
-                        onError={(error) => console.error(error)}
+                        onScan={handleScan}
                         components={{
                             tracker: highlightCodeOnCanvas,
-                            finder: false,
+                            torch: true, // Show torch/flashlight button (if supported)
+                            zoom: true, // Show zoom control (if supported)
+                            finder: false, // Show finder overlay
                         }}
-                        constraints={{ deviceId: selectedDevice }}
+                        constraints={{
+                            deviceId: selectedDevice,
+                            facingMode: 'environment',
+                            width: { ideal: 1920 },
+                            height: { ideal: 1080 },
+                        }}
                     />
                 </div>
             </div>

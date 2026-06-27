@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Trainee extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'first_name',
         'middle_name',
@@ -31,6 +34,10 @@ class Trainee extends Model
         'hair_color',
     ];
 
+    public function movements()
+    {
+        return $this->hasMany(TraineeMovement::class);
+    }
     public function attendances()
     {
         return $this->hasMany(Attendance::class);

@@ -53,11 +53,11 @@ export default function Index({ ashorePasses, filters }: any) {
                 </div>
 
                 {/* TABLE (NO LOCAL FILTERING) */}
-                <DataTable columns={columns} data={ashorePasses} />
+                <DataTable columns={columns} data={ashorePasses.data} />
 
                 {/* PAGINATION */}
-                {/* <div className="flex justify-center gap-2 pt-4">
-                    {trainees.links.map((link: any, i: number) => (
+                <div className="flex justify-center gap-2 pt-4">
+                    {ashorePasses.links.map((link: any, i: number) => (
                         <Link
                             key={i}
                             href={link.url ?? ''}
@@ -67,7 +67,7 @@ export default function Index({ ashorePasses, filters }: any) {
                             dangerouslySetInnerHTML={{ __html: link.label }}
                         />
                     ))}
-                </div> */}
+                </div>
             </div>
         </>
     );

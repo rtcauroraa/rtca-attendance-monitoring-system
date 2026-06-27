@@ -1,18 +1,19 @@
 <?php
 
-use App\Http\Controllers\AshoreAboardPassesController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\PersonnelController;
 use App\Http\Controllers\ScanController;
 use App\Http\Controllers\TraineeController;
+use App\Http\Controllers\TraineeMovementController;
 use App\Http\Controllers\UserController;
 
 Route::inertia('/', 'welcome')->name('home');
 
 
-Route::middleware(['auth', 'verified', ])->group(function () {
+Route::middleware(['auth', 'verified',])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
+    Route::inertia('company-monitoring', 'company-monitoring')->name('company-monitoring');
     Route::inertia('create-trainee', 'trainees/create-trainee')->name('create-trainee');
 
     Route::get('/users', [UserController::class, 'index'])->name('users');
@@ -39,16 +40,16 @@ Route::middleware(['auth', 'verified', ])->group(function () {
 
     Route::inertia('attendance', 'attendance/attendance')->name('attendance');
     Route::inertia('create-attendance', 'attendance/create-attendance')->name('create-attendance');
-    Route::get('/ashore-passes', [AshoreAboardPassesController::class, 'index'])->name('ashore.passes');
+    Route::get('/ashore-passes', [TraineeMovementController::class, 'index'])->name('ashore.passes');
 });
 
 Route::middleware(['auth', 'verified', 'role:User'])->group(function () {
     Route::inertia('/scanner', 'scanner')->name('scanner');
     Route::get('/scan/{type}/{id}', [ScanController::class, 'qr_code'])
         ->name('scan.show');
-    Route::post('/ashore-post/{trainee}', [AshoreAboardPassesController::class, 'store'])
+    Route::post('/trainee-movement/{trainee}', [TraineeMovementController::class, 'store'])
         ->name('ashore.store');
-         Route::post('/aboard-post/{trainee}', [AshoreAboardPassesController::class, 'updateToAboard'])
+    Route::post('/aboard-post/{trainee}', [TraineeMovementController::class, 'updateToAboard'])
         ->name('aboard.store');
 });
 

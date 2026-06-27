@@ -18,7 +18,7 @@ export default defineConfig({
                 }),
             ],
         }),
-        
+
         inertia(),
         react({
             babel: {
@@ -30,11 +30,22 @@ export default defineConfig({
             formVariants: true,
         }),
     ],
+    server: {
+        host: '0.0.0.0',
+        port: 5173,
+        hmr: {
+            host: '192.168.100.10',
+        },
+      cors: {
+        origin: [
+            'http://192.168.100.10:8001',
+        ]
+      }
+    },
     resolve: {
         alias: {
-            'react': path.resolve(__dirname, 'node_modules/react'),
+            react: path.resolve(__dirname, 'node_modules/react'),
             'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
         },
     },
-        
 });
