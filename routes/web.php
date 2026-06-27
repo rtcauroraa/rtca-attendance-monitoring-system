@@ -7,10 +7,11 @@ use App\Http\Controllers\ScanController;
 use App\Http\Controllers\TraineeController;
 use App\Http\Controllers\TraineeMovementController;
 use App\Http\Controllers\UserController;
+Route::redirect('/', '/login');
 
-Route::inertia('/', 'welcome')->name('home');
-
-
+Route::get('/phpinfo', function () {
+    phpinfo();
+});
 Route::middleware(['auth', 'verified',])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
     Route::inertia('company-monitoring', 'company-monitoring')->name('company-monitoring');

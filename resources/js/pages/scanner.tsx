@@ -47,16 +47,15 @@ export default function ScannerPage() {
     const lastQRRef = useRef<string | null>(null);
     const [scannerKey, setScannerKey] = useState(0);
 
-    const [selectedDevice] = useState(null);
-
     // 🔥 ACTION TYPE (LIBERTY / LEAVE / OFFICIAL BUSINESS)
     const [activeAction, setActiveAction] = useState<string | null>(null);
 
-    const [openActionDialog, setOpenActionDialog] = useState(false);
+    const [openActionDialog, setOpenActionDialog] = useState(true);
     const [openAshoreForm, setOpenAshoreForm] = useState(false);
 
     const [pendingAboardId, setPendingAboardId] = useState<number | null>(null);
     const [confirmOpen, setConfirmOpen] = useState(false);
+    const [ashoreID, setAShoreID] = useState(null);
 
     const { data, setData, reset, processing } = useForm({
         duration: '',
@@ -84,11 +83,10 @@ export default function ScannerPage() {
     });
 
     const closeModal = () => {
-        setModalOpen(false);
-        setPerson(null);
         setType(null);
         setActiveAction(null);
-
+        setScannerOpen(false);
+        setAShoreID(null);
         reset();
 
         scanLockRef.current = false;
@@ -111,7 +109,7 @@ export default function ScannerPage() {
         e.preventDefault();
 
         router.post(
-            `/trainee-movement/${person?.id}`,
+            `/trainee-movement/${person.trainee_id}`,
             {
                 type: activeAction, // LIBERTY | LEAVE | OFFICIAL_BUSINESS
                 mode: 'ASHORE',
@@ -207,6 +205,10 @@ export default function ScannerPage() {
             },
         );
     };
+    const [activeMode, setActiveMode] = useState<'ASHORE' | 'ABOARD' | null>(
+        null,
+    );
+    const [scannerOpen, setScannerOpen] = useState(false);
     const handleScan = (results: any) => {
         closeModal();
         setNotFoundDialogOpen(false);
@@ -218,6 +220,13 @@ export default function ScannerPage() {
 
         const [type, id] = raw.split('_');
 
+        if (activeMode === 'ASHORE') {
+            setAShoreID(id);
+            setOpenAshoreForm(true);
+        } else {
+            setConfirmOpen(true);
+        }
+
         router.get(
             `/scan/${type}/${id}`,
             {},
@@ -225,8 +234,13 @@ export default function ScannerPage() {
                 preserveState: true,
                 onSuccess: (page) => {
                     setPerson(page.props.data);
-                    setType(type);
-                    setModalOpen(true);
+
+                    setScannerOpen(true);
+                    if (activeMode === 'ASHORE') {
+                        setOpenAshoreForm(true);
+                    } else {
+                        setConfirmOpen(true);
+                    }
                 },
                 onError: (errors) => {
                     setPerson(null);
@@ -270,338 +284,7 @@ export default function ScannerPage() {
         <div className="flex min-h-screen items-center justify-center bg-gray-100">
             <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow-md">
                 {/* MAIN SCAN RESULT MODAL */}
-                <AlertDialog open={modalOpen} onOpenChange={setModalOpen}>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>
-                                {person &&
-                                    `${person.first_name} ${person.middle_name ?? ''} ${person.last_name}`}
-                            </AlertDialogTitle>
-
-                            <AlertDialogDescription>
-                                Select action below
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-
-                        {person && (
-                            <div className="flex flex-col gap-2">
-                                {/* LIBERTY */}
-                                {type === 'Trainee' && (
-                                    <>
-                                        <Button
-                                            onClick={() => {
-                                                setActiveAction('LIBERTY');
-                                                setOpenActionDialog(true);
-                                            }}
-                                        >
-                                            LIBERTY
-                                        </Button>
-
-                                        <Button
-                                            onClick={() => {
-                                                setActiveAction('LEAVE');
-                                                setOpenActionDialog(true);
-                                            }}
-                                        >
-                                            LEAVE
-                                        </Button>
-
-                                        <Button
-                                            onClick={() => {
-                                                setActiveAction(
-                                                    'OFFICIAL_BUSINESS',
-                                                );
-                                                setOpenActionDialog(true);
-                                            }}
-                                        >
-                                            OFFICIAL BUSINESS
-                                        </Button>
-                                    </>
-                                )}
-
-                                {/* VIEW PROFILE (UNCHANGED) */}
-
-                                <Dialog>
-                                    <DialogTrigger asChild>
-                                        <Button variant="outline">
-                                            VIEW PROFILE
-                                        </Button>
-                                    </DialogTrigger>
-                                    <DialogContent
-                                        onOpenAutoFocus={(e) => {
-                                            e.preventDefault();
-                                            document
-                                                .getElementById(
-                                                    'dialog-title-focus',
-                                                )
-                                                ?.focus();
-                                        }}
-                                        className="max-h-[90dvh] max-w-[90vw] overflow-y-auto sm:max-w-[800px]"
-                                    >
-                                        <DialogHeader>
-                                            <DialogTitle>
-                                                Trainee Details
-                                            </DialogTitle>
-                                        </DialogHeader>
-
-                                        {/* DETAILS */}
-
-                                        <div
-                                            className="grid grid-cols-1 gap-4 md:grid-cols-2"
-                                            id="dialog-title-focus"
-                                            tabIndex={-1}
-                                        >
-                                            <div>
-                                                <label className="text-xs text-gray-500">
-                                                    Full Name
-                                                </label>
-                                                <input
-                                                    readOnly
-                                                    value={`${person?.first_name} ${person?.middle_name ?? ''} ${person?.last_name} ${person?.suffix && person?.suffix !== 'N/A' ? person?.suffix : ''}`}
-                                                    className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                />
-                                            </div>
-                                            {/* SERIAL NUMBER */}
-                                            <div>
-                                                <label className="text-xs text-gray-500">
-                                                    Email
-                                                </label>
-                                                <input
-                                                    readOnly
-                                                    value={person?.email ?? ''}
-                                                    className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-4 text-sm">
-                                            {/* NAME */}
-
-                                            {/* EMAIL */}
-
-                                            {/* SERIAL NUMBER */}
-
-                                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                                <div>
-                                                    <label className="text-xs text-gray-500">
-                                                        Company Coy
-                                                    </label>
-                                                    <input
-                                                        readOnly
-                                                        value={
-                                                            person?.coy ?? ''
-                                                        }
-                                                        className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                    />
-                                                </div>
-                                                {/* SERIAL NUMBER */}
-                                                <div>
-                                                    <label className="text-xs text-gray-500">
-                                                        Serial Number
-                                                    </label>
-                                                    <input
-                                                        readOnly
-                                                        value={
-                                                            person?.serial_number ??
-                                                            ''
-                                                        }
-                                                        className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                                <div>
-                                                    <label className="text-xs text-gray-500">
-                                                        Religion
-                                                    </label>
-                                                    <input
-                                                        readOnly
-                                                        value={
-                                                            person?.religion ??
-                                                            ''
-                                                        }
-                                                        className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                    />
-                                                </div>
-                                                {/* SERIAL NUMBER */}
-                                                <div>
-                                                    <label className="text-xs text-gray-500">
-                                                        Marital Status
-                                                    </label>
-                                                    <input
-                                                        readOnly
-                                                        value={
-                                                            person?.status ?? ''
-                                                        }
-                                                        className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                                <div>
-                                                    <label className="text-xs text-gray-500">
-                                                        Contact Number
-                                                    </label>
-                                                    <input
-                                                        readOnly
-                                                        value={
-                                                            person?.contact_no ??
-                                                            ''
-                                                        }
-                                                        className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                    />
-                                                </div>
-
-                                                {/* BIRTHDAY */}
-                                                <div>
-                                                    <label className="text-xs text-gray-500">
-                                                        Birthday
-                                                    </label>
-                                                    <input
-                                                        readOnly
-                                                        value={formatDateToMilitary(
-                                                            person?.birthday,
-                                                        )}
-                                                        className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                                <div>
-                                                    <label className="text-xs text-gray-500">
-                                                        Emergency Contact Person
-                                                    </label>
-                                                    <input
-                                                        readOnly
-                                                        value={
-                                                            person?.emergency_contact_person ??
-                                                            ''
-                                                        }
-                                                        className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                    />
-                                                </div>
-
-                                                {/* BIRTHDAY */}
-                                                <div>
-                                                    <label className="text-xs text-gray-500">
-                                                        Emergeny Contact Number
-                                                    </label>
-                                                    <input
-                                                        readOnly
-                                                        value={
-                                                            person?.emergency_contact_no
-                                                        }
-                                                        className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                                                <div>
-                                                    <label className="text-xs text-gray-500">
-                                                        Height
-                                                    </label>
-                                                    <input
-                                                        readOnly
-                                                        value={`${person?.height} cm`}
-                                                        className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                    />
-                                                </div>
-                                                {/* BIRTHDAY */}
-                                                <div>
-                                                    <label className="text-xs text-gray-500">
-                                                        Weight
-                                                    </label>
-                                                    <input
-                                                        readOnly
-                                                        value={`${person?.weight} kg`}
-                                                        className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="text-xs text-gray-500">
-                                                        Weight
-                                                    </label>
-                                                    <input
-                                                        readOnly
-                                                        value={
-                                                            person?.blood_type
-                                                        }
-                                                        className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                                                <div>
-                                                    <label className="text-xs text-gray-500">
-                                                        Eye Color
-                                                    </label>
-                                                    <input
-                                                        readOnly
-                                                        value={`${person?.eye_color}`}
-                                                        className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                    />
-                                                </div>
-                                                {/* BIRTHDAY */}
-                                                <div>
-                                                    <label className="text-xs text-gray-500">
-                                                        Hair Color
-                                                    </label>
-                                                    <input
-                                                        readOnly
-                                                        value={
-                                                            person?.hair_color
-                                                        }
-                                                        className="w-full rounded border bg-gray-100 px-3 py-2"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label className="text-xs text-gray-500">
-                                                        Identifying Marks
-                                                    </label>
-                                                    <input
-                                                        readOnly
-                                                        value={
-                                                            person?.identifying_marks
-                                                        }
-                                                        className="w-full overflow-x-auto rounded border bg-gray-100 px-3 py-2"
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <div>
-                                                <label className="text-xs text-gray-500">
-                                                    Address
-                                                </label>
-                                                <input
-                                                    readOnly
-                                                    value={person?.address}
-                                                    className="w-full overflow-x-auto rounded border bg-gray-100 px-3 py-2"
-                                                />
-                                            </div>
-                                            <hr className="my-4 border-t border-gray-300" />
-
-                                            <Tabs02
-                                                movements={
-                                                    person?.movements || []
-                                                }
-                                            />
-                                        </div>
-                                    </DialogContent>
-                                </Dialog>
-                            </div>
-                        )}
-
-                        <AlertDialogFooter>
-                            <AlertDialogCancel onClick={closeModal}>
-                                Close
-                            </AlertDialogCancel>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
+                {/* Alert dialog here */}
 
                 <Dialog
                     open={notFoundDialogOpen}
@@ -632,9 +315,20 @@ export default function ScannerPage() {
                 {/* ACTION DIALOG (LIBERTY / LEAVE / OFFICIAL BUSINESS) */}
                 <Dialog
                     open={openActionDialog}
-                    onOpenChange={setOpenActionDialog}
+                    onOpenChange={(open) => {
+                        // Only allow opening programmatically.
+                        // Ignore attempts to close from outside click or Esc.
+                        if (open) {
+                            setOpenActionDialog(true);
+                        }
+                    }}
                 >
-                    <DialogContent className="w-[80vw] md:max-w-[400px]">
+                    <DialogContent
+                        className="w-[80vw] md:max-w-[400px]"
+                        onPointerDownOutside={(e) => e.preventDefault()}
+                        onEscapeKeyDown={(e) => e.preventDefault()}
+                        showCloseButton={false}
+                    >
                         <DialogHeader>
                             <DialogTitle>
                                 {durationLabel(activeAction)}
@@ -644,9 +338,9 @@ export default function ScannerPage() {
                         <div className="flex flex-col gap-2">
                             <Button
                                 onClick={() => {
+                                    setActiveMode('ASHORE');
                                     setOpenActionDialog(false);
-                                    setOpenAshoreForm(true);
-                                    setOpenActionDialog(false);
+                                    setScannerOpen(true);
                                 }}
                             >
                                 Ashore
@@ -654,8 +348,7 @@ export default function ScannerPage() {
 
                             <Button
                                 onClick={() => {
-                                    setPendingAboardId(person?.id);
-                                    setConfirmOpen(true);
+                                    setActiveMode('ABOARD');
                                     setOpenActionDialog(false);
                                 }}
                             >
@@ -664,7 +357,6 @@ export default function ScannerPage() {
                         </div>
                     </DialogContent>
                 </Dialog>
-
                 {/* ABOARD CONFIRM */}
                 <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
                     <AlertDialogContent size="sm">
@@ -743,24 +435,26 @@ export default function ScannerPage() {
                 </Dialog>
 
                 {/* SCANNER */}
-                <div className="flex justify-center">
-                    <Scanner
-                        key={scannerKey}
-                        onScan={handleScan}
-                        components={{
-                            tracker: highlightCodeOnCanvas,
-                            torch: true, // Show torch/flashlight button (if supported)
-                            zoom: true, // Show zoom control (if supported)
-                            finder: false, // Show finder overlay
-                        }}
-                        constraints={{
-                            deviceId: selectedDevice,
-                            facingMode: 'environment',
-                            width: { ideal: 1920 },
-                            height: { ideal: 1080 },
-                        }}
-                    />
-                </div>
+
+                {scannerOpen && (
+                    <div className="flex justify-center">
+                        <Scanner
+                            key={scannerKey}
+                            onScan={handleScan}
+                            components={{
+                                tracker: highlightCodeOnCanvas,
+                                torch: true,
+                                zoom: true,
+                                finder: false,
+                            }}
+                            constraints={{
+                                facingMode: 'environment',
+                                width: { ideal: 1920 },
+                                height: { ideal: 1080 },
+                            }}
+                        />
+                    </div>
+                )}
             </div>
         </div>
     );

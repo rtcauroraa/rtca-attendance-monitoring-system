@@ -1,10 +1,7 @@
-import type { SVGAttributes } from 'react';
+import type { ImgHTMLAttributes } from 'react';
 
-export default function AppLogoIcon(props: SVGAttributes<SVGElement>) {
-    return (
-        <img
-            src="http://rtca-e-monitoring.runasp.net/main-logo.png"
-            alt="RTC Attendance Monitoring System"
-        />
-    );
+export default function AppLogoIcon(
+    props: ImgHTMLAttributes<HTMLImageElement>,
+) {
+    return <img src="/app-logo.png" alt="App Logo" {...props} />;
 }
