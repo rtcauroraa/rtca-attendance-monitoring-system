@@ -1,39 +1,81 @@
-import { Head, Link } from '@inertiajs/react';
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
-import { dashboard, user } from '@/routes';
-import { columns, Payment } from './columns';
+import { Head, Link, router } from '@inertiajs/react';
+import { users as UserList, users } from '@/routes';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { DataTable } from '@/components/ui/data-table';
+import { columns } from './columns';
+import { useState } from 'react';
 
-async function getData(): Promise<Payment[]> {
-    // Fetch data from your API here.
-    return [
-        {
-            id: '728ed52f',
-            amount: 100,
-            status: 'pending',
-            email: 'm@example.com',
-        },
-        // ...
-    ];
-}
+export default function User({ users, filters }: any) {
+    console.log(users);
+    const [search, setSearch] = useState(filters?.search || '');
 
-const data = await getData();
-export default function User() {
+    // ✅ SERVER SEARCH TRIGGER
+    const handleSearch = (value: string) => {
+        setSearch(value);
+
+        router.get(
+            '/users',
+            { search: value },
+            {
+                preserveState: true,
+                replace: true,
+            },
+        );
+    };
     return (
         <>
             <Head title="Users" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4 px-10">
+
+            <div className="flex flex-col gap-4 p-4">
+                {/* SEARCH */}
                 <div className="flex justify-between">
-                    <div>Left Side (Logo)</div>
-                    <div>
-                        <Button variant="outline" className="cursor-pointer">
-                            <Link href="/create-user">Add User</Link>
-                        </Button>
+                    <div className="flex items-center gap-5">
+                        <Input
+                            placeholder="Search User..."
+                            value={search}
+                            onChange={(e) => handleSearch(e.target.value)}
+                            className="max-w-sm"
+                        />
+                        {/* <input
+                            type="file"
+                            accept=".csv"
+                            ref={fileInputRef}
+                            onChange={handleFileChange}
+                            className="hidden"
+                        />
+                        <Button
+                            className="cursor-pointer"
+                            type="button"
+                            disabled={processing}
+                            onClick={handleButtonClick}
+                        >
+                            {processing
+                                ? 'Processing Import...'
+                                : ' Import CSV'}
+                        </Button>  */}
                     </div>
+
+                    <Button>
+                        <Link href="/create-user">Add User</Link>
+                    </Button>
                 </div>
-                <div className="grid auto-rows-min">
-                    <DataTable columns={columns} data={data} />
+
+                {/* TABLE (NO LOCAL FILTERING) */}
+                <DataTable columns={columns} data={users.data} />
+
+                {/* PAGINATION */}
+                <div className="flex justify-center gap-2 pt-4">
+                    {users.links.map((link: any, i: number) => (
+                        <Link
+                            key={i}
+                            href={link.url ?? ''}
+                            className={`rounded border px-3 py-1 ${
+                                link.active ? 'bg-black text-white' : ''
+                            }`}
+                            dangerouslySetInnerHTML={{ __html: link.label }}
+                        />
+                    ))}
                 </div>
             </div>
         </>
@@ -43,8 +85,8 @@ export default function User() {
 User.layout = {
     breadcrumbs: [
         {
-            title: 'Users',
-            href: user(),
+            title: 'Manage Users',
+            href: users(),
         },
     ],
 };

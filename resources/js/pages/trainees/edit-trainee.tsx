@@ -19,7 +19,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { CloudCog } from 'lucide-react';
 import { toast } from 'sonner';
-import { Trainee } from '@/types/interface';
+import { Trainee } from '@/@types/Trainees';
 
 const options = {
     month: 'long',
@@ -104,8 +104,8 @@ export default function EditTrainee({ trainee }: { trainee: Trainee }) {
                                 Edit Trainee Information
                             </FieldLegend>
                             <FieldDescription>
-                                Edit in the information below to update current
-                                trainee. Click submit when you're done.{' '}
+                                Update the trainee information below. Click
+                                Submit when you're done.
                             </FieldDescription>
 
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -151,7 +151,10 @@ export default function EditTrainee({ trainee }: { trainee: Trainee }) {
                                     <Input
                                         value={data.serial_number}
                                         onChange={(e) =>
-                                            setData('serial_number', e.target.value)
+                                            setData(
+                                                'serial_number',
+                                                e.target.value,
+                                            )
                                         }
                                     />
                                 </Field>
@@ -507,9 +510,7 @@ export default function EditTrainee({ trainee }: { trainee: Trainee }) {
 
                             <div className="mt-8 flex gap-3">
                                 <Button type="submit" disabled={processing}>
-                                    {processing
-                                        ? 'Updating...'
-                                        : 'Update'}
+                                    {processing ? 'Updating...' : 'Update'}
                                 </Button>
                                 <Button
                                     variant="outline"

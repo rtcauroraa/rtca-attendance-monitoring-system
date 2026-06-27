@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
 import { columns } from './columns';
 import { trainees as traineesRoute } from '@/routes';
-import { Import, Upload, UploadIcon } from 'lucide-react';
+import { Import, Plus, Upload, UploadIcon } from 'lucide-react';
 import { useForm } from '@inertiajs/react';
 export default function Trainee({ trainees, filters }: any) {
     const [search, setSearch] = useState(filters?.search || '');
@@ -54,6 +54,9 @@ export default function Trainee({ trainees, filters }: any) {
                     // alert('Trainees imported successfully!');
                     setData('csv_file', null); // Reset file input state
                 },
+                onError: (skipped) => {
+                    console.log('Validation errors:', skipped);
+                },
             });
         }
     }, [data.csv_file]);
@@ -66,7 +69,7 @@ export default function Trainee({ trainees, filters }: any) {
                 <div className="flex justify-between">
                     <div className="flex items-center gap-5">
                         <Input
-                            placeholder="Search trainees..."
+                            placeholder="Search Trainee..."
                             value={search}
                             onChange={(e) => handleSearch(e.target.value)}
                             className="max-w-sm"
@@ -84,14 +87,29 @@ export default function Trainee({ trainees, filters }: any) {
                             disabled={processing}
                             onClick={handleButtonClick}
                         >
-                            {processing
-                                ? 'Processing Import...'
-                                : ' Import CSV'}
+                            {processing ? (
+                                'Processing Import...'
+                            ) : (
+                                <div className="flex items-center gap-2">
+                                    <Upload className="h-4 w-4" />
+                                    <span className="hidden sm:inline">
+                                        Import CSV
+                                    </span>
+                                </div>
+                            )}
                         </Button>
                     </div>
 
-                    <Button>
-                        <Link href="/create-trainee">Add Trainee</Link>
+                    <Button asChild>
+                        <Link
+                            href="/create-trainee"
+                            className="flex items-center gap-2"
+                        >
+                            <Plus className="h-4 w-4" />
+                            <span className="hidden sm:inline">
+                                Add Trainee
+                            </span>
+                        </Link>
                     </Button>
                 </div>
 
@@ -105,7 +123,7 @@ export default function Trainee({ trainees, filters }: any) {
                             key={i}
                             href={link.url ?? ''}
                             className={`rounded border px-3 py-1 ${
-                                link.active ? 'bg-black text-white' : ''
+                                link.active ? 'bg-[#173796] text-white' : ''
                             }`}
                             dangerouslySetInnerHTML={{ __html: link.label }}
                         />

@@ -3,8 +3,10 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\Trainee;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,10 +18,24 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // User::factory(10)->create();
+            // Trainee::factory(50)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $admin = User::factory()->create([
+            'name' => 'Admin',
+            'email' => 'admin@gmail.com',
+            'password' => 'admin123',
         ]);
-    }
+        $admin->assignRole('Admin');
+
+        $user = User::factory()->create([
+            'name' => 'Gangway Post 1',
+            'email' => 'gangway@gmail.com',
+            'password' => 'gangway123',
+        ]);
+
+        $user->assignRole('User');
+
+        }
+    
+
 }

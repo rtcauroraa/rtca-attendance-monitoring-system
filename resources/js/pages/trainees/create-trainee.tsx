@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 
-const options = {
+const options:any = {
     month: 'long',
     day: 'numeric',
     year: 'numeric',
@@ -242,7 +242,10 @@ export default function CreateTrainee() {
                                     <FieldLabel>Contact No.</FieldLabel>
                                     <Input
                                         required
-                                        type="text" // Kept as text or tel to handle leading zeros safely
+                                        type="text"
+                                        maxLength={11}
+                                        pattern="[0-9]{11}"
+                                        inputMode="numeric"
                                         value={data.contact_no}
                                         placeholder="Enter Contact Number"
                                         onChange={(e) =>
@@ -354,6 +357,9 @@ export default function CreateTrainee() {
                                     </FieldLabel>
                                     <Input
                                         required
+                                        maxLength={11}
+                                        pattern="[0-9]{11}"
+                                        inputMode="numeric"
                                         placeholder="Enter Emergency Contact Person"
                                         value={data.emergency_contact_person}
                                         onChange={(e) =>
