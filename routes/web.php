@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\AttendanceController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\PersonnelController;
@@ -13,7 +12,7 @@ Route::redirect('/', '/login');
 
 
 Route::middleware(['auth', 'verified', 'role:Admin'])->group(function () {
-    Route::inertia('company-moginitoring', 'company-monitoring')->name('company-monitoring');
+    Route::inertia('company-monitoring', 'company-monitoring')->name('company-monitoring');
     Route::inertia('create-trainee', 'trainees/create-trainee')->name('create-trainee');
 
     Route::get('/users', [UserController::class, 'index'])->name('users');
@@ -28,16 +27,17 @@ Route::middleware(['auth', 'verified', 'role:Admin'])->group(function () {
 
     Route::post('/trainees', [TraineeController::class, 'store'])
         ->name('trainees.store');
-    Route::get('/trainees', [TraineeController::class, 'index']);
-
-
+    Route::get('/trainees', [TraineeController::class, 'index'])
+        ->name('trainees');
     Route::get('/trainees/{trainee}/edit', [TraineeController::class, 'edit'])
         ->name('trainees-edit');
     Route::put('/trainees/{trainee}/update', [TraineeController::class, 'update'])
         ->name('trainees-update');
     Route::delete('/trainees/{trainee}/delete', [TraineeController::class, 'destroy'])
         ->name('trainees.destroy');
-    Route::post('/import-trainees', [TraineeController::class, 'storeCSV']);:inertia('attendance', 'attendance/attendance')->name('attendance');
+    Route::post('/import-trainees', [TraineeController::class, 'storeCSV']);
+
+    Route::inertia('attendance', 'attendance/attendance')->name('attendance');
     Route::inertia('create-attendance', 'attendance/create-attendance')->name('create-attendance');
     Route::get('/ashore-passes', [TraineeMovementController::class, 'index'])->name('ashore.passes');
 });
