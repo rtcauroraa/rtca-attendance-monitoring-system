@@ -7,8 +7,7 @@ use App\Http\Controllers\ScanController;
 use App\Http\Controllers\TraineeController;
 use App\Http\Controllers\TraineeMovementController;
 use App\Http\Controllers\UserController;
-
-Route::inertia('/', 'welcome')->name('home');
+Route::redirect('/', '/login');
 
 
 Route::middleware(['auth', 'verified',])->group(function () {

@@ -33,14 +33,7 @@ export default defineConfig({
     server: {
         host: '0.0.0.0',
         port: 5173,
-        hmr: {
-            host: '192.168.100.10',
-        },
-      cors: {
-        origin: [
-            'http://192.168.100.10:8001',
-        ]
-      }
+       
     },
     resolve: {
         alias: {

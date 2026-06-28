@@ -754,7 +754,6 @@ export default function ScannerPage() {
                             finder: false, // Show finder overlay
                         }}
                         constraints={{
-                            deviceId: selectedDevice,
                             facingMode: 'environment',
                             width: { ideal: 1920 },
                             height: { ideal: 1080 },
