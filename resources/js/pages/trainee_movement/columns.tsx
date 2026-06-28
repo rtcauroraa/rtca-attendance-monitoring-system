@@ -1,38 +1,50 @@
 'use client';
 
-import { Link, router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
-
 import { TraineeMovement } from '@/@types/TraineeMovement';
 
-// const handleDelete = (id: number) => {
-//     toast.warning('Are you sure you want to delete this trainee record?', {
-//         description: 'This action cannot be undone.',
-//         position: 'top-center',
-//         action: {
-//             label: 'Yes',
-//             onClick: () => {
-//                 router.delete(`/trainees/${id}/delete`, {
-//                     onSuccess: () => {
-//                         toast.success('Trainee deleted successfully.');
-//                     },
-//                     onError: () => {
-//                         toast.error('Failed to delete trainee.');
-//                     },
-//                 });
-//             },
-//         },
-//         cancel: { label: 'No', onClick: () => {} },
-//     });
-// };
-const handleDelete = (id: number) => {};
+import Papa from 'papaparse';
+import * as XLSX from 'xlsx';
 
-// const capitalize = (value: string) =>
-//     value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+import type {
+    ColumnFiltersState,
+    SortingState,
+    VisibilityState,
+} from '@tanstack/react-table';
+import {
+    flexRender,
+    getCoreRowModel,
+    getFilteredRowModel,
+    getPaginationRowModel,
+    getSortedRowModel,
+    useReactTable,
+} from '@tanstack/react-table';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
+import { DownloadIcon, FileTextIcon, FileSpreadsheetIcon } from 'lucide-react';
+/* -----------------------------
+   DATE FORMATTER
+------------------------------*/
 const formatMilitaryDate = (value?: string | Date | null) => {
     if (!value) return '-';
 
-    // If it's a Date object
     if (value instanceof Date) {
         const day = value.getDate().toString().padStart(2, '0');
         const month = value.toLocaleString('en-US', { month: 'short' });
@@ -43,10 +55,7 @@ const formatMilitaryDate = (value?: string | Date | null) => {
         return `${day} ${month} ${year}, ${hh}${mm}H`;
     }
 
-    // If it's already a formatted string:
-    // "21 1937H June 2026"
     const parts = value.split(' ');
-
     if (parts.length >= 4) {
         const day = parts[0];
         const time = parts[1];
@@ -59,153 +68,157 @@ const formatMilitaryDate = (value?: string | Date | null) => {
     return value;
 };
 
+/* -----------------------------
+   COLUMNS
+------------------------------*/
 export const columns: ColumnDef<TraineeMovement>[] = [
     {
         id: 'full_name',
-        header: () => <div className="text-start">Name</div>,
+        accessorFn: (row) => {
+            const t = row.trainee;
+
+            return [
+                t?.first_name,
+                t?.middle_name,
+                t?.last_name,
+                t?.suffix && t.suffix !== 'N/A' ? t.suffix : '',
+            ]
+                .filter(Boolean)
+                .join(' ');
+        },
+        header: 'Name',
         cell: ({ row }) => {
+            const t = row.original.trainee;
+
+            const middleInitial = t.middle_name
+                ? `${t.middle_name.charAt(0)}.`
+                : '';
+
+            const suffix = t.suffix && t.suffix !== 'N/A' ? t.suffix : '';
+
             return (
                 <div className="text-start">
-                    <div>
-                        <div>
-                            {`${row.original.trainee.first_name} ${
-                                row.original.trainee.middle_name
-                                    ? row.original.trainee.middle_name.charAt(
-                                          0,
-                                      ) + '.'
-                                    : ''
-                            } ${row.original.trainee.last_name} ${row?.original?.trainee.suffix === 'N/A' || !row?.original?.trainee?.suffix ? '' : row?.original?.trainee?.suffix}
-`}
-                        </div>
+                    <div className="font-medium">
+                        {`${t.first_name} ${middleInitial} ${t.last_name} ${suffix}`.trim()}
                     </div>
-                    <div className="text-xs text-gray-500">
-                        {row.original.trainee.email}
-                    </div>
+                    <div className="text-xs text-gray-500">{t.email}</div>
                 </div>
             );
         },
+        enableColumnFilter: true,
     },
 
     {
-        accessorKey: 'serial_number',
+        id: 'serial_number',
+        accessorFn: (row) => row.trainee?.serial_number,
         header: 'Serial',
-        cell: ({ row }) => row.original.trainee.serial_number,
-    },
-    {
-        accessorKey: 'contact_no',
-        header: 'Contact',
-        cell: ({ row }) => row.original.trainee.contact_no,
-    },
-    {
-        accessorKey: 'coy',
-        header: 'Coy',
-        cell: ({ row }) => row.original.trainee.coy,
+        cell: ({ row }) => row.original.trainee?.serial_number ?? '-',
+        enableColumnFilter: true,
     },
 
     {
+        id: 'contact_no',
+        accessorFn: (row) => row.trainee?.contact_no,
+        header: 'Contact',
+        cell: ({ row }) => row.original.trainee?.contact_no ?? '-',
+    },
+
+    {
+        id: 'coy',
+        accessorFn: (row) => row.trainee?.coy,
+        header: 'Coy',
+        cell: ({ row }) => row.original.trainee?.coy ?? '-',
+        enableColumnFilter: true,
+    },
+
+    {
+        id: 'duration',
         accessorKey: 'duration',
         header: 'Days',
-        cell: ({ row }) => row.original.duration,
+        cell: ({ row }) => row.original.duration ?? '-',
+        enableColumnFilter: true,
     },
 
     {
+        id: 'issued_at',
         accessorKey: 'issued_at',
         header: 'Issued',
         cell: ({ row }) => formatMilitaryDate(row.original.issued_at),
     },
+
     {
+        id: 'expires_at',
         accessorKey: 'expires_at',
         header: 'Expires',
         cell: ({ row }) => formatMilitaryDate(row.original.expires_at),
     },
+
     {
+        id: 'returned_at',
         accessorKey: 'returned_at',
         header: 'Aboard',
         cell: ({ row }) => formatMilitaryDate(row.original.returned_at),
     },
 
     {
+        id: 'return_type',
         accessorKey: 'return_type',
         header: 'Return',
-        cell: ({ row }) => (
-            <div
-                className={`text-center font-semibold uppercase ${
-                    row.original.return_type === 'ON_TIME'
-                        ? 'text-green-600'
-                        : 'text-red-600'
-                }`}
-            >
-                {row.original.return_type === 'ON_TIME'
-                    ? 'ON TIME'
-                    : row.original.return_type === 'LATE'
-                      ? 'LATE'
-                      : '-'}
-            </div>
-        ),
-    },
-
-    {
-        accessorKey: 'late_minutes',
-        header: 'Late',
+        enableColumnFilter: true,
         cell: ({ row }) => {
+            const type = row.original.return_type;
+
             return (
-                <div>
-                    {row.original.late_minutes
-                        ? `${row.original.late_minutes}m`
-                        : '-'}
+                <div
+                    className={`text-center font-semibold uppercase ${
+                        type === 'ON_TIME'
+                            ? 'text-green-600'
+                            : type === 'LATE'
+                              ? 'text-red-600'
+                              : 'text-gray-400'
+                    }`}
+                >
+                    {type === 'ON_TIME'
+                        ? 'ON TIME'
+                        : type === 'LATE'
+                          ? 'LATE'
+                          : '-'}
                 </div>
             );
         },
     },
 
     {
+        id: 'late_minutes',
+        accessorKey: 'late_minutes',
+        header: 'Late',
+        cell: ({ row }) =>
+            row.original.late_minutes ? `${row.original.late_minutes}m` : '-',
+    },
+
+    {
+        id: 'status',
         accessorKey: 'status',
         header: 'Status',
+        enableColumnFilter: true,
         cell: ({ row }) => {
+            const status = row.original.status;
+
             return (
                 <div
                     className={`text-center font-semibold uppercase ${
-                        row.original.status === 'ACTIVE'
+                        status === 'ACTIVE'
                             ? 'text-green-600'
-                            : row.original.status === 'COMPLETED'
+                            : status === 'COMPLETED'
                               ? 'text-blue-600'
-                              : row.original.status === 'EXPIRED'
+                              : status === 'EXPIRED'
                                 ? 'text-yellow-600'
                                 : 'text-red-600'
                     }`}
                 >
-                    {row.original.status}
+                    {status}
                 </div>
             );
         },
     },
-
-    // {
-    //     id: 'action',
-    //     header: 'Action',
-    //     cell: ({ row }) => {
-    //         const trainee = row.original.trainee;
-
-    //         return (
-    //             <div className="flex items-center gap-3 text-center">
-    //                 {/* VIEW DETAILS DIALOG */}
-    //                 {/* EDIT */}
-    //                 <Link
-    //                     href={`trainees/${trainee.id}/edit`}
-    //                     className="text-blue-600 hover:text-blue-800"
-    //                 >
-    //                     <Penc size={14} />
-    //                 </Link>
-
-    //                 {/* DELETE */}
-    //                 <button
-    //                     onClick={() => handleDelete(trainee.id)}
-    //                     className="text-red-600 hover:text-red-800"
-    //                 >
-    //                     <Trash2 size={14} />
-    //                 </button>
-    //             </div>
-    //         );
-    //     },
-    // },
 ];

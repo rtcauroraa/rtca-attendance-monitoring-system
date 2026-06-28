@@ -33,18 +33,27 @@ export function DataTable<TData, TValue>({
     data,
 }: DataTableProps<TData, TValue>) {
 const [sorting, setSorting] = useState<SortingState>([]);
-    const table = useReactTable({
-        data,
-        columns,
-      getCoreRowModel: getCoreRowModel(),
-    onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
-    state: {
-      sorting,
-    },
+  const [globalFilter, setGlobalFilter] = useState("")
+  const [rowSelection, setRowSelection] = useState({})
 
-        
-    })
+  const table = useReactTable({
+    data,
+    columns,
+    state: {
+      globalFilter,
+      rowSelection,
+    },
+    onGlobalFilterChange: setGlobalFilter,
+    onRowSelectionChange: setRowSelection,
+
+    globalFilterFn: "includesString",
+
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+  })
+
 
     return (
         <div className="rounded-md border overflow-hidden">

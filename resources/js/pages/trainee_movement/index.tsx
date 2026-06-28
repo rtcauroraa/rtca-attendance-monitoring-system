@@ -8,6 +8,8 @@ import { trainees as traineesRoute } from '@/routes';
 import { Import, Plus, Upload, UploadIcon } from 'lucide-react';
 import { useForm } from '@inertiajs/react';
 import { columns } from './columns';
+import * as XLSX from 'xlsx';
+import Papa from 'papaparse';
 export default function Index({ ashorePasses, filters }: any) {
     const [search, setSearch] = useState(filters?.search || '');
 
@@ -22,6 +24,18 @@ export default function Index({ ashorePasses, filters }: any) {
                 replace: true,
             },
         );
+    };
+
+    // EXPORT EXCEL
+    const exportExcel = () => {
+        const dataToExport = ashorePasses.data;
+
+        const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+        const workbook = XLSX.utils.book_new();
+
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+
+        XLSX.writeFile(workbook, 'trainee-movement.xlsx');
     };
     return (
         <>
@@ -51,9 +65,22 @@ export default function Index({ ashorePasses, filters }: any) {
                         </Link>
                     </Button> */}
                 </div>
+                <div className="flex gap-2">
+                    <button
+                        onClick={exportExcel}
+                        className="rounded border px-3 py-1"
+                    >
+                        Export Excel
+                    </button>
+                </div>
 
                 {/* TABLE (NO LOCAL FILTERING) */}
-                <DataTable columns={columns} data={ashorePasses.data} />
+                <DataTable
+                    columns={columns}
+                    data={ashorePasses.data}
+                    globalFilter={search}
+                    setGlobalFilter={setSearch}
+                />
 
                 {/* PAGINATION */}
                 <div className="flex justify-center gap-2 pt-4">

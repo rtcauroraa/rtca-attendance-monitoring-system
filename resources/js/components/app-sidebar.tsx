@@ -25,7 +25,6 @@ import { dashboard, trainees, attendance, scanner, personnel } from '@/routes';
 import type { NavItem } from '@/types';
 import { usePage } from '@inertiajs/react';
 
-
 const footerNavItems: NavItem[] = [
     {
         title: 'Repository',
@@ -43,9 +42,18 @@ export function AppSidebar() {
     const { auth } = usePage().props as any;
 
     const roles = auth?.user?.roles ?? [];
-    const isUser = roles[0].name === 'User';
-    const isAdmin = roles[0].name === 'Admin';
 
+    const roleNames = roles.map((r: any) => r.name);
+    const isAdmin = roles[0].name === 'Admin';
+    const isUser = roleNames.includes('User');
+    const isAlpha = roleNames.includes('Alpha');
+    const isBravo = roleNames.includes('Bravo');
+    const isCharlie = roleNames.includes('Charlie');
+    const isDelta = roleNames.includes('Delta');
+
+    const canAccessScanner = roleNames.some((r: string) =>
+        ['User', 'Alpha', 'Bravo', 'Charlie', 'Delta'].includes(r),
+    );
     const mainNavItems: NavItem[] = [
         ...(isAdmin
             ? [
@@ -64,31 +72,29 @@ export function AppSidebar() {
                       href: trainees(),
                       icon: User,
                   },
+                  //   {
+                  //       title: 'Attendance',
+                  //       href: attendance(),
+                  //       icon: User,
+                  //   },
+                  //   {
+                  //       title: 'Personnel',
+                  //       href: '/personnels',
+                  //       icon: User,
+                  //   },
                   {
-                      title: 'Attendance',
-                      href: attendance(),
-                      icon: User,
-                  },
-                  {
-                      title: 'Personnel',
-                      href: '/personnels',
-                      icon: User,
-                  },
-                   {
                       title: 'Passes',
                       href: '/ashore-passes',
                       icon: NotebookIcon,
                   },
-
-                    
               ]
             : []),
 
-        ...(isUser
+        ...(canAccessScanner
             ? [
                   {
                       title: 'Scanner',
-                      href: scanner(),
+                      href: '/scanner',
                       icon: ScanBarcodeIcon,
                   },
               ]
