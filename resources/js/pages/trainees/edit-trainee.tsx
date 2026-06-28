@@ -1,8 +1,9 @@
-import { useForm, Head, Link } from '@inertiajs/react';
+import { useForm, Head, Link, router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
     Field,
+    FieldDescription,
     FieldLabel,
     FieldLegend,
     FieldSet,
@@ -16,34 +17,34 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { CloudCog } from 'lucide-react';
+import { toast } from 'sonner';
+import { Trainee } from '@/@types/Trainees';
 
-interface Trainee {
-    id: number;
-    name: string;
-    birthday: string;
-    religion: string;
-    contact_no: string;
-    email: string;
-    status: string;
-    address: string;
-    emergency_contact_person: string;
-    emergency_contact_no: string;
-    blood_type: string;
-    height: string;
-    weight: string;
-    identifying_marks: string;
-    eye_color: string;
-    hair_color: string;
-}
+const options = {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+};
 
+const formattedDateTime = new Date().toLocaleString('en-US', options);
+// Output: June 14, 2026, 4:20 PM
 export default function EditTrainee({ trainee }: { trainee: Trainee }) {
     const { data, setData, put, processing, errors, reset } = useForm({
-        name: trainee.name || '',
+        first_name: trainee.first_name || '',
+        middle_name: trainee.middle_name || '',
+        last_name: trainee.last_name || '',
+        serial_number: trainee.serial_number || '',
+        suffix: trainee.suffix || '',
         birthday: trainee.birthday || '',
         religion: trainee.religion || '',
         contact_no: trainee.contact_no || '',
         email: trainee.email || '',
         status: trainee.status || '',
+        coy: trainee.coy || '',
         address: trainee.address || '',
         emergency_contact_person: trainee.emergency_contact_person || '',
         emergency_contact_no: trainee.emergency_contact_no || '',
@@ -68,16 +69,27 @@ export default function EditTrainee({ trainee }: { trainee: Trainee }) {
         'Buddhism',
         'Hinduism',
         'None',
+        'United Penticostal Church',
     ];
 
     const statuses = ['Single', 'Married', 'Widowed'];
 
     const bloodTypes = ['A', 'A+', 'B', 'B+', 'AB', 'O', 'O+'];
+    const coy = ['Alpha', 'Bravo', 'Charlie', 'Delta'];
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        put(`/trainees/${trainee.id}/update`);
+        put(`/trainees/${trainee.id}/update`, {
+            onSuccess: () => {
+                toast.success('Trainee has been updated successfully.', {
+                    description: formattedDateTime,
+                    duration: 4000,
+                    position: 'top-center',
+                });
+                router.reload();
+            },
+        });
     };
 
     return (
@@ -88,25 +100,63 @@ export default function EditTrainee({ trainee }: { trainee: Trainee }) {
                 <div className="mx-auto w-full max-w-7xl">
                     <form onSubmit={submit}>
                         <FieldSet>
-                            <FieldLegend className="mb-6 text-lg font-semibold">
+                            <FieldLegend className="text-lg font-semibold">
                                 Edit Trainee Information
                             </FieldLegend>
+                            <FieldDescription>
+                                Update the trainee information below. Click
+                                Submit when you're done.
+                            </FieldDescription>
 
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
                                 {/* NAME */}
                                 <Field>
-                                    <FieldLabel>Name</FieldLabel>
+                                    <FieldLabel>First Name</FieldLabel>
                                     <Input
-                                        value={data.name}
+                                        value={data.first_name}
                                         onChange={(e) =>
-                                            setData('name', e.target.value)
+                                            setData(
+                                                'first_name',
+                                                e.target.value,
+                                            )
                                         }
                                     />
-                                    {errors.name && (
-                                        <span className="text-sm leading-tight text-destructive">
-                                            {errors.name}
-                                        </span>
-                                    )}
+                                </Field>
+
+                                <Field>
+                                    <FieldLabel>Middle Name</FieldLabel>
+                                    <Input
+                                        value={data.middle_name}
+                                        onChange={(e) =>
+                                            setData(
+                                                'middle_name',
+                                                e.target.value,
+                                            )
+                                        }
+                                    />
+                                </Field>
+
+                                <Field>
+                                    <FieldLabel>Last Name</FieldLabel>
+                                    <Input
+                                        value={data.last_name}
+                                        onChange={(e) =>
+                                            setData('last_name', e.target.value)
+                                        }
+                                    />
+                                </Field>
+
+                                <Field>
+                                    <FieldLabel>Serial Number</FieldLabel>
+                                    <Input
+                                        value={data.serial_number}
+                                        onChange={(e) =>
+                                            setData(
+                                                'serial_number',
+                                                e.target.value,
+                                            )
+                                        }
+                                    />
                                 </Field>
 
                                 {/* BIRTHDAY */}
@@ -130,7 +180,7 @@ export default function EditTrainee({ trainee }: { trainee: Trainee }) {
                                 <Field>
                                     <FieldLabel>Religion</FieldLabel>
                                     <Select
-                                        value={data.religion}
+                                        value={data.religion?.trim()}
                                         onValueChange={(value) =>
                                             setData('religion', value)
                                         }
@@ -197,15 +247,15 @@ export default function EditTrainee({ trainee }: { trainee: Trainee }) {
 
                                 {/* STATUS */}
                                 <Field>
-                                    <FieldLabel>Status</FieldLabel>
+                                    <FieldLabel>Marital Status</FieldLabel>
                                     <Select
-                                        value={data.status}
+                                        value={data.status?.trim()}
                                         onValueChange={(value) =>
                                             setData('status', value)
                                         }
                                     >
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select status" />
+                                            <SelectValue placeholder="Select Marital status" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectGroup>
@@ -221,22 +271,40 @@ export default function EditTrainee({ trainee }: { trainee: Trainee }) {
                                         </SelectContent>
                                     </Select>
                                 </Field>
+                                <Field>
+                                    <FieldLabel>Suffix</FieldLabel>
+                                    <Select
+                                        value={data.suffix.trim()}
+                                        onValueChange={(value) =>
+                                            setData('suffix', value)
+                                        }
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select Suffix" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                {[
+                                                    'N/A',
+                                                    'Jr.',
+                                                    'Sr.',
+                                                    'II',
+                                                    'III',
+                                                    'IV',
+                                                ].map((label) => (
+                                                    <SelectItem
+                                                        key={label}
+                                                        value={label}
+                                                    >
+                                                        {label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                </Field>
 
                                 {/* ADDRESS */}
-                                <Field className="md:col-span-2 xl:col-span-3">
-                                    <FieldLabel>Address</FieldLabel>
-                                    <Textarea
-                                        value={data.address}
-                                        onChange={(e) =>
-                                            setData('address', e.target.value)
-                                        }
-                                    />
-                                    {errors.address && (
-                                        <span className="text-sm leading-tight text-destructive">
-                                            {errors.address}
-                                        </span>
-                                    )}
-                                </Field>
 
                                 {/* EMERGENCY PERSON */}
                                 <Field>
@@ -397,13 +465,52 @@ export default function EditTrainee({ trainee }: { trainee: Trainee }) {
                                         </span>
                                     )}
                                 </Field>
+
+                                <Field>
+                                    <FieldLabel>Coy</FieldLabel>
+                                    <Select
+                                        value={data.coy}
+                                        onValueChange={(value) =>
+                                            setData('coy', value)
+                                        }
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select Coy" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                {coy.map((b) => (
+                                                    <SelectItem
+                                                        key={b}
+                                                        value={b}
+                                                    >
+                                                        {b}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                </Field>
                             </div>
+
+                            <Field className="md:col-span-2 xl:col-span-3">
+                                <FieldLabel>Address</FieldLabel>
+                                <Textarea
+                                    value={data.address}
+                                    onChange={(e) =>
+                                        setData('address', e.target.value)
+                                    }
+                                />
+                                {errors.address && (
+                                    <span className="text-sm leading-tight text-destructive">
+                                        {errors.address}
+                                    </span>
+                                )}
+                            </Field>
 
                             <div className="mt-8 flex gap-3">
                                 <Button type="submit" disabled={processing}>
-                                    {processing
-                                        ? 'Updating...'
-                                        : 'Update Trainee'}
+                                    {processing ? 'Updating...' : 'Update'}
                                 </Button>
                                 <Button
                                     variant="outline"

@@ -6,7 +6,7 @@ import { Link, router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { CloudCog, EyeIcon, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { format } from 'date-fns';
+// import { format } from 'date-fns';
 
 export type User = {
     id: number;
@@ -62,9 +62,9 @@ export const columns: ColumnDef<User>[] = [
         header: 'Date Created',
         cell: ({ row }) => {
             const dateValue = row.getValue('created_at');
-            return dateValue
-                ? format(new Date(dateValue), 'dd, MMMM yyyy hh:mm a')
-                : 'N/A';
+            // return dateValue
+            //     ? format(new Date(dateValue), 'dd, MMMM yyyy hh:mm a')
+            //     : 'N/A';
         },
     },
     {

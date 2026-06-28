@@ -13,7 +13,7 @@ createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     layout: (name) => {
         switch (true) {
-            case name === 'welcome':
+            case name === 'login':
                 return null;
             case name.startsWith('auth/'):
                 return AuthLayout;
@@ -27,12 +27,11 @@ createInertiaApp({
     withApp(app) {
         return (
             <QueryClientProvider client={queryClient}>
-            <TooltipProvider delayDuration={0}>
-                {app}
-                <Toaster />
-            </TooltipProvider>
-        </QueryClientProvider>
-           
+                <TooltipProvider delayDuration={0}>
+                    {app}
+                    <Toaster />
+                </TooltipProvider>
+            </QueryClientProvider>
         );
     },
     progress: {
