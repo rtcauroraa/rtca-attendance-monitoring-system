@@ -13,18 +13,13 @@ Route::redirect('/', '/login');
 
 
 Route::middleware(['auth', 'verified', 'role:Admin'])->group(function () {
-    Route::inertia('company-monitoring', 'company-monitoring')->name('company-monitoring');
+    Route::inertia('company-moginitoring', 'company-monitoring')->name('company-monitoring');
     Route::inertia('create-trainee', 'trainees/create-trainee')->name('create-trainee');
 
     Route::get('/users', [UserController::class, 'index'])->name('users');
     Route::inertia('create-user', 'users/create-user')->name('create-user');
     Route::post('/users', [UserController::class, 'store']);
-<<<<<<< HEAD
-    Route::put('/users', [UserController::class, 'update']);
-    Route::get('/users/{id}/edit',[UserController::class, 'edit']);
-=======
     Route::get('/users/{id}/edit', [UserController::class, 'edit']);
->>>>>>> e1996f8e47627489a595d914fd97118e2ae933b6
     Route::delete('/users/{id}', [UserController::class, 'destroy']);
 
     // Route::resource('personnels', PersonnelController::class);
@@ -33,27 +28,16 @@ Route::middleware(['auth', 'verified', 'role:Admin'])->group(function () {
 
     Route::post('/trainees', [TraineeController::class, 'store'])
         ->name('trainees.store');
-    Route::get('/trainees', [TraineeController::class, 'index'])
-<<<<<<< HEAD
-    ->name('trainees');
-    Route::post('/import-trainees', [TraineeController::class, 'import'])
-    ->name('import-trainees');
-    
-    // Attendance 
-     Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance');
-     Route::inertia('create-attendance', 'attendance/create-attendance')->name('create-attendance');
-=======
-        ->name('trainees');
+    Route::get('/trainees', [TraineeController::class, 'index']);
+
+
     Route::get('/trainees/{trainee}/edit', [TraineeController::class, 'edit'])
         ->name('trainees-edit');
     Route::put('/trainees/{trainee}/update', [TraineeController::class, 'update'])
         ->name('trainees-update');
     Route::delete('/trainees/{trainee}/delete', [TraineeController::class, 'destroy'])
         ->name('trainees.destroy');
-    Route::post('/import-trainees', [TraineeController::class, 'storeCSV']);
->>>>>>> e1996f8e47627489a595d914fd97118e2ae933b6
-
-    Route::inertia('attendance', 'attendance/attendance')->name('attendance');
+    Route::post('/import-trainees', [TraineeController::class, 'storeCSV']);:inertia('attendance', 'attendance/attendance')->name('attendance');
     Route::inertia('create-attendance', 'attendance/create-attendance')->name('create-attendance');
     Route::get('/ashore-passes', [TraineeMovementController::class, 'index'])->name('ashore.passes');
 });
