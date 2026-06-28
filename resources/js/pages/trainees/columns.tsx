@@ -43,74 +43,6 @@ const capitalize = (value: string) =>
 
 export const columns: ColumnDef<Trainee>[] = [
     {
-<<<<<<< HEAD
-        id: 'action',
-        header: 'Action',
-        cell: ({ row }) => {
-            return (
-                <div className="flex items-center gap-3">
-                    <Link
-                        href={`trainees/${row.original.id}/edit`}
-                        className="text-green-600 hover:text-green-800"
-                    >
-                        <EyeIcon size={14} />
-                    </Link>
-                    <Link
-                        href={`trainees/${row.original.id}/edit`}
-                        className="text-blue-600 hover:text-blue-800"
-                    >
-                        <Pencil size={14} />
-                    </Link>
-                    <Link
-                        onClick={() => handleDelete(row.original.id)}
-                        className="text-red-600 hover:text-red-800"
-                    >
-                        <Trash2 size={14} />
-                    </Link>
-                </div>
-            );
-        },
-    },
-
-    // {
-    //     accessorKey: 'id',
-    //     header: 'ID',
-    // },
-    {
-        accessorKey: 'id',
-        header: 'Profile',
-        cell: ({ row }) => (
-            <img
-                // src={imageUtility.getProfile(row.original.profile)}
-                src="https://www.pngall.com/wp-content/uploads/5/Profile-PNG-File.png"
-                alt="Photo"
-                className="aspect-square h-20 w-20 rounded-lg border object-cover shadow-sm"
-            />
-        ),
-    },
-    {
-        accessorKey: 'lastname',
-        header: 'Last Name',
-    },
-    {
-        accessorKey: 'firstname',
-        header: 'First Name',
-    },
-    {
-        accessorKey: 'middlename',
-        header: 'Middle Name',
-    },
-    {
-        accessorKey: 'suffix',
-        header: 'Suffix',
-        cell: ({ row }) => {
-            return `${row.original.suffix.toUpperCase()}`;
-        },
-    },
-    {
-        accessorKey: 'email',
-        header: 'Email',
-=======
         id: 'full_name',
         accessorFn: (row) =>
             `${row.last_name} ${row.first_name} ${row.middle_name ?? ''}`,
@@ -128,7 +60,7 @@ export const columns: ColumnDef<Trainee>[] = [
         ),
         cell: ({ row }) => {
             return (
-                <div  className="text-start">
+                <div className="text-start">
                     <div>
                         {`${row.original.first_name} ${
                             row.original.middle_name
@@ -147,33 +79,12 @@ export const columns: ColumnDef<Trainee>[] = [
                 </div>
             );
         },
->>>>>>> e1996f8e47627489a595d914fd97118e2ae933b6
     },
     {
         accessorKey: 'contact_no',
         header: 'Contact No',
     },
     {
-<<<<<<< HEAD
-        accessorKey: 'company',
-        header: 'Company',
-    },
-    {
-        accessorKey: 'status',
-        header: 'Status',
-        cell: ({ row }) => {
-            return `${row.original.status.toUpperCase()}`;
-        },
-    },
-    {
-        accessorKey: 'blood_type',
-        header: 'Blood Type',
-        cell: ({ row }) => {
-            return row.original?.blood_type === ''
-                ? 'N/A'
-                : row.original?.blood_type.toLocaleUpperCase();
-        },
-=======
         accessorKey: 'serial_number',
         header: ({ column }) => (
             <Button
@@ -214,7 +125,6 @@ export const columns: ColumnDef<Trainee>[] = [
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
->>>>>>> e1996f8e47627489a595d914fd97118e2ae933b6
     },
     {
         accessorKey: 'birthday',
@@ -262,8 +172,6 @@ export const columns: ColumnDef<Trainee>[] = [
             );
         },
     },
-<<<<<<< HEAD
-=======
 
     {
         id: 'action',
@@ -550,5 +458,4 @@ export const columns: ColumnDef<Trainee>[] = [
             );
         },
     },
->>>>>>> e1996f8e47627489a595d914fd97118e2ae933b6
 ];

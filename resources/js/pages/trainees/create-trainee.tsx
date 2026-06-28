@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 
-const options:any = {
+const options: any = {
     month: 'long',
     day: 'numeric',
     year: 'numeric',
@@ -56,17 +56,10 @@ const religions = [
 
 export default function CreateTrainee() {
     const { data, setData, post, processing, errors, reset } = useForm({
-<<<<<<< HEAD
-        // name: '',
-        lastname: '',
-        firstname: '',
-        middlename: '',
-=======
         first_name: '',
         middle_name: '',
         last_name: '',
         serial_number: '',
->>>>>>> e1996f8e47627489a595d914fd97118e2ae933b6
         suffix: '',
         birthday: '',
         religion: '',
@@ -119,78 +112,7 @@ export default function CreateTrainee() {
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
                                 {/* Standard Text Input */}
                                 <Field>
-<<<<<<< HEAD
-                                    <FieldLabel>Last Name</FieldLabel>
-                                    <Input
-                                        placeholder="Enter Last Name"
-                                        required
-                                        value={data.lastname}
-                                        onChange={(e) =>
-                                            setData('lastname', e.target.value)
-                                        }
-                                    />
-                                    {errors.lastname && (
-                                        <span className="text-sm text-destructive">
-                                            {errors.lastname}
-                                        </span>
-                                    )}
-                                </Field>
-                                <Field>
                                     <FieldLabel>First Name</FieldLabel>
-                                    <Input
-                                        placeholder="Enter First Name"
-                                        required
-                                        value={data.firstname}
-                                        onChange={(e) =>
-                                            setData('firstname', e.target.value)
-                                        }
-                                    />
-                                    {errors.firstname && (
-                                        <span className="text-sm text-destructive">
-                                            {errors.firstname}
-                                        </span>
-                                    )}
-                                </Field>
-                                <Field>
-                                    <FieldLabel>Middle Name</FieldLabel>
-                                    <Input
-                                        placeholder="Enter Middle Name"
-                                        required
-                                        value={data.middlename}
-                                        onChange={(e) =>
-                                            setData(
-                                                'middlename',
-                                                e.target.value,
-                                            )
-                                        }
-                                    />
-                                    {errors.middlename && (
-                                        <span className="text-sm text-destructive">
-                                            {errors.middlename}
-                                        </span>
-                                    )}
-                                </Field>
-                                <Field>
-                                    <FieldLabel>Suffix</FieldLabel>
-                                    <Input
-                                        placeholder="Enter Suffix (Jr., Sr., N/A)"
-                                        required
-                                        value={data.suffix}
-                                        onChange={(e) =>
-                                            setData('suffix', e.target.value)
-                                        }
-                                    />
-                                    {errors.suffix && (
-                                        <span className="text-sm text-destructive">
-                                            {errors.suffix}
-                                        </span>
-                                    )}
-                                </Field>
-                                {/* <Field>
-                                    <FieldLabel>Name</FieldLabel>
-=======
-                                    <FieldLabel>First Name</FieldLabel>
->>>>>>> e1996f8e47627489a595d914fd97118e2ae933b6
                                     <Input
                                         placeholder="Enter First Name"
                                         required
@@ -264,7 +186,7 @@ export default function CreateTrainee() {
                                             {errors.serial_number}
                                         </span>
                                     )}
-                                </Field> */}
+                                </Field>
 
                                 {/* Date Input */}
                                 <Field>
@@ -319,7 +241,6 @@ export default function CreateTrainee() {
                                 <Field>
                                     <FieldLabel>Contact No.</FieldLabel>
                                     <Input
-                                        placeholder="Enter Contact No"
                                         required
                                         type="text"
                                         maxLength={11}
@@ -344,7 +265,6 @@ export default function CreateTrainee() {
                                     <FieldLabel>Email</FieldLabel>
                                     <Input
                                         type="email"
-                                        placeholder="name@example.com"
                                         required
                                         placeholder="Enter Email"
                                         value={data.email}
@@ -394,23 +314,12 @@ export default function CreateTrainee() {
                                     )}
                                 </Field>
 
-<<<<<<< HEAD
-                                <Field className="xl:col-span-3">
-                                    <FieldLabel>Address</FieldLabel>
-                                    <Textarea
-                                        rows={4}
-                                        placeholder="Enter Address"
-                                        value={data.address}
-                                        onChange={(e) =>
-                                            setData('address', e.target.value)
-=======
                                 <Field>
                                     <FieldLabel>Status</FieldLabel>
                                     <Select
                                         value={data.suffix}
                                         onValueChange={(value) =>
                                             setData('suffix', value)
->>>>>>> e1996f8e47627489a595d914fd97118e2ae933b6
                                         }
                                     >
                                         <SelectTrigger>
@@ -447,7 +356,6 @@ export default function CreateTrainee() {
                                         Emergency Contact Person
                                     </FieldLabel>
                                     <Input
-                                        placeholder="Enter Emergency Contact Person"
                                         required
                                         maxLength={11}
                                         pattern="[0-9]{11}"
@@ -473,7 +381,6 @@ export default function CreateTrainee() {
                                         Emergency Contact No.
                                     </FieldLabel>
                                     <Input
-                                        placeholder="Enter Emergency Contact No"
                                         required
                                         type="text"
                                         placeholder="Enter Contact Number"
@@ -537,7 +444,6 @@ export default function CreateTrainee() {
                                         placeholder="Enter Height (cm)"
                                         type="number"
                                         value={data.height}
-                                        placeholder="Enter Height in cm"
                                         onChange={(e) =>
                                             setData('height', e.target.value)
                                         }
@@ -553,11 +459,7 @@ export default function CreateTrainee() {
                                     <FieldLabel>Weight (kg)</FieldLabel>
                                     <Input
                                         type="number"
-<<<<<<< HEAD
-                                        placeholder="Enter Height (kg)"
-=======
                                         placeholder="Enter Weight in Kg"
->>>>>>> e1996f8e47627489a595d914fd97118e2ae933b6
                                         value={data.weight}
                                         onChange={(e) =>
                                             setData('weight', e.target.value)
@@ -574,11 +476,7 @@ export default function CreateTrainee() {
                                     <FieldLabel>Identifying Marks</FieldLabel>
                                     <Input
                                         value={data.identifying_marks}
-<<<<<<< HEAD
-                                        placeholder="Enter Identifyng Marks"
-=======
                                         placeholder="Enter Identifying Marks"
->>>>>>> e1996f8e47627489a595d914fd97118e2ae933b6
                                         onChange={(e) =>
                                             setData(
                                                 'identifying_marks',
@@ -598,7 +496,6 @@ export default function CreateTrainee() {
                                     <Input
                                         placeholder="Eye Color"
                                         value={data.eye_color}
-                                        placeholder="Enter Eye Color"
                                         onChange={(e) =>
                                             setData('eye_color', e.target.value)
                                         }
@@ -615,7 +512,6 @@ export default function CreateTrainee() {
                                     <Input
                                         placeholder="Enter Hair Color"
                                         value={data.hair_color}
-                                        placeholder="Enter Hair Color"
                                         onChange={(e) =>
                                             setData(
                                                 'hair_color',

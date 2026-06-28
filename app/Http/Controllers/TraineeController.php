@@ -27,15 +27,6 @@ class TraineeController extends Controller
         $query = Trainee::query();
         // ✅ SERVER-SIDE SEARCH
         if ($request->search) {
-<<<<<<< HEAD
-            $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', "%{$request->search}%")
-                    ->orWhere('email', 'like', "%{$request->search}%")
-                    ->orWhere('company', 'like', "%{$request->search}%")
-                    ->orWhere('status', 'like', "%{$request->search}%")
-                    ->orWhere('blood_type', 'like', "%{$request->search}%")
-                    ->orWhere('contact_no', 'like', "%{$request->search}%");
-=======
             $search = $request->search;
 
             $query->where(function ($q) use ($search) {
@@ -46,7 +37,6 @@ class TraineeController extends Controller
                     ->orWhere('status', 'like', "%{$search}%")
                     ->orWhere('coy', 'like', "%{$search}%")
                     ->orWhere('emergency_contact_person', 'like', "%{$search}%");
->>>>>>> e1996f8e47627489a595d914fd97118e2ae933b6
             });
         }
 

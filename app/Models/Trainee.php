@@ -8,12 +8,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Trainee extends Model
 {
-<<<<<<< HEAD
-  protected $fillable = [
-        'lastname',
-        'firstname',
-        'middlename',
-=======
     use HasFactory;
 
     protected $fillable = [
@@ -22,7 +16,6 @@ class Trainee extends Model
         'last_name',
         'serial_number',
         'qr_code',
->>>>>>> e1996f8e47627489a595d914fd97118e2ae933b6
         'suffix',
         'birthday',
         'religion',
@@ -51,10 +44,5 @@ class Trainee extends Model
         return $this->hasMany(Attendance::class);
     }
 
-    public function ashorePasses(): HasOne
-    {
-        return $this->hasOne(AshorePass::class)
-            ->where('status', 'active')
-            ->latestOfMany();
-    }
+   
 }
