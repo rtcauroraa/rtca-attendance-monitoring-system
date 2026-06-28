@@ -7,11 +7,14 @@ use App\Http\Controllers\ScanController;
 use App\Http\Controllers\TraineeController;
 use App\Http\Controllers\TraineeMovementController;
 use App\Http\Controllers\UserController;
+<<<<<<< HEAD
+=======
+use App\Http\Controllers\DashboardController;
+>>>>>>> e1996f8e47627489a595d914fd97118e2ae933b6
 Route::redirect('/', '/login');
 
 
-Route::middleware(['auth', 'verified',])->group(function () {
-    Route::inertia('dashboard', 'dashboard')->name('dashboard');
+Route::middleware(['auth', 'verified', 'role:Admin'])->group(function () {
     Route::inertia('company-monitoring', 'company-monitoring')->name('company-monitoring');
     Route::inertia('create-trainee', 'trainees/create-trainee')->name('create-trainee');
 
@@ -42,7 +45,20 @@ Route::middleware(['auth', 'verified',])->group(function () {
     Route::get('/ashore-passes', [TraineeMovementController::class, 'index'])->name('ashore.passes');
 });
 
-Route::middleware(['auth', 'verified', 'role:User'])->group(function () {
+Route::middleware([
+    'auth',
+    'verified',
+    'role:Alpha|Bravo|Charlie|Delta|User|Admin'
+])->group(function () {
+         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+});
+
+Route::middleware([
+    'auth',
+    'verified',
+    'role:Alpha|Bravo|Charlie|Delta|User'
+])->group(function () {
     Route::inertia('/scanner', 'scanner')->name('scanner');
     Route::get('/scan/{type}/{id}', [ScanController::class, 'qr_code'])
         ->name('scan.show');

@@ -30,11 +30,25 @@ export default defineConfig({
             formVariants: true,
         }),
     ],
+<<<<<<< HEAD
     server: {
         host: '0.0.0.0',
         port: 5173,
        
     },
+=======
+
+    // server: {
+    //     // Force Vite to listen on all local interfaces
+    //     host: '0.0.0.0',
+    //     hmr: {
+    //         // Tell Vite to route its client requests through your tunnel
+    //         host: 'fikli3tozn.sharedwithexpose.com',
+    //         protocol: 'wss', // Use secure web sockets over HTTPS
+    //     },
+    // },
+    //
+>>>>>>> e1996f8e47627489a595d914fd97118e2ae933b6
     resolve: {
         alias: {
             react: path.resolve(__dirname, 'node_modules/react'),

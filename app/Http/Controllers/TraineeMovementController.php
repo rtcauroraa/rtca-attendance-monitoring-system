@@ -39,8 +39,9 @@ class TraineeMovementController extends Controller
             ],
         ]);
     }
-    public function store(Request $request, Trainee $trainee)
+    public function  store(Request $request, Trainee $trainee)
     {
+
         $validated = $request->validate([
             'type' => 'required|in:LIBERTY,LEAVE,OFFICIAL_BUSINESS',
             'mode' => 'required|in:ASHORE,ABOARD',

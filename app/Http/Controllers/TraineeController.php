@@ -225,6 +225,7 @@ class TraineeController extends Controller
     }
     public function storeCSV(Request $request)
     {
+
         $request->validate([
             'csv_file' => 'required|file|mimes:csv,txt|max:10240',
         ]);
