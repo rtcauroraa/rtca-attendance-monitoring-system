@@ -51,7 +51,6 @@ export default function Trainee({ trainees, filters }: any) {
             post('/import-trainees', {
                 forceFormData: true,
                 onSuccess: () => {
-                    // alert('Trainees imported successfully!');
                     setData('csv_file', null); // Reset file input state
                 },
                 onError: (skipped) => {

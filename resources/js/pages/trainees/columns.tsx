@@ -60,7 +60,7 @@ export const columns: ColumnDef<Trainee>[] = [
         ),
         cell: ({ row }) => {
             return (
-                <div  className="text-start">
+                <div className="text-start">
                     <div>
                         {`${row.original.first_name} ${
                             row.original.middle_name

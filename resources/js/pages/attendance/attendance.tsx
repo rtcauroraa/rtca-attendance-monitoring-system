@@ -1,46 +1,92 @@
-import React, { Component } from 'react';
-import {
-    Table,
-    TableBody,
-    TableCaption,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+import { Head, Link, router } from '@inertiajs/react';
+import { attendance } from '@/routes';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { DataTable } from '@/components/ui/data-table';
+import { columns } from './columns';
+import { useState } from 'react';
 
-export class attendance extends Component {
-    render() {
-        return (
-            <div>
-                <h6>Manage Attendances</h6>
+export default function Attendance({ attendance, filters }: any) {
+    console.log(attendance);
+    const [search, setSearch] = useState(filters?.search || '');
 
-                <Table>
-                    <TableCaption>A list of your recent invoices.</TableCaption>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead className="w-[100px]">Invoice</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Method</TableHead>
-                            <TableHead className="text-right">Amount</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        <TableRow>
-                            <TableCell className="font-medium">
-                                INV001
-                            </TableCell>
-                            <TableCell>Paid</TableCell>
-                            <TableCell>Credit Card</TableCell>
-                            <TableCell className="text-right">
-                                $250.00
-                            </TableCell>
-                        </TableRow>
-                    </TableBody>
-                </Table>
-            </div>
+    // ✅ SERVER SEARCH TRIGGER
+    const handleSearch = (value: string) => {
+        setSearch(value);
+
+        router.get(
+            '/attendance',
+            { search: value },
+            {
+                preserveState: true,
+                replace: true,
+            },
         );
-    }
+    };
+    return (
+        <>
+            <Head title="Attendance" />
+
+            <div className="flex flex-col gap-4 p-4">
+                {/* SEARCH */}
+                <div className="flex justify-between">
+                    <div className="flex items-center gap-5">
+                        <Input
+                            placeholder="Search Attendance..."
+                            value={search}
+                            onChange={(e) => handleSearch(e.target.value)}
+                            className="max-w-sm"
+                        />
+                        {/* <input
+                            type="file"
+                            accept=".csv"
+                            ref={fileInputRef}
+                            onChange={handleFileChange}
+                            className="hidden"
+                        />
+                        <Button
+                            className="cursor-pointer"
+                            type="button"
+                            disabled={processing}
+                            onClick={handleButtonClick}
+                        >
+                            {processing
+                                ? 'Processing Import...'
+                                : ' Import CSV'}
+                        </Button>  */}
+                    </div>
+
+                    <Button>
+                        <Link href="/create-user">Add Attendance</Link>
+                    </Button>
+                </div>
+
+                {/* TABLE (NO LOCAL FILTERING) */}
+                <DataTable columns={columns} data={attendance.data} />
+
+                {/* PAGINATION */}
+                <div className="flex justify-center gap-2 pt-4">
+                    {attendance.links.map((link: any, i: number) => (
+                        <Link
+                            key={i}
+                            href={link.url ?? ''}
+                            className={`rounded border px-3 py-1 ${
+                                link.active ? 'bg-black text-white' : ''
+                            }`}
+                            dangerouslySetInnerHTML={{ __html: link.label }}
+                        />
+                    ))}
+                </div>
+            </div>
+        </>
+    );
 }
 
-export default attendance;
+Attendance.layout = {
+    breadcrumbs: [
+        {
+            title: 'Manage Attendance',
+            href: attendance(),
+        },
+    ],
+};

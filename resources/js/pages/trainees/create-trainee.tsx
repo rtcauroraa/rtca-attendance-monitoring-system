@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 
-const options:any = {
+const options: any = {
     month: 'long',
     day: 'numeric',
     year: 'numeric',
@@ -265,8 +265,8 @@ export default function CreateTrainee() {
                                     <FieldLabel>Email</FieldLabel>
                                     <Input
                                         type="email"
-                                        placeholder="name@example.com"
                                         required
+                                        placeholder="Enter Email"
                                         value={data.email}
                                         onChange={(e) =>
                                             setData('email', e.target.value)
@@ -441,9 +441,9 @@ export default function CreateTrainee() {
                                 <Field>
                                     <FieldLabel>Height (cm)</FieldLabel>
                                     <Input
+                                        placeholder="Enter Height (cm)"
                                         type="number"
                                         value={data.height}
-                                        placeholder="Enter Height in cm"
                                         onChange={(e) =>
                                             setData('height', e.target.value)
                                         }
@@ -494,8 +494,8 @@ export default function CreateTrainee() {
                                 <Field>
                                     <FieldLabel>Eye Color</FieldLabel>
                                     <Input
+                                        placeholder="Eye Color"
                                         value={data.eye_color}
-                                        placeholder="Enter Eye Color"
                                         onChange={(e) =>
                                             setData('eye_color', e.target.value)
                                         }
@@ -510,8 +510,8 @@ export default function CreateTrainee() {
                                 <Field>
                                     <FieldLabel>Hair Color</FieldLabel>
                                     <Input
-                                        value={data.hair_color}
                                         placeholder="Enter Hair Color"
+                                        value={data.hair_color}
                                         onChange={(e) =>
                                             setData(
                                                 'hair_color',

@@ -14,19 +14,17 @@ return new class extends Migration {
             $table->string('middle_name');
             $table->string('last_name');
             $table->string('serial_number');
-            $table->string('suffix');
+            
             $table->date('birthday')->nullable();
             $table->string('religion')->nullable();
             $table->string('contact_no')->nullable();
             $table->string('email')->unique();
-
             $table->string('status')->nullable();
-            $table->string('coy')->nullable();
             $table->text('address')->nullable();
-
             $table->string('emergency_contact_person')->nullable();
             $table->string('emergency_contact_no')->nullable();
-
+            $table->string('suffix')->nullable();
+            $table->string('company')->nullable();
             $table->string('blood_type')->nullable();
             $table->string('height')->nullable();
             $table->string('weight')->nullable();

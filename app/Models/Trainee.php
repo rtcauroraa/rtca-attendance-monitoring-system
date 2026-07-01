@@ -24,6 +24,7 @@ class Trainee extends Model
         'status',
         'coy',
         'address',
+        'company',
         'emergency_contact_person',
         'emergency_contact_no',
         'blood_type',
@@ -43,10 +44,5 @@ class Trainee extends Model
         return $this->hasMany(Attendance::class);
     }
 
-    public function ashorePasses(): HasOne
-    {
-        return $this->hasOne(AshorePass::class)
-            ->where('status', 'active')
-            ->latestOfMany();
-    }
+   
 }
