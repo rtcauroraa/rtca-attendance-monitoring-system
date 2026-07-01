@@ -30,13 +30,6 @@ export default defineConfig({
             formVariants: true,
         }),
     ],
-<<<<<<< HEAD
-    server: {
-        host: '0.0.0.0',
-        port: 5173,
-       
-    },
-=======
 
     // server: {
     //     // Force Vite to listen on all local interfaces
@@ -48,7 +41,6 @@ export default defineConfig({
     //     },
     // },
     //
->>>>>>> e1996f8e47627489a595d914fd97118e2ae933b6
     resolve: {
         alias: {
             react: path.resolve(__dirname, 'node_modules/react'),

@@ -7,10 +7,7 @@ use App\Http\Controllers\ScanController;
 use App\Http\Controllers\TraineeController;
 use App\Http\Controllers\TraineeMovementController;
 use App\Http\Controllers\UserController;
-<<<<<<< HEAD
-=======
 use App\Http\Controllers\DashboardController;
->>>>>>> e1996f8e47627489a595d914fd97118e2ae933b6
 Route::redirect('/', '/login');
 
 

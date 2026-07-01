@@ -545,15 +545,6 @@ export default function ScannerPage() {
                                 setOpenActionTypeDialog(true);
                             }
                         }}
-<<<<<<< HEAD
-                        constraints={{
-                            facingMode: 'environment',
-                            width: { ideal: 1920 },
-                            height: { ideal: 1080 },
-                        }}
-                    />
-                </div>
-=======
                     >
                         <DialogContent className="max-h-[90dvh] max-w-[90vw] overflow-y-auto sm:max-w-[800px]">
                             <DialogClose asChild>
@@ -576,7 +567,6 @@ export default function ScannerPage() {
                             <DialogHeader>
                                 <DialogTitle>Trainee Details</DialogTitle>
                             </DialogHeader>
-
                             {/* DETAILS */}
 
                             <div
@@ -821,7 +811,6 @@ export default function ScannerPage() {
                         />
                     </div>
                 )}
->>>>>>> e1996f8e47627489a595d914fd97118e2ae933b6
             </div>
         </div>
     );
