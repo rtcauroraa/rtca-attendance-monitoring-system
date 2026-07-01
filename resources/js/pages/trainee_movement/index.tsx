@@ -5,14 +5,20 @@ import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
 // import { columns } from './columns';
 import { trainees as traineesRoute } from '@/routes';
-import { Import, Plus, Upload, UploadIcon } from 'lucide-react';
+import { DownloadIcon, Import, Plus, Upload, UploadIcon } from 'lucide-react';
 import { useForm } from '@inertiajs/react';
 import { columns } from './columns';
 import * as XLSX from 'xlsx';
-import Papa from 'papaparse';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 export default function Index({ ashorePasses, filters }: any) {
     const [search, setSearch] = useState(filters?.search || '');
-
+    const [company, setCompany] = useState(filters?.company || 'all');
     const handleSearch = (value: string) => {
         setSearch(value);
 
@@ -25,7 +31,21 @@ export default function Index({ ashorePasses, filters }: any) {
             },
         );
     };
+    const handleCompanyFilter = (value: string) => {
+        setCompany(value);
 
+        router.get(
+            '/ashore-passes',
+            {
+                search,
+                company: value,
+            },
+            {
+                preserveState: true,
+                replace: true,
+            },
+        );
+    };
     // EXPORT EXCEL
     const exportExcel = () => {
         const dataToExport = ashorePasses.data;
@@ -35,12 +55,16 @@ export default function Index({ ashorePasses, filters }: any) {
 
         XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
 
-        XLSX.writeFile(workbook, 'trainee-movement.xlsx');
+        const date = new Date().toISOString().slice(0, 10);
+
+        XLSX.writeFile(
+            workbook,
+            `${company || 'all'}-trainee-movement-${date}.xlsx`,
+        );
     };
     return (
         <>
             <Head title="Ashore Passes" />
-
             <div className="flex flex-col gap-4 p-4">
                 {/* SEARCH */}
                 <div className="flex justify-between">
@@ -51,27 +75,39 @@ export default function Index({ ashorePasses, filters }: any) {
                             onChange={(e) => handleSearch(e.target.value)}
                             className="max-w-sm"
                         />
-                    </div>
 
-                    {/* <Button asChild>
-                        <Link
-                            href="/create-trainee"
-                            className="flex items-center gap-2"
+                        <Select
+                            value={company || 'all'}
+                            onValueChange={handleCompanyFilter}
                         >
-                            <Plus className="h-4 w-4" />
-                            <span className="hidden sm:inline">
-                                Add Trainee
-                            </span>
-                        </Link>
-                    </Button> */}
-                </div>
-                <div className="flex gap-2">
-                    <button
-                        onClick={exportExcel}
-                        className="rounded border px-3 py-1"
-                    >
-                        Export Excel
-                    </button>
+                            <SelectTrigger className="w-[200px]">
+                                <SelectValue placeholder="All Companies" />
+                            </SelectTrigger>
+
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    All Companies
+                                </SelectItem>
+
+                                <SelectItem value="Alpha">Alpha</SelectItem>
+                                <SelectItem value="Bravo">Bravo</SelectItem>
+                                <SelectItem value="Charlie">Charlie</SelectItem>
+                                <SelectItem value="Delta">Delta</SelectItem>
+                            </SelectContent>
+                        </Select>
+
+                        <Button
+                            className="cursor-pointer border text-primary"
+                            type="button"
+                            onClick={exportExcel}
+                            variant="ghost"
+                        >
+                            <div className="flex items-center gap-2">
+                                <DownloadIcon className="h-4 w-4" />
+                                <span className="hidden sm:inline">Export</span>
+                            </div>
+                        </Button>
+                    </div>
                 </div>
 
                 {/* TABLE (NO LOCAL FILTERING) */}

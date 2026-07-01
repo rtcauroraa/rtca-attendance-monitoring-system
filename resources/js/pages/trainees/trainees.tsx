@@ -5,18 +5,51 @@ import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
 import { columns } from './columns';
 import { trainees as traineesRoute } from '@/routes';
-import { Import, Plus, Upload, UploadIcon } from 'lucide-react';
+import {
+    DownloadCloud,
+    DownloadIcon,
+    Import,
+    Plus,
+    Upload,
+    UploadIcon,
+} from 'lucide-react';
 import { useForm } from '@inertiajs/react';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 export default function Trainee({ trainees, filters }: any) {
     const [search, setSearch] = useState(filters?.search || '');
-
+    const [company, setCompany] = useState(filters?.company || 'all');
     // ✅ SERVER SEARCH TRIGGER
     const handleSearch = (value: string) => {
         setSearch(value);
 
         router.get(
             '/trainees',
-            { search: value },
+            {
+                search: value,
+                company: company,
+            },
+            {
+                preserveState: true,
+                replace: true,
+            },
+        );
+    };
+
+    const handleCompanyFilter = (value: string) => {
+        setCompany(value);
+
+        router.get(
+            '/trainees',
+            {
+                search: search,
+                company: value,
+            },
             {
                 preserveState: true,
                 replace: true,
@@ -38,27 +71,32 @@ export default function Trainee({ trainees, filters }: any) {
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0]; // Safe navigation for files
+        const file = e.target.files?.[0];
         if (!file) return;
 
-        // FIX 2: Set the data via Inertia's state manager
         setData('csv_file', file);
+
+        post('/import-trainees', {
+            forceFormData: true,
+            onSuccess: () => {
+                setData('csv_file', null);
+                e.target.value = '';
+            },
+            onError: (errors) => {
+                console.log(errors);
+            },
+        });
     };
 
-    // FIX 2: Watch for changes to data.csv_file and submit automatically
-    React.useEffect(() => {
-        if (data.csv_file) {
-            post('/import-trainees', {
-                forceFormData: true,
-                onSuccess: () => {
-                    setData('csv_file', null); // Reset file input state
-                },
-                onError: (skipped) => {
-                    console.log('Validation errors:', skipped);
-                },
-            });
+    const downloadQrPdf = () => {
+        const params = new URLSearchParams();
+
+        if (company && company !== 'all') {
+            params.append('company', company);
         }
-    }, [data.csv_file]);
+
+        window.open(`/trainees/qr-pdf?${params.toString()}`, '_blank');
+    };
     return (
         <>
             <Head title="Trainees" />
@@ -80,6 +118,26 @@ export default function Trainee({ trainees, filters }: any) {
                             onChange={handleFileChange}
                             className="hidden"
                         />
+
+                        <Select
+                            value={company || 'all'}
+                            onValueChange={handleCompanyFilter}
+                        >
+                            <SelectTrigger className="w-[200px]">
+                                <SelectValue placeholder="All Companies" />
+                            </SelectTrigger>
+
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    All Companies
+                                </SelectItem>
+
+                                <SelectItem value="Alpha">Alpha</SelectItem>
+                                <SelectItem value="Bravo">Bravo</SelectItem>
+                                <SelectItem value="Charlie">Charlie</SelectItem>
+                                <SelectItem value="Delta">Delta</SelectItem>
+                            </SelectContent>
+                        </Select>
                         <Button
                             className="cursor-pointer"
                             type="button"
@@ -96,6 +154,19 @@ export default function Trainee({ trainees, filters }: any) {
                                     </span>
                                 </div>
                             )}
+                        </Button>
+                        <Button
+                            className="cursor-pointer border text-primary"
+                            type="button"
+                            onClick={downloadQrPdf}
+                            variant="ghost"
+                        >
+                            <div className="flex items-center gap-2">
+                                <DownloadIcon className="h-4 w-4" />
+                                <span className="hidden sm:inline">
+                                    Download QR Code
+                                </span>
+                            </div>
                         </Button>
                     </div>
 

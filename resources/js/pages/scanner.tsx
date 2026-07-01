@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
-import { Scanner } from '@yudiel/react-qr-scanner';
-import { useForm, router } from '@inertiajs/react';
 
+import { useForm, router } from '@inertiajs/react';
+import { Scanner } from '@yudiel/react-qr-scanner';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { formatDateToMilitary } from '@/utils/formatDateToMilitary';
@@ -478,9 +478,18 @@ export default function ScannerPage() {
                     >
                         <form onSubmit={submitAshore}>
                             <DialogHeader>
-                                <DialogTitle>Ashore Details</DialogTitle>
+                                <DialogTitle className="text-primary">
+                                    Ashore Details
+                                </DialogTitle>
                             </DialogHeader>
 
+                            <div className="mt-3 w-full space-y-0 text-center">
+                                <p className="text-xl leading-tight font-semibold tracking-tight">
+                                    {`${person.first_name} ${person.middle_name?.charAt(0)}. ${person.last_name}`}
+                                </p>
+
+                                <p className="text-sm">{person.coy}</p>
+                            </div>
                             {/* Duration */}
                             <Select
                                 value={data.duration}

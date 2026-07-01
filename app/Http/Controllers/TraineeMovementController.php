@@ -12,30 +12,39 @@ class TraineeMovementController extends Controller
 {
     public function index(Request $request)
     {
+        $query = TraineeMovement::with('trainee');
 
-        $search = $request->search;
+        if ($request->search) {
+            $search = $request->search;
 
-        $ashorePasses = TraineeMovement::with('trainee')
-            ->when($search, function ($query) use ($search) {
-                $query->whereHas('trainee', function ($q) use ($search) {
-                    $q->where('first_name', 'like', "%{$search}%")
-                        ->orWhere('middle_name', 'like', "%{$search}%")
-                        ->orWhere('last_name', 'like', "%{$search}%")
-                        ->orWhere('coy', 'like', "%{$search}%")
-                        ->orWhere('status', 'like', "%{$search}%");
-                });
-            })
+            $query->whereHas('trainee', function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('middle_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('serial_number', 'like', "%{$search}%")
+                    ->orWhere('status', 'like', "%{$search}%")
+                    ->orWhere('coy', 'like', "%{$search}%")
+                    ->orWhere('emergency_contact_person', 'like', "%{$search}%");
+            });
+        }
+
+        // ✅ COMPANY FILTER
+        if ($request->company && $request->company !== 'all') {
+            $query->whereHas('trainee', function ($q) use ($request) {
+                $q->where('coy', $request->company);
+            });
+        }
+
+        $ashorePasses = $query
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->withQueryString();
 
-
-
-
         return Inertia::render('trainee_movement/index', [
             'ashorePasses' => $ashorePasses,
             'filters' => [
-                'search' => $search,
+                'search' => $request->search ?? '',
+                'company' => $request->company ?? 'all',
             ],
         ]);
     }

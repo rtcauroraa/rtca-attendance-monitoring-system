@@ -8,6 +8,7 @@ use App\Http\Controllers\TraineeController;
 use App\Http\Controllers\TraineeMovementController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
+
 Route::redirect('/', '/login');
 
 
@@ -23,8 +24,6 @@ Route::middleware(['auth', 'verified', 'role:Admin'])->group(function () {
 
     // Route::resource('personnels', PersonnelController::class);
     Route::get('/personnels', [PersonnelController::class, 'index'])->name('personnel');
-
-
     Route::post('/trainees', [TraineeController::class, 'store'])
         ->name('trainees.store');
     Route::get('/trainees', [TraineeController::class, 'index'])
@@ -40,6 +39,7 @@ Route::middleware(['auth', 'verified', 'role:Admin'])->group(function () {
     Route::inertia('attendance', 'attendance/attendance')->name('attendance');
     Route::inertia('create-attendance', 'attendance/create-attendance')->name('create-attendance');
     Route::get('/ashore-passes', [TraineeMovementController::class, 'index'])->name('ashore.passes');
+    Route::get('/trainees/qr-pdf', [TraineeController::class, 'downloadQrPdf']);
 });
 
 Route::middleware([
@@ -47,8 +47,7 @@ Route::middleware([
     'verified',
     'role:Alpha|Bravo|Charlie|Delta|User|Admin'
 ])->group(function () {
-         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
 
 Route::middleware([

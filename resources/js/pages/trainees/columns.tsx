@@ -43,6 +43,31 @@ const capitalize = (value: string) =>
 
 export const columns: ColumnDef<Trainee>[] = [
     {
+        accessorKey: 'qr_code',
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === 'asc')
+                }
+            >
+                QR Code
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+        ),
+        cell: ({ row }) => {
+            const file = row.getValue('qr_code') as string;
+
+            return (
+                <img
+                    src={`/storage/${file}`}
+                    alt="QR Code"
+                    className="h-12 w-12 object-contain"
+                />
+            );
+        },
+    },
+    {
         id: 'full_name',
         accessorFn: (row) =>
             `${row.last_name} ${row.first_name} ${row.middle_name ?? ''}`,
