@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActivityLogController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\PersonnelController;
@@ -35,11 +36,14 @@ Route::middleware(['auth', 'verified', 'role:Admin'])->group(function () {
     Route::delete('/trainees/{trainee}/delete', [TraineeController::class, 'destroy'])
         ->name('trainees.destroy');
     Route::post('/import-trainees', [TraineeController::class, 'storeCSV']);
-
+    Route::post('/import-trainees/passes', [TraineeMovementController::class, 'storeManualPassesCSV']);
     Route::inertia('attendance', 'attendance/attendance')->name('attendance');
     Route::inertia('create-attendance', 'attendance/create-attendance')->name('create-attendance');
     Route::get('/ashore-passes', [TraineeMovementController::class, 'index'])->name('ashore.passes');
     Route::get('/trainees/qr-pdf', [TraineeController::class, 'downloadQrPdf']);
+    Route::post('/trainee_movements/manual-bypass', [TraineeMovementController::class, 'storeManualBypass'])
+        ->name('admin.movements.manual-bypass');
+    Route::get('/activity-logs', [ActivityLogController::class, 'index']);
 });
 
 Route::middleware([

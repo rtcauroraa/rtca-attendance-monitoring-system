@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 
 const options: any = {
     month: 'long',
@@ -34,7 +33,6 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Head, Link } from '@inertiajs/react';
 import { useForm } from '@inertiajs/react';
-import { CloudCog } from 'lucide-react';
 import { toast, useSonner } from 'sonner';
 
 const religions = [
@@ -172,7 +170,6 @@ export default function CreateTrainee() {
                                     <Input
                                         placeholder="Enter Serial Number"
                                         required
-                                        type="number"
                                         value={data.serial_number}
                                         onChange={(e) =>
                                             setData(
@@ -357,9 +354,6 @@ export default function CreateTrainee() {
                                     </FieldLabel>
                                     <Input
                                         required
-                                        maxLength={11}
-                                        pattern="[0-9]{11}"
-                                        inputMode="numeric"
                                         placeholder="Enter Emergency Contact Person"
                                         value={data.emergency_contact_person}
                                         onChange={(e) =>
@@ -382,7 +376,9 @@ export default function CreateTrainee() {
                                     </FieldLabel>
                                     <Input
                                         required
-                                        type="text"
+                                        maxLength={11}
+                                        pattern="[0-9]{11}"
+                                        inputMode="numeric"
                                         placeholder="Enter Contact Number"
                                         value={data.emergency_contact_no}
                                         onChange={(e) =>

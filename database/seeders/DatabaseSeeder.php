@@ -20,47 +20,41 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
         //     Trainee::factory(50)->create();
 
-      $admin = User::factory()->create([
-    'name' => 'Admin',
-    'email' => 'admin@gmail.com',
-    'password' => Hash::make('admin123'),
-]);
-$admin->assignRole('Admin');
+        $admin = User::factory()->create([
+            'name' => 'Admin',
+            'email' => 'admin@gmail.com',
+            'password' => Hash::make('admin123'),
+        ]);
+        $admin->assignRole('Admin');
 
-$user = User::factory()->create([
-    'name' => 'Gangway Post 1',
-    'email' => 'gangway@gmail.com',
-    'password' => Hash::make('gangway123'),
-]);
-$user->assignRole('User');
 
-$alpha = User::factory()->create([
-    'name' => 'Alpha Company',
-    'email' => 'alphacompany@gmail.com',
-    'password' => Hash::make('alpha1192026'),
-]);
-$alpha->assignRole('Alpha');
 
-$bravo = User::factory()->create([
-    'name' => 'Bravo Company',
-    'email' => 'bravocompany@gmail.com',
-    'password' => Hash::make('bravo1192026'),
-]);
-$bravo->assignRole('Bravo');
+        $alpha = User::factory()->create([
+            'name' => 'Alpha Company',
+            'email' => 'alphacompany@gmail.com',
+            'password' => Hash::make('alpha1192026'),
+        ]);
+        $alpha->assignRole('Alpha');
 
-$charlie = User::factory()->create([
-    'name' => 'Charlie Company',
-    'email' => 'charliecompany@gmail.com',
-    'password' => Hash::make('charlie1192026'),
-]);
-$charlie->assignRole('Charlie');
+        $bravo = User::factory()->create([
+            'name' => 'Bravo Company',
+            'email' => 'bravocompany@gmail.com',
+            'password' => Hash::make('bravo1192026'),
+        ]);
+        $bravo->assignRole('Bravo');
 
-$delta = User::factory()->create([
-    'name' => 'Delta Company',
-    'email' => 'deltacompany@gmail.com',
-    'password' => Hash::make('delta1192026'),
-]);
-$delta->assignRole('Delta');
-    
+        $charlie = User::factory()->create([
+            'name' => 'Charlie Company',
+            'email' => 'charliecompany@gmail.com',
+            'password' => Hash::make('charlie1192026'),
+        ]);
+        $charlie->assignRole('Charlie');
+
+        $delta = User::factory()->create([
+            'name' => 'Delta Company',
+            'email' => 'deltacompany@gmail.com',
+            'password' => Hash::make('delta1192026'),
+        ]);
+        $delta->assignRole('Delta');
     }
 }

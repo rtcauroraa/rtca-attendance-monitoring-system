@@ -16,7 +16,9 @@ use Endroid\QrCode\Label\LabelAlignment;
 use Endroid\QrCode\Label\Font\OpenSans;
 use Endroid\QrCode\RoundBlockSizeMode;
 use Endroid\QrCode\Writer\PngWriter;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Activitylog\Models\Activity;
 
 class TraineeController extends Controller
 {
@@ -128,7 +130,7 @@ class TraineeController extends Controller
             size: 300,
             margin: 10,
             roundBlockSizeMode: RoundBlockSizeMode::Margin,
-            logoPath: public_path('rtc-aurora-logo'),
+            logoPath: public_path('rtc-aurora-logo.png'),
             logoResizeToWidth: 50,
             logoPunchoutBackground: true,
             labelText: $validated['serial_number'],
@@ -145,10 +147,22 @@ class TraineeController extends Controller
             $result->getString()
         );
 
-        Trainee::create([
+        $trainee =  Trainee::create([
             ...$validated,
             'qr_code' => $filename, // SAVE TO DB
         ]);
+
+        // 2. Log the activity with matching properties
+        activity()
+            ->useLog('Trainees')
+            ->performedOn($trainee) // Links the log directly to this specific trainee
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'company' => $request->company ?? 'all',
+                'type'    => 'create', // Changed to 'create' since it's a manual entry
+            ])
+            ->log("Created new trainee: " . $trainee->first_name . ' ' . $trainee->last_name);
+
         return back();
     }
 
@@ -459,6 +473,15 @@ class TraineeController extends Controller
             // Final Leftover Save
             if (!empty($batch)) {
                 Trainee::insert($batch);
+
+                activity()
+                    ->useLog('Trainees')
+                    ->causedBy(Auth::user())
+                    ->withProperties([
+                        'company' => $request->company ?? 'all',
+                        'type' => 'download',
+                    ])
+                    ->log("Imported Trainees CSV");
             }
 
             fclose($handle);
@@ -498,6 +521,22 @@ class TraineeController extends Controller
         ]);
         $fileName = 'qr-codes-' . $request->company . '' . '-' . now()->format('Y-m-d') . '.pdf';
 
+        $company = $request->company && $request->company !== 'all'
+            ? strtoupper($request->company)
+            : 'All';
+
+        $company = $request->company && $request->company !== 'all'
+            ? strtoupper($request->company)
+            : 'ALL';
+
+        activity()
+            ->useLog('Trainees')
+            ->causedBy(Auth::user())
+            ->withProperties([
+                'company' => $request->company ?? 'all',
+                'type' => 'download',
+            ])
+            ->log("Downloaded {$company} Company Trainee Data");
         return $pdf->download($fileName);
     }
 }

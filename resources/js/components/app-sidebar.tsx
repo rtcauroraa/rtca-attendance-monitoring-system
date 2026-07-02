@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import {
+    ActivityIcon,
     BookOpen,
     FolderGit2,
     LayoutGrid,
@@ -64,7 +65,7 @@ export function AppSidebar() {
                   },
                   {
                       title: 'Users',
-                      href: '/user',
+                      href: '/users',
                       icon: User,
                   },
                   {
@@ -72,6 +73,7 @@ export function AppSidebar() {
                       href: trainees(),
                       icon: User,
                   },
+
                   //   {
                   //       title: 'Attendance',
                   //       href: attendance(),
@@ -86,6 +88,12 @@ export function AppSidebar() {
                       title: 'Passes',
                       href: '/ashore-passes',
                       icon: NotebookIcon,
+                  },
+
+                  {
+                      title: 'Activity Logs',
+                      href: '/activity-logs',
+                      icon: ActivityIcon,
                   },
               ]
             : []),

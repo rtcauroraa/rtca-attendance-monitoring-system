@@ -150,7 +150,7 @@ export default function Trainee({ trainees, filters }: any) {
                                 <div className="flex items-center gap-2">
                                     <Upload className="h-4 w-4" />
                                     <span className="hidden sm:inline">
-                                        Import CSV
+                                        Upload CSV
                                     </span>
                                 </div>
                             )}
@@ -190,6 +190,7 @@ export default function Trainee({ trainees, filters }: any) {
                 <div className="flex justify-center gap-2 pt-4">
                     {trainees.links.map((link: any, i: number) => (
                         <Link
+                            preserveState
                             key={i}
                             href={link.url ?? ''}
                             className={`rounded border px-3 py-1 ${

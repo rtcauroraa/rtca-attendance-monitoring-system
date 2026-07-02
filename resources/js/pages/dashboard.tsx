@@ -27,7 +27,7 @@ export default function Dashboard({
     activePasses,
     completedPasses,
     totalMinutesLate,
-}) {
+}: any) {
     const [loading, setLoading] = React.useState(true);
     const { auth } = usePage().props as any;
     const roles = auth?.user?.roles ?? [];

@@ -189,9 +189,14 @@ export const columns: ColumnDef<Trainee>[] = [
         cell: ({ row }) => {
             return (
                 <div>
-                    <div>{row.original.emergency_contact_person}</div>
+                    <div>
+                        {row.original.emergency_contact_person
+                            ?.toLowerCase()
+                            .replace(/\b\w/g, (char) => char.toUpperCase()) ??
+                            'N/A'}
+                    </div>
                     <div className="text-xs text-gray-500">
-                        {row.original.emergency_contact_no}
+                        {row.original.emergency_contact_no || 'N/A'}
                     </div>
                 </div>
             );
@@ -209,7 +214,7 @@ export const columns: ColumnDef<Trainee>[] = [
                     {/* VIEW DETAILS DIALOG */}
                     <Dialog>
                         <DialogTrigger asChild>
-                            <button className="cursor-pointer text-gray-600 hover:text-black">
+                            <button className="cursor-pointer text-green-600 hover:text-black">
                                 <Eye size={16} />
                             </button>
                         </DialogTrigger>
@@ -407,7 +412,7 @@ export const columns: ColumnDef<Trainee>[] = [
                                     </div>
                                     <div>
                                         <label className="text-xs text-gray-500">
-                                            Weight
+                                            Blood Type
                                         </label>
                                         <input
                                             readOnly
