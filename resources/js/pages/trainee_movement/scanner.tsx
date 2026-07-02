@@ -485,7 +485,7 @@ export default function ScannerPage() {
 
                             <div className="mt-3 w-full space-y-0 text-center">
                                 <p className="text-xl leading-tight font-semibold tracking-tight">
-                                    {`${person.first_name} ${person.middle_name?.charAt(0)}. ${person.last_name}`}
+                                    {`${person?.first_name} ${person?.middle_name?.charAt(0)}. ${person?.last_name}`}
                                 </p>
 
                                 <p className="text-sm">{person.coy}</p>

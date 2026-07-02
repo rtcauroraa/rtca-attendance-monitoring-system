@@ -209,6 +209,7 @@ class TraineeMovementController extends Controller
 
             // If it includes return data, auto-complete the lifecycle block instantly
             if ($returnedAt) {
+
                 $status = 'COMPLETED';
                 $mode = 'ABOARD';
                 $isLate = $returnedAt->greaterThan($expiresAt);
