@@ -464,8 +464,6 @@ export default function ScannerPage() {
                 <Dialog
                     open={openAshoreForm}
                     onOpenChange={(open) => {
-                        // Only allow opening programmatically.
-                        // Ignore attempts to close from outside click or Esc.
                         if (open) {
                             setOpenAshoreForm(true);
                             closeModal();
@@ -482,13 +480,15 @@ export default function ScannerPage() {
                                     Ashore Details
                                 </DialogTitle>
                             </DialogHeader>
-
                             <div className="mt-3 w-full space-y-0 text-center">
                                 <p className="text-xl leading-tight font-semibold tracking-tight">
-                                    {`${person?.first_name} ${person?.middle_name?.charAt(0)}. ${person?.last_name}`}
+                                    {person
+                                        ? `${person.first_name} ${person.middle_name ? person.middle_name.charAt(0) + '.' : ''} ${person.last_name}`
+                                        : 'Loading Trainee...'}
                                 </p>
-
-                                <p className="text-sm">{person.coy}</p>
+                                <p className="text-sm text-gray-500">
+                                    {person?.coy ?? ''}
+                                </p>
                             </div>
                             {/* Duration */}
                             <Select

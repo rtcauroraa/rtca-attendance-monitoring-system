@@ -80,12 +80,12 @@ export const columns: ColumnDef<User>[] = [
         cell: ({ row }) => {
             return (
                 <div className="flex items-center justify-center gap-3">
-                    <Link
+                    {/* <Link
                         href={`users/${row.original.id}`} // Typically view is just the resource path
                         className="text-green-600 hover:text-green-800"
                     >
                         <EyeIcon size={14} />
-                    </Link>
+                    </Link> */}
                     <Link
                         href={`users/${row.original.id}/edit`}
                         className="text-blue-600 hover:text-blue-800"
