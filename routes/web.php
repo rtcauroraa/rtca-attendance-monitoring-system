@@ -53,7 +53,6 @@ Route::middleware([
 ])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
-
 Route::middleware([
     'auth',
     'verified',
@@ -67,6 +66,7 @@ Route::middleware([
     Route::post('/aboard-post/{trainee}', [TraineeMovementController::class, 'updateToAboard'])
         ->name('aboard.store');
 });
+
 
 
 require __DIR__ . '/settings.php';
