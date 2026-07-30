@@ -43,6 +43,23 @@ const capitalize = (value: string) =>
 
 export const columns: ColumnDef<Trainee>[] = [
     {
+        id: 'number',
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                onClick={() =>
+                    column.toggleSorting(column.getIsSorted() === 'asc')
+                }
+            >
+                #
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+        ),
+        cell: ({ row }) => {
+            return row.index + 1;
+        },
+    },
+    {
         accessorKey: 'qr_code',
         header: ({ column }) => (
             <Button
@@ -57,7 +74,6 @@ export const columns: ColumnDef<Trainee>[] = [
         ),
         cell: ({ row }) => {
             const file = row.getValue('qr_code') as string;
-
             return (
                 <img
                     src={`/storage/${file}`}

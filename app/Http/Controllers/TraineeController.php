@@ -147,6 +147,8 @@ class TraineeController extends Controller
             $result->getString()
         );
 
+
+
         $trainee =  Trainee::create([
             ...$validated,
             'qr_code' => $filename, // SAVE TO DB
