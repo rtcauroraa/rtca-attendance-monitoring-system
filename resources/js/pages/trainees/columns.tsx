@@ -51,22 +51,12 @@ export const columns = (
             return (currentPage - 1) * pageSize + row.index + 1;
         },
     },
+
     {
         accessorKey: 'qr_code',
-        header: ({ column }) => (
-            <Button
-                variant="ghost"
-                onClick={() =>
-                    column.toggleSorting(column.getIsSorted() === 'asc')
-                }
-            >
-                QR Code
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-        ),
+        header: ({ column }) => <div>QR Code</div>,
         cell: ({ row }) => {
             const file = row.getValue('qr_code') as string;
-
             return (
                 <img
                     src={`/storage/${file}`}
@@ -78,8 +68,7 @@ export const columns = (
     },
     {
         id: 'full_name',
-        accessorFn: (row) =>
-            `${row.last_name} ${row.first_name} ${row.middle_name ?? ''}`,
+        accessorFn: (row) => row.last_name,
         header: ({ column }) => (
             <Button
                 variant="ghost"
@@ -100,12 +89,7 @@ export const columns = (
                             row.original.middle_name
                                 ? row.original.middle_name.charAt(0) + '.'
                                 : ''
-                        } ${row.original.last_name} ${
-                            row.original.suffix === 'N/A' ||
-                            !row.original.suffix
-                                ? ''
-                                : row.original.suffix
-                        }`}
+                        } ${row.original.last_name}`}
                     </div>
                     <div className="text-xs text-gray-500">
                         {row.original.email}
@@ -121,17 +105,7 @@ export const columns = (
     },
     {
         accessorKey: 'serial_number',
-        header: ({ column }) => (
-            <Button
-                variant="ghost"
-                onClick={() =>
-                    column.toggleSorting(column.getIsSorted() === 'asc')
-                }
-            >
-                Serial Number
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-        ),
+        header: ({ column }) => <div>Serial Number</div>,
     },
     {
         accessorKey: 'coy',
@@ -149,17 +123,7 @@ export const columns = (
     },
     {
         accessorKey: 'blood_type',
-        header: ({ column }) => (
-            <Button
-                variant="ghost"
-                onClick={() =>
-                    column.toggleSorting(column.getIsSorted() === 'asc')
-                }
-            >
-                Blood Type
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-        ),
+        header: ({ column }) => <div>Blood Type</div>,
     },
     {
         accessorKey: 'birthday',
@@ -170,32 +134,14 @@ export const columns = (
     },
     {
         id: 'physical',
-        header: ({ column }) => (
-            <Button
-                variant="ghost"
-                onClick={() =>
-                    column.toggleSorting(column.getIsSorted() === 'asc')
-                }
-            >
-                Physical
-            </Button>
-        ),
+        header: ({ column }) => <div>Physical</div>,
         cell: ({ row }) => {
             return `${row.original.height} cm / ${row.original.weight} kg`;
         },
     },
     {
         id: 'emergency',
-        header: ({ column }) => (
-            <Button
-                variant="ghost"
-                onClick={() =>
-                    column.toggleSorting(column.getIsSorted() === 'asc')
-                }
-            >
-                Emergency Contact
-            </Button>
-        ),
+        header: ({ column }) => <div>Emergency Contact</div>,
         cell: ({ row }) => {
             return (
                 <div>
