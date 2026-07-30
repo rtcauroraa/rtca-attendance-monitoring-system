@@ -40,15 +40,15 @@ const handleDelete = (id: number) => {
 
 const capitalize = (value: string) =>
     value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
-
-export const columns: ColumnDef<Trainee>[] = [
+export const columns = (
+    currentPage: number,
+    pageSize: number,
+): ColumnDef<Trainee>[] => [
     {
         id: 'number',
         header: () => <div>No.</div>,
-        cell: ({ row, table }) => {
-            const { pageIndex, pageSize } = table.getState().pagination;
-
-            return pageIndex * pageSize + row.index + 1;
+        cell: ({ row }) => {
+            return (currentPage - 1) * pageSize + row.index + 1;
         },
     },
     {

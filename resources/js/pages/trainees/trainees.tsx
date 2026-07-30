@@ -97,6 +97,7 @@ export default function Trainee({ trainees, filters }: any) {
 
         window.open(`/trainees/qr-pdf?${params.toString()}`, '_blank');
     };
+    const tableColumns = columns(trainees.current_page, trainees.per_page);
     return (
         <>
             <Head title="Trainees" />
@@ -184,7 +185,7 @@ export default function Trainee({ trainees, filters }: any) {
                 </div>
 
                 {/* TABLE (NO LOCAL FILTERING) */}
-                <DataTable columns={columns} data={trainees.data} />
+                <DataTable columns={tableColumns} data={trainees.data} />
 
                 {/* PAGINATION */}
                 <div className="flex justify-center gap-2 pt-4">
