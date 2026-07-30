@@ -158,6 +158,15 @@ export default function ManualPassForm({
             if (!issuedDate || !expiresDate) {
                 toast.error(
                     'Departure and Expected Return dates are required for Go Ashore.',
+                    {
+                        position: 'top-center',
+                        style: {
+                            '--normal-bg': 'var(--background)',
+                            '--normal-text': 'var(--destructive)',
+                            '--normal-border': 'var(--destructive)',
+                        } as React.CSSProperties,
+                        icon: <TriangleAlertIcon />,
+                    },
                 );
                 return;
             }
@@ -184,7 +193,17 @@ export default function ManualPassForm({
             if (!aboardDate) {
                 toast.error(
                     'Actual Return date is required for Return Aboard.',
+                    {
+                        position: 'top-center',
+                        style: {
+                            '--normal-bg': 'var(--background)',
+                            '--normal-text': 'var(--destructive)',
+                            '--normal-border': 'var(--destructive)',
+                        } as React.CSSProperties,
+                        icon: <TriangleAlertIcon />,
+                    },
                 );
+
                 return;
             }
             finalAboardAt = createLocalISOString(
@@ -216,10 +235,19 @@ export default function ManualPassForm({
             },
             {
                 onSuccess: () => {
-                    toast.success('Bypass transaction processed successfully.');
-                    setReason('');
-                    setTraineeId('');
-                    onSuccessClose();
+                    toast.success(
+                        'Bypass transaction processed successfully.',
+                        {
+                            position: 'top-center',
+                            style: {
+                                '--normal-bg': 'var(--background)',
+                                '--normal-text':
+                                    'light-dark(var(--color-green-600), var(--color-green-400))',
+                                '--normal-border':
+                                    'light-dark(var(--color-green-600), var(--color-green-400))',
+                            } as React.CSSProperties,
+                        },
+                    );
                 },
                 onError: (errors) => {
                     Object.values(errors).forEach((message) => {
@@ -232,6 +260,8 @@ export default function ManualPassForm({
             },
         );
     };
+
+    const showReturnDateandTimeAbord = expiresDate < new Date();
 
     return (
         <form
@@ -480,7 +510,7 @@ export default function ManualPassForm({
                         </div>
 
                         {/* Backlog Actual Return Block Nested Inside Go Ashore */}
-                        {expiresDate && (
+                        {showReturnDateandTimeAbord && (
                             <div className="mt-4 space-y-3 rounded-lg border border-dashed border-emerald-500/30 bg-emerald-500/[0.02] p-4">
                                 <div className="flex flex-col space-y-1">
                                     <div className="flex items-center justify-between">

@@ -17,9 +17,10 @@ class TraineeMovementController extends Controller
     {
         $query = TraineeMovement::with('trainee');
         $trainees = Trainee::all();
+
+        // 🔍 SEARCH FILTER
         if ($request->search) {
             $search = $request->search;
-
             $query->whereHas('trainee', function ($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
                     ->orWhere('middle_name', 'like', "%{$search}%")
@@ -31,11 +32,27 @@ class TraineeMovementController extends Controller
             });
         }
 
-        // ✅ COMPANY FILTER
+        // 🏢 COMPANY FILTER
         if ($request->company && $request->company !== 'all') {
             $query->whereHas('trainee', function ($q) use ($request) {
                 $q->where('coy', $request->company);
             });
+        }
+
+
+        // 📝 TYPE FILTER (LIBERTY, LEAVE, OFFICIAL_BUSINESS)
+        if ($request->type && $request->type !== 'all') {
+            $query->where('type', $request->type);
+        }
+
+        // 🟢 STATUS FILTER (COMPLETED, EXPIRED, ACTIVE, CANCELED)
+        if ($request->status && $request->status !== 'all') {
+            $query->where('status', $request->status);
+        }
+
+        // ⏱️ RETURN TYPE FILTER (ON_TIME, LATE)
+        if ($request->return_type && $request->return_type !== 'all') {
+            $query->where('return_type', $request->return_type);
         }
 
         $ashorePasses = $query
@@ -49,6 +66,10 @@ class TraineeMovementController extends Controller
             'filters' => [
                 'search' => $request->search ?? '',
                 'company' => $request->company ?? 'all',
+                'mode' => $request->mode ?? 'all',
+                'type' => $request->type ?? 'all',
+                'status' => $request->status ?? 'all',
+                'return_type' => $request->return_type ?? 'all',
             ],
         ]);
     }
@@ -99,62 +120,67 @@ class TraineeMovementController extends Controller
                 ->addDays((int) $validated['duration'])
                 ->setTime($hour, $minute, 0);
 
-            TraineeMovement::create([
-                'trainee_id' => $trainee->id,
-                'type' => $validated['type'],
-                'mode' => 'ASHORE',
-
-                'duration' => $validated['duration'],
-                'issued_at' => now(),
-                'expires_at' => $expiresAt,
-
-                'status' => 'ACTIVE',
+            // Rename the variable here so it doesn't overwrite your $trainee instance
+            $activeMovement = TraineeMovement::create([
+                'trainee_id'  => $trainee->id,
+                'type'        => $validated['type'],
+                'mode'        => 'ASHORE',
+                'duration'    => $validated['duration'],
+                'issued_at'   => now(),
+                'expires_at'  => $expiresAt,
+                'status'      => 'ACTIVE',
             ]);
 
-            return back()->with('success', 'Ashore pass created.');
-        }
+            $user = Auth::user();
 
-        /*
+            activity('scanning') // Changed activity log name to reflect scanning
+                ->performedOn($activeMovement)
+                ->causedBy($user)
+                ->withProperty('method', 'Scanner')
+
+                ->log("Pass successfully generated via scanner for SN: {$trainee->serial_number} - {$trainee->first_name} {$trainee->last_name}.");
+            /*
     |--------------------------------------------------------------------------
     | ABOARD (RETURN / CHECK-IN)
     |--------------------------------------------------------------------------
     */
-        if ($validated['mode'] === 'ABOARD') {
+            if ($validated['mode'] === 'ABOARD') {
 
-            $movement = TraineeMovement::where('trainee_id', $trainee->id)
-                ->whereNull('returned_at')
-                ->whereIn('status', ['ACTIVE', 'EXPIRED'])
-                ->latest()
-                ->first();
+                $movement = TraineeMovement::where('trainee_id', $trainee->id)
+                    ->whereNull('returned_at')
+                    ->whereIn('status', ['ACTIVE', 'EXPIRED'])
+                    ->latest()
+                    ->first();
 
-            if (!$movement) {
-                return back()->withErrors([
-                    'noMovement' => 'No active pass found.',
+                if (!$movement) {
+                    return back()->withErrors([
+                        'noMovement' => 'No active pass found.',
+                    ]);
+                }
+
+                $now = now();
+
+                // ensure expires_at exists and is a Carbon instance
+                $expiresAt = $movement->expires_at ? \Carbon\Carbon::parse($movement->expires_at) : null;
+
+                $isLate = $expiresAt ? $now->gt($expiresAt) : false;
+
+                $lateMinutes = 0;
+
+                if ($isLate) {
+                    // difference should be now - expires_at
+                    $lateMinutes = $expiresAt->diffInMinutes($now);
+                }
+
+                $movement->update([
+                    'returned_at' => $now,
+                    'status' => 'COMPLETED',
+                    'return_type' => $isLate ? 'LATE' : 'ON_TIME',
+                    'late_minutes' => $lateMinutes,
                 ]);
+
+                return back()->with('success', 'Trainee returned successfully.');
             }
-
-            $now = now();
-
-            // ensure expires_at exists and is a Carbon instance
-            $expiresAt = $movement->expires_at ? \Carbon\Carbon::parse($movement->expires_at) : null;
-
-            $isLate = $expiresAt ? $now->gt($expiresAt) : false;
-
-            $lateMinutes = 0;
-
-            if ($isLate) {
-                // difference should be now - expires_at
-                $lateMinutes = $expiresAt->diffInMinutes($now);
-            }
-
-            $movement->update([
-                'returned_at' => $now,
-                'status' => 'COMPLETED',
-                'return_type' => $isLate ? 'LATE' : 'ON_TIME',
-                'late_minutes' => $lateMinutes,
-            ]);
-
-            return back()->with('success', 'Trainee returned successfully.');
         }
     }
 
@@ -209,6 +235,7 @@ class TraineeMovementController extends Controller
 
             // If it includes return data, auto-complete the lifecycle block instantly
             if ($returnedAt) {
+
                 $status = 'COMPLETED';
                 $mode = 'ABOARD';
                 $isLate = $returnedAt->greaterThan($expiresAt);

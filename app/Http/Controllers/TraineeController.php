@@ -133,7 +133,6 @@ class TraineeController extends Controller
             logoPath: public_path('rtc-aurora-logo.png'),
             logoResizeToWidth: 50,
             logoPunchoutBackground: true,
-            labelText: $validated['serial_number'],
             labelFont: new OpenSans(20),
             labelAlignment: LabelAlignment::Center
         );
@@ -436,7 +435,33 @@ class TraineeController extends Controller
                     }
                 }
 
-                // 7. Push to Array Collection
+
+
+                // 1. Sanitize the entire row dynamically to fix UTF-8 encoding and spaces
+                $cleanRow = array_map(function ($value) {
+                    if (is_string($value)) {
+                        // Detect and convert non-UTF-8 characters (like 'Ñ' encoded in Windows-1252/ISO-8859-1)
+                        if (!mb_check_encoding($value, 'UTF-8')) {
+                            $value = mb_convert_encoding($value, 'UTF-8', 'Windows-1252');
+                        }
+
+                        // Replace both hidden raw bytes (\xA0) and common utf8 non-breaking spaces
+                        $value = str_replace(["\xA0", "\xc2\xa0"], ' ', $value);
+
+                        // Normalize multiple spaces into a single clean space
+                        $value = preg_replace('/\s+/u', ' ', $value);
+
+                        return trim($value);
+                    }
+                    return $value;
+                }, $rowData);
+
+                // 2. IMPORTANT: Ensure your individual variables are pulling from $cleanRow too!
+                $lastName = $cleanRow['lastname'] ?? $cleanRow['last_name'] ?? null;
+                $serial   = $cleanRow['serialnumber'] ?? $cleanRow['serial_number'] ?? null;
+                // ... apply the same for $contactNo, $email, $emergencyContactNo, etc.
+
+                // 3. Push your formatted batch
                 $batch[] = [
                     'first_name'               => $rowData['firstname'] ?? null,
                     'middle_name'              => $rowData['middlename'] ?? null,
@@ -462,6 +487,8 @@ class TraineeController extends Controller
                     'created_at'               => $now,
                     'updated_at'               => $now,
                 ];
+                // 7. Push to Array Collection
+
 
                 $existingSerials[$serial] = true;
 
@@ -495,7 +522,6 @@ class TraineeController extends Controller
                 ]);
             }
         }
-
 
 
         if (!empty($skippedRows)) {

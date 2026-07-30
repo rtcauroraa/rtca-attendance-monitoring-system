@@ -47,7 +47,7 @@ export default function EditTrainee({ trainee }: { trainee: Trainee }) {
         coy: trainee.coy || '',
         address: trainee.address || '',
         emergency_contact_person: trainee.emergency_contact_person || '',
-        emergency_contact_no: trainee.emergency_contact_no || '',
+        emergency_contact_no: trainee.emergency_contact_no || 'N/A',
         blood_type: trainee.blood_type || '',
         height: trainee.height || '',
         weight: trainee.weight || '',

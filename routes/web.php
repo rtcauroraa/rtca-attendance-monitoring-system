@@ -58,7 +58,7 @@ Route::middleware([
     'verified',
     'role:Alpha|Bravo|Charlie|Delta|User'
 ])->group(function () {
-    Route::inertia('/scanner', 'scanner')->name('scanner');
+    Route::inertia('/scanner', 'trainee_movement/scanner')->name('scanner');
     Route::get('/scan/{type}/{id}', [ScanController::class, 'qr_code'])
         ->name('scan.show');
     Route::post('/trainee-movement/{trainee}', [TraineeMovementController::class, 'store'])

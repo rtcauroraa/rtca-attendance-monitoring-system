@@ -14,7 +14,7 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $query = User::query();        
+        $query = User::query();
         // ✅ SERVER-SIDE SEARCH
         if ($request->search) {
             $query->where(function ($q) use ($request) {
@@ -36,7 +36,7 @@ class UserController extends Controller
             ],
         ]);
     }
-    
+
 
     /**
      * Show the form for creating a new resource.
@@ -51,7 +51,7 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-          $validated = $request->validate([
+        $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'password' => ['required', 'confirmed', Password::defaults()],
             'email' => ['required', 'email', 'max:255', 'unique:trainees,email'],
@@ -75,8 +75,8 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-       $user = User::findOrFail($id);
-        return Inertia::render('users/edit-user',['user'=>$user]);
+        $user = User::findOrFail($id);
+        return Inertia::render('users/edit-user', ['user' => $user]);
     }
 
     /**
@@ -86,22 +86,21 @@ class UserController extends Controller
     {
         $user = User::find($request->id);
 
-        if($request->password === ""){
+        if ($request->password === "") {
             $user->update([
                 'name' => $request->name,
                 'email' => $request->email,
             ]);
-        }else{
+        } else {
             $user->update([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => $request->password,
             ]);
         }
-        
-        
-        return back();
 
+
+        return back();
     }
 
     /**

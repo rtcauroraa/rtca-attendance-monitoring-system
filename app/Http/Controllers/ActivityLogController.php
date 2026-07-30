@@ -16,7 +16,7 @@ class ActivityLogController extends Controller
             $query->where('description', 'like', "%{$request->search}%");
         }
 
-        if ($request->module) {
+        if ($request->module && $request->module !== 'all') {
             $query->where('log_name', $request->module);
         }
 
@@ -26,13 +26,13 @@ class ActivityLogController extends Controller
             });
         }
 
-        $logs = $query->latest()->paginate(15)->withQueryString();
+        $logs = $query->latest()->paginate(10)->withQueryString();
 
         return Inertia::render('activity-logs/index', [
             'logs' => $logs,
             'filters' => [
                 'search' => $request->search ?? '',
-                'module' => $request->module ?? '',
+                'module' => $request->module ?? 'all', // Fallback directly to 'all' for perfect dropdown mapping
                 'user' => $request->user ?? '',
             ]
         ]);

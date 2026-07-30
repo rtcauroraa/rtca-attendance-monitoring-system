@@ -40,8 +40,17 @@ const handleDelete = (id: number) => {
 
 const capitalize = (value: string) =>
     value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
-
-export const columns: ColumnDef<Trainee>[] = [
+export const columns = (
+    currentPage: number,
+    pageSize: number,
+): ColumnDef<Trainee>[] => [
+    {
+        id: 'number',
+        header: () => <div>No.</div>,
+        cell: ({ row }) => {
+            return (currentPage - 1) * pageSize + row.index + 1;
+        },
+    },
     {
         id: 'number',
         header: () => <div>No.</div>,
@@ -116,6 +125,7 @@ export const columns: ColumnDef<Trainee>[] = [
     {
         accessorKey: 'contact_no',
         header: 'Contact No',
+        cell: ({ row }) => row.original.contact_no?.trim() || 'N/A',
     },
     {
         accessorKey: 'serial_number',
@@ -238,11 +248,6 @@ export const columns: ColumnDef<Trainee>[] = [
                         >
                             <DialogHeader>
                                 <DialogTitle>Trainee Details</DialogTitle>
-                                <img
-                                    src="{{ asset('storage/qrcodes/PCG-Class-119/2330.png') }}"
-                                    alt="My Image"
-                                    width="300"
-                                />
                             </DialogHeader>
                             <div className="flex flex-col items-center border-t pt-4">
                                 {trainee.qr_code ? (
@@ -376,21 +381,26 @@ export const columns: ColumnDef<Trainee>[] = [
                                         <input
                                             readOnly
                                             value={
-                                                trainee.emergency_contact_person ??
-                                                ''
+                                                trainee.emergency_contact_person
+                                                    ?.toLowerCase()
+                                                    .replace(/\b\w/g, (char) =>
+                                                        char.toUpperCase(),
+                                                    ) ?? 'N/A'
                                             }
                                             className="w-full rounded border bg-gray-100 px-3 py-2"
                                         />
                                     </div>
 
-                                    {/* BIRTHDAY */}
                                     <div>
                                         <label className="text-xs text-gray-500">
                                             Emergeny Contact Number
                                         </label>
                                         <input
                                             readOnly
-                                            value={trainee.emergency_contact_no}
+                                            value={
+                                                trainee?.emergency_contact_no ||
+                                                'N/A'
+                                            }
                                             className="w-full rounded border bg-gray-100 px-3 py-2"
                                         />
                                     </div>
