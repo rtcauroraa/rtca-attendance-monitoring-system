@@ -44,17 +44,7 @@ const capitalize = (value: string) =>
 export const columns: ColumnDef<Trainee>[] = [
     {
         id: 'number',
-        header: ({ column }) => (
-            <Button
-                variant="ghost"
-                onClick={() =>
-                    column.toggleSorting(column.getIsSorted() === 'asc')
-                }
-            >
-                #
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-        ),
+        header: ({ column }) => <div>No.</div>,
         cell: ({ row }) => {
             return row.index + 1;
         },
