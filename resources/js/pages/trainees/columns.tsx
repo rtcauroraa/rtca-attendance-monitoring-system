@@ -44,9 +44,11 @@ const capitalize = (value: string) =>
 export const columns: ColumnDef<Trainee>[] = [
     {
         id: 'number',
-        header: ({ column }) => <div>No.</div>,
-        cell: ({ row }) => {
-            return row.index + 1;
+        header: () => <div>No.</div>,
+        cell: ({ row, table }) => {
+            const { pageIndex, pageSize } = table.getState().pagination;
+
+            return pageIndex * pageSize + row.index + 1;
         },
     },
     {
