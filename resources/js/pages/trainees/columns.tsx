@@ -77,7 +77,7 @@ export const columns = (
                     <img
                         src={`/storage/${file}`}
                         alt="QR Code"
-                        className="h-12 w-12 object-contain"
+                        className="h-13 w-13 object-contain"
                     />
                 </div>
             );
