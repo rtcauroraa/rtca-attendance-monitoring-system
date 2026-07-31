@@ -223,7 +223,7 @@ export default function Dashboard({
                                             </thead>
                                             <tbody className="divide-y divide-gray-100 bg-white text-center">
                                                 {recentActivity.map(
-                                                    (activity) => (
+                                                    (activity: any) => (
                                                         <tr
                                                             key={activity.id}
                                                             className="transition-colors hover:bg-gray-50/70"
