@@ -75,7 +75,7 @@ export const columns = (
             return (
                 <div className="flex items-center justify-center">
                     <img
-                        src={`/storage/${file}`}
+                        src={`https://fls-a263b547-b858-4087-957f-aca8163a669a.laravel.cloud/${file}`}
                         alt="QR Code"
                         className="h-13 w-13 object-contain"
                     />
