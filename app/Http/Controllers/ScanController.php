@@ -25,7 +25,7 @@ class ScanController extends Controller
         }
 
 
-        return Inertia::render('trainee_movement/scanner', [
+        return Inertia::render('scanner', [
             'data' => $person,
             'type' => $type,
         ]);

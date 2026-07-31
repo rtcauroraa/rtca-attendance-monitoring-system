@@ -18,6 +18,9 @@ type Props = {
 
 export function UserMenuContent({ user }: Props) {
     const cleanup = useMobileNavigation();
+    const canManageSettings =
+        user?.roles[0]?.name === 'Admin' ||
+        user?.roles[0]?.name === 'SuperAdmin';
 
     const handleLogout = () => {
         cleanup();
@@ -33,17 +36,19 @@ export function UserMenuContent({ user }: Props) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-                <DropdownMenuItem asChild>
-                    <Link
-                        className="block w-full cursor-pointer"
-                        href={edit()}
-                        prefetch
-                        onClick={cleanup}
-                    >
-                        <Settings className="mr-2" />
-                        Settings
-                    </Link>
-                </DropdownMenuItem>
+                {canManageSettings && (
+                    <DropdownMenuItem asChild>
+                        <Link
+                            className="block w-full cursor-pointer"
+                            href={edit()}
+                            prefetch
+                            onClick={cleanup}
+                        >
+                            <Settings className="mr-2" />
+                            Settings
+                        </Link>
+                    </DropdownMenuItem>
+                )}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>

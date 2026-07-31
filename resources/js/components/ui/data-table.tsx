@@ -42,6 +42,7 @@ const [sorting, setSorting] = useState<SortingState>([]);
     state: {
       globalFilter,
       rowSelection,
+      
     },
     onGlobalFilterChange: setGlobalFilter,
     onRowSelectionChange: setRowSelection,

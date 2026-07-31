@@ -26,10 +26,27 @@ const handleDelete = (id: number) => {
             onClick: () => {
                 router.delete(`/trainees/${id}/delete`, {
                     onSuccess: () => {
-                        toast.success('Trainee deleted successfully.');
+                        toast.success('Trainee deleted successfully.', {
+                            position: 'top-center',
+                            style: {
+                                '--normal-bg':
+                                    'light-dark(var(--color-green-600), var(--color-green-400))',
+                                '--normal-text': 'var(--color-white)',
+                                '--normal-border':
+                                    'light-dark(var(--color-green-600), var(--color-green-400))',
+                            } as React.CSSProperties,
+                        });
                     },
-                    onError: () => {
-                        toast.error('Failed to delete trainee.');
+                    onError: (error) => {
+                        toast.error(error.error, {
+                            position: 'top-center',
+                            style: {
+                                '--normal-bg':
+                                    'light-dark(var(--destructive), color-mix(in oklab, var(--destructive) 60%, var(--background)))',
+                                '--normal-text': 'var(--color-white)',
+                                '--normal-border': 'transparent',
+                            } as React.CSSProperties,
+                        });
                     },
                 });
             },
@@ -58,32 +75,22 @@ export const columns = (
         cell: ({ row }) => {
             const file = row.getValue('qr_code') as string;
             return (
-                <img
-                    src={`/storage/${file}`}
-                    alt="QR Code"
-                    className="h-12 w-12 object-contain"
-                />
+                <div className="flex items-center justify-center">
+                    <img
+                        src={`/storage/${file}`}
+                        alt="QR Code"
+                        className="h-12 w-12 object-contain"
+                    />
+                </div>
             );
         },
     },
     {
         id: 'full_name',
-        accessorFn: (row) => row.last_name,
-        header: ({ column }) => (
-            <Button
-                variant="ghost"
-                className="w-full justify-start px-0"
-                onClick={() =>
-                    column.toggleSorting(column.getIsSorted() === 'asc')
-                }
-            >
-                Name
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-        ),
+        header: 'Full Name',
         cell: ({ row }) => {
             return (
-                <div className="text-start">
+                <div className="text-center">
                     <div>
                         {`${row.original.first_name} ${
                             row.original.middle_name
@@ -109,28 +116,17 @@ export const columns = (
     },
     {
         accessorKey: 'coy',
-        header: ({ column }) => (
-            <Button
-                variant="ghost"
-                onClick={() =>
-                    column.toggleSorting(column.getIsSorted() === 'asc')
-                }
-            >
-                Coy
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-        ),
+        header: 'Company',
     },
     {
         accessorKey: 'blood_type',
-        header: ({ column }) => <div>Blood Type</div>,
+        header: 'Blood Type',
+        cell: ({ row }) => row?.blood_type || 'N/A',
     },
     {
         accessorKey: 'birthday',
         header: 'Birthday',
-        cell: ({ row }) => {
-            return formatDateToMilitary(row.original.birthday);
-        },
+        cell: ({ row }) => row?.birthday || 'N/A',
     },
     {
         id: 'physical',
