@@ -46,15 +46,17 @@ return [
             'throw' => false,
             'report' => false,
         ],
+
         'r2' => [
             'driver' => 's3',
-            'key' => env('AWS_ACCESS_KEY_ID', ''),
-            'secret' => env('AWS_SECRET_ACCESS_KEY', ''),
-            'region' => env('AWS_DEFAULT_REGION'),
-            'bucket' => env('AWS_BUCKET'),
-            'endpoint' => env('AWS_ENDPOINT'),
+            'key' => '02e66cae5aac98957f1b7ab25c98cb11',
+            'secret' => 'cb99213b22cc9101fd3e4607bce5452a029636ed2f29097ebd03db89354dd8d3',
+            'region' => 'auto',
+            'bucket' => 'fls-a263b547-b858-4087-957f-aca8163a669a',
+            'endpoint' => 'https://367be3a2035528943240074d0096e0cd.r2.cloudflarestorage.com',
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
         ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
