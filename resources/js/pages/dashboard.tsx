@@ -29,6 +29,10 @@ export default function Dashboard({
     totalMinutesLate,
     recentActivity,
     passBreakdown,
+    alphaCount,
+    bravoCount,
+    charlieCount,
+    deltaCount,
 }: any) {
     const [loading, setLoading] = React.useState(true);
     const { auth } = usePage().props as any;
@@ -65,6 +69,7 @@ export default function Dashboard({
             return isoString;
         }
     };
+
     return (
         <div>
             {loading ? (
@@ -121,12 +126,49 @@ export default function Dashboard({
                             <Card>
                                 <CardHeader className="flex flex-row items-center justify-between">
                                     <CardTitle className="text-sm font-medium">
-                                        Total Late Minutes
+                                        Trainees by Company
                                     </CardTitle>
-                                    <Clock className="h-4 w-4 text-muted-foreground" />
+                                    <Users className="h-4 w-4 text-muted-foreground" />
                                 </CardHeader>
-                                <CardContent className="text-2xl font-bold">
-                                    {totalMinutesLate} mins
+
+                                <CardContent>
+                                    <div className="grid grid-cols-2 gap-x-10 gap-y-2">
+                                        <div className="flex justify-between">
+                                            <span className="text-sm font-semibold">
+                                                ALPHA
+                                            </span>
+                                            <span className="font-bold text-primary">
+                                                {alphaCount}
+                                            </span>
+                                        </div>
+
+                                        <div className="flex justify-between">
+                                            <span className="text-sm font-semibold">
+                                                BRAVO
+                                            </span>
+                                            <span className="font-bold text-primary">
+                                                {bravoCount}
+                                            </span>
+                                        </div>
+
+                                        <div className="flex justify-between">
+                                            <span className="text-sm font-semibold">
+                                                CHARLIE
+                                            </span>
+                                            <span className="font-bold text-primary">
+                                                {charlieCount}
+                                            </span>
+                                        </div>
+
+                                        <div className="flex justify-between">
+                                            <span className="text-sm font-semibold">
+                                                DELTA
+                                            </span>
+                                            <span className="font-bold text-primary">
+                                                {deltaCount}
+                                            </span>
+                                        </div>
+                                    </div>
                                 </CardContent>
                             </Card>
                         </div>

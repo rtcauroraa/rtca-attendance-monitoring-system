@@ -57,7 +57,6 @@ export default function ManualPassForm({
     const [expiresHour, setExpiresHour] = useState('17');
     const [expiresMinute, setExpiresMinute] = useState('00');
 
-    const [reason, setReason] = useState('');
     const [loading, setLoading] = useState(false);
 
     const selectedTrainee = trainees.find((t) => String(t.id) === traineeId);
@@ -138,15 +137,23 @@ export default function ManualPassForm({
         const yyyy = baseDate.getFullYear();
         const mm = String(baseDate.getMonth() + 1).padStart(2, '0');
         const dd = String(baseDate.getDate()).padStart(2, '0');
-        return `${yyyy}-${mm}-${dd}T${hh}:${min}:00.000Z`;
+        return `${yyyy}-${mm}-${dd}T${hh}:${min}:00`;
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
         // Base Validations
-        if (!traineeId || !reason) {
-            toast.error('Trainee and Justification Reason are required.');
+        if (!traineeId) {
+            toast.error('Please Select Trainee.', {
+                position: 'top-center',
+                style: {
+                    '--normal-bg':
+                        'light-dark(var(--destructive), color-mix(in oklab, var(--destructive) 60%, var(--background)))',
+                    '--normal-text': 'var(--color-white)',
+                    '--normal-border': 'transparent',
+                } as React.CSSProperties,
+            });
             return;
         }
 
@@ -231,7 +238,6 @@ export default function ManualPassForm({
                     direction === 'GO_ASHORE' && returnType === 'LATE'
                         ? lateMinutes
                         : 0,
-                reason: reason,
             },
             {
                 onSuccess: () => {
@@ -252,7 +258,13 @@ export default function ManualPassForm({
                 onError: (errors) => {
                     Object.values(errors).forEach((message) => {
                         toast.error(message as string, {
-                            icon: <TriangleAlertIcon />,
+                            position: 'top-center',
+                            style: {
+                                '--normal-bg':
+                                    'light-dark(var(--destructive), color-mix(in oklab, var(--destructive) 60%, var(--background)))',
+                                '--normal-text': 'var(--color-white)',
+                                '--normal-border': 'transparent',
+                            } as React.CSSProperties,
                         });
                     });
                 },
@@ -711,16 +723,6 @@ export default function ManualPassForm({
                     </div>
                 </div>
             )}
-
-            {/* Reason Field */}
-            <div className="space-y-1">
-                <Label>Bypass Justification / Reason</Label>
-                <Input
-                    placeholder="e.g. Backlogging paper log records / Offline scan"
-                    value={reason}
-                    onChange={(e) => setReason(e.target.value)}
-                />
-            </div>
 
             <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? 'Processing Override...' : 'Execute Override Action'}

@@ -190,16 +190,15 @@ class TraineeMovementController extends Controller
         $request->validate([
             'trainee_id'       => 'required|exists:trainees,id',
             'action_direction' => 'required|in:GO_ASHORE,RETURN_ABOARD',
-            'reason'           => 'required|string|max:255',
-
-            // Required only when configuring a new departure history track
             'type'             => 'required_if:action_direction,GO_ASHORE|in:LIBERTY,LEAVE,OFFICIAL_BUSINESS',
             'issued_at'        => 'required_if:action_direction,GO_ASHORE|date',
             'expires_at'       => 'required_if:action_direction,GO_ASHORE|date|after:issued_at',
-
-            // Accepted for both workflows if managing historical return entry
             'aboard_at'        => 'nullable|date',
         ]);
+
+
+        $mode = $request->action_direction === 'GO_ASHORE' ? 'ASHORE' : 'ABOARD';
+
 
         $trainee = Trainee::findOrFail($request->trainee_id);
         $user = Auth::user();
@@ -231,17 +230,18 @@ class TraineeMovementController extends Controller
             $status = 'ACTIVE';
             $returnType = null;
             $lateMinutes = null;
-            $mode = 'ASHORE';
+            // $mode = 'ASHORE';
 
-            // If it includes return data, auto-complete the lifecycle block instantly
-            if ($returnedAt) {
+            // // If it includes return data, auto-complete the lifecycle block instantly
+            // if ($returnedAt) {
 
-                $status = 'COMPLETED';
-                $mode = 'ABOARD';
-                $isLate = $returnedAt->greaterThan($expiresAt);
-                $returnType = $isLate ? 'LATE' : 'ON_TIME';
-                $lateMinutes = $isLate ? (int) $returnedAt->diffInMinutes($expiresAt) : 0;
-            }
+            //     $status = 'COMPLETED';
+            //     $mode = 'ABOARD';
+            //     $isLate = $returnedAt->greaterThan($expiresAt);
+            //     $returnType = $isLate ? 'LATE' : 'ON_TIME';
+            //     $lateMinutes = $isLate ? (int) $returnedAt->diffInMinutes($expiresAt) : 0;
+            // }
+
 
             $movement = TraineeMovement::create([
                 'trainee_id'   => $trainee->id,
@@ -250,9 +250,9 @@ class TraineeMovementController extends Controller
                 'duration'     => $durationDays,
                 'issued_at'    => $issuedAt,
                 'expires_at'   => $expiresAt,
-                'returned_at'  => $returnedAt,
+                'returned_at'  => null,
                 'status'       => $status,
-                'return_type'  => $returnType,
+                'return_type'  => null,
                 'late_minutes' => $lateMinutes,
             ]);
 
@@ -261,7 +261,6 @@ class TraineeMovementController extends Controller
                 ->performedOn($movement)
                 ->causedBy($user)
                 ->withProperty('trainee', "{$trainee->first_name} {$trainee->last_name}")
-                ->withProperty('reason', $request->reason)
                 ->withProperty('details', [
                     'type' => $request->type,
                     'duration_days' => $durationDays,
@@ -290,16 +289,30 @@ class TraineeMovementController extends Controller
 
             if (!$activeMovement) {
                 return back()->withErrors([
-                    'trainee_id' => "No active 'Ashore' departure log found for {$trainee->first_name}. Please log the departure first."
+                    'trainee_id' => "No active 'Ashore' departure log found for {$trainee->last_name}. Please log the departure first."
                 ]);
             }
+
+
 
             $returnedAt = Carbon::parse($request->aboard_at);
             $originalExpiration = Carbon::parse($activeMovement->expires_at);
 
             $isLate = $returnedAt->greaterThan($originalExpiration);
             $lateMinutes = $isLate ? (int) $returnedAt->diffInMinutes($originalExpiration) : 0;
+            // dd([
+            //     'returned_at_raw' => $request->aboard_at,
+            //     'expires_at_db' => $activeMovement->expires_at,
 
+            //     'returned_at' => $returnedAt->toDateTimeString(),
+            //     'expires_at' => $originalExpiration->toDateTimeString(),
+
+            //     'returned_timestamp' => $returnedAt->timestamp,
+            //     'expires_timestamp' => $originalExpiration->timestamp,
+
+            //     'is_late' => $returnedAt->greaterThan($originalExpiration),
+            //     'late_minutes' => $returnedAt->diffInMinutes($originalExpiration),
+            // ]);
             $activeMovement->update([
                 'mode'         => 'ABOARD',
                 'returned_at'  => $returnedAt,
@@ -312,7 +325,6 @@ class TraineeMovementController extends Controller
                 ->performedOn($activeMovement)
                 ->causedBy($user)
                 ->withProperty('trainee', "{$trainee->first_name} {$trainee->last_name}")
-                ->withProperty('reason', $request->reason)
                 ->withProperty('details', [
                     'status' => 'COMPLETED',
                     'return_type' => $isLate ? 'LATE' : 'ON_TIME',
@@ -330,9 +342,32 @@ class TraineeMovementController extends Controller
 
     public function storeManualPassesCSV(Request $request)
     {
-        $request->validate([
-            'csv_file' => 'required|file|mimes:csv,txt|max:4096',
+        $validator = Validator::make($request->all(), [
+            'csv_file' => 'required|file|mimes:csv,txt|max:2048',
         ]);
+        $validator->after(function ($validator) use ($request) {
+            if ($request->hasFile('csv_file')) {
+                $content = file_get_contents($request->file('csv_file')->getRealPath());
+
+                // Remove UTF-8 BOM if present
+                $content = preg_replace('/^\xEF\xBB\xBF/', '', $content);
+
+                if (!mb_check_encoding($content, 'UTF-8')) {
+                    $validator->errors()->add(
+                        'csv_file',
+                        'The uploaded CSV file must be UTF-8 encoded.'
+                    );
+                }
+            }
+        });
+
+        $validator->validate();
+        if ($validator->fails()) {
+            return redirect()
+                ->back()
+                ->withErrors($validator);
+        }
+
 
         $file = $request->file('csv_file');
         $content = file_get_contents($file->getRealPath());
@@ -350,7 +385,7 @@ class TraineeMovementController extends Controller
         }
 
         // 2. Define the exact internal keys we are expecting
-        $expectedHeaders = ['serial_number', 'action_direction', 'type', 'issued_at', 'expires_at', 'aboard_at', 'reason'];
+        $expectedHeaders = ['serial_number', 'action_direction', 'type', 'issued_at', 'expires_at', 'aboard_at'];
         $rows = [];
 
         // 3. Smart Parsing Strategy: Detect layout structure
@@ -382,7 +417,7 @@ class TraineeMovementController extends Controller
             $chunks = array_chunk($rawLines, 7);
             foreach ($chunks as $chunk) {
                 if (count($chunk) < 7) {
-                    // Pad missing trailing values (like a missing reason or aboard_at) with nulls
+                    // Pad missing trailing values (like a missing or aboard_at) with nulls
                     $chunk = array_pad($chunk, 7, null);
                 }
                 $rows[] = array_combine($expectedHeaders, $chunk);
@@ -419,15 +454,31 @@ class TraineeMovementController extends Controller
                 $validator = Validator::make($row, [
                     'serial_number'    => 'required|exists:trainees,serial_number',
                     'action_direction' => 'required|in:GO_ASHORE,RETURN_ABOARD',
-                    'reason'           => 'required|string|max:255',
                     'type'             => 'required_if:action_direction,GO_ASHORE|nullable|in:LIBERTY,LEAVE,OFFICIAL_BUSINESS',
                     'issued_at'        => 'required_if:action_direction,GO_ASHORE|nullable|date_format:d/m/Y H:i',
                     'expires_at'       => 'required_if:action_direction,GO_ASHORE|nullable|date_format:d/m/Y H:i',
                     'aboard_at'        => 'nullable|date_format:d/m/Y H:i',
+                ], [
+                    'serial_number.required' => 'Serial number is required.',
+                    'serial_number.exists' => 'The serial number does not exist in the trainee records.',
+
+                    'action_direction.required' => 'Action direction is required.',
+                    'action_direction.in' => 'Action direction must be GO_ASHORE or RETURN_ABOARD.',
+
+                    'type.required_if' => 'Movement type is required when going ashore.',
+                    'type.in' => 'Movement type must be LIBERTY, LEAVE, or OFFICIAL_BUSINESS.',
+
+                    'issued_at.required_if' => 'Issued date/time is required when going ashore.',
+                    'issued_at.date_format' => 'Issued date/time must use format d/m/Y H:i.',
+
+                    'expires_at.required_if' => 'Expiry date/time is required when going ashore.',
+                    'expires_at.date_format' => 'Expiry date/time must use format d/m/Y H:i.',
+
+                    'aboard_at.date_format' => 'Aboard date/time must use format d/m/Y H:i.',
                 ]);
 
                 if ($validator->fails()) {
-                    $errors[] = "Row {$rowNumber}: " . implode(', ', $validator->errors()->all());
+                    $errors[] =  implode(' ', $validator->errors()->all());
                     continue;
                 }
 
@@ -484,8 +535,7 @@ class TraineeMovementController extends Controller
                     activity('bypass')
                         ->performedOn($movement)
                         ->causedBy($user)
-                        ->withProperty('reason', $row['reason'] . " (via CSV Import)")
-                        ->log("CSV Import: Historical departure pass created for SN: {$row['serial_number']}, {$trainee->first_name} {$trainee->last_name}.");
+                        ->log("CSV Import: Data created for SN: {$row['serial_number']}, {$trainee->first_name} {$trainee->last_name}.");
 
                     $successCount++;
                 }
@@ -525,8 +575,7 @@ class TraineeMovementController extends Controller
                     activity('bypass')
                         ->performedOn($activeMovement)
                         ->causedBy($user)
-                        ->withProperty('reason', $row['reason'] . " (via CSV Import)")
-                        ->log("CSV Import: Historical return pass completed for SN: {$row['serial_number']}.");
+                        ->log("CSV Import: Data created for SN: {$row['serial_number']}.");
 
                     $successCount++;
                 }

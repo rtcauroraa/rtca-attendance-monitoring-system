@@ -14,8 +14,12 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $query = User::query();
-        // ✅ SERVER-SIDE SEARCH
+        $query = User::query()
+            ->whereDoesntHave('roles', function ($q) {
+                $q->whereIn('name', ['Admin', 'SuperAdmin']);
+            });
+
+        // SERVER-SIDE SEARCH
         if ($request->search) {
             $query->where(function ($q) use ($request) {
                 $q->where('name', 'like', "%{$request->search}%")

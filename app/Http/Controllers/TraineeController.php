@@ -288,7 +288,7 @@ class TraineeController extends Controller
 
         $trainee->update($validated);
 
-        return back();
+        return redirect('/trainees');
     }
     /**
      * Remove the specified resource from storage.

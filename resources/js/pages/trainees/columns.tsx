@@ -55,8 +55,6 @@ const handleDelete = (id: number) => {
     });
 };
 
-const capitalize = (value: string) =>
-    value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
 export const columns = (
     currentPage: number,
     pageSize: number,
@@ -94,7 +92,7 @@ export const columns = (
                     <div>
                         {`${row.original.first_name} ${
                             row.original.middle_name
-                                ? row.original.middle_name.charAt(0) + '.'
+                                ? row.original.middle_name.charAt(0)
                                 : ''
                         } ${row.original.last_name}`}
                     </div>
@@ -121,12 +119,12 @@ export const columns = (
     {
         accessorKey: 'blood_type',
         header: 'Blood Type',
-        cell: ({ row }) => row?.blood_type || 'N/A',
+        cell: ({ row }) => row?.original.blood_type || 'N/A',
     },
     {
         accessorKey: 'birthday',
         header: 'Birthday',
-        cell: ({ row }) => row?.birthday || 'N/A',
+        cell: ({ row }) => row?.original.birthday || 'N/A',
     },
     {
         id: 'physical',

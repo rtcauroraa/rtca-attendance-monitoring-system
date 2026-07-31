@@ -6,7 +6,7 @@ export type Trainee = {
     suffix: string;
     qr_code: string;
     serial_number: string;
-    birthday: string;
+    birthday: Date;
     religion: string;
     contact_no: string;
     email: string;
