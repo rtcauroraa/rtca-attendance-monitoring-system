@@ -3,11 +3,9 @@
 namespace App\Http\Controllers;
 
 
-use App\Models\Attendance;
 use App\Models\Trainee;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
@@ -18,7 +16,7 @@ use Endroid\QrCode\RoundBlockSizeMode;
 use Endroid\QrCode\Writer\PngWriter;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Spatie\Activitylog\Models\Activity;
+use Illuminate\Support\Facades\Validator;
 
 class TraineeController extends Controller
 {
@@ -40,7 +38,7 @@ class TraineeController extends Controller
                     ->orWhere('last_name', 'like', "%{$search}%")
                     ->orWhere('status', 'like', "%{$search}%")
                     ->orWhere('coy', 'like', "%{$search}%")
-                    ->orWhere('emergency_contact_person', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -50,10 +48,10 @@ class TraineeController extends Controller
         }
 
         $trainees = $query
-            ->orderBy('created_at', 'desc')
+
+            ->orderBy('last_name', 'asc')
             ->paginate(10)
             ->withQueryString();
-
         return Inertia::render('trainees/trainees', [
             'trainees' => $trainees,
             'filters' => [
@@ -170,9 +168,28 @@ class TraineeController extends Controller
     public function import(Request $request)
     {
         // 1. Validate that the uploaded file is indeed a CSV
-        $request->validate([
+
+        $validator = Validator::make($request->all(), [
             'csv_file' => 'required|file|mimes:csv,txt|max:2048',
         ]);
+
+        $validator->after(function ($validator) use ($request) {
+            if ($request->hasFile('csv_file')) {
+                $content = file_get_contents($request->file('csv_file')->getRealPath());
+
+                // Remove UTF-8 BOM if present
+                $content = preg_replace('/^\xEF\xBB\xBF/', '', $content);
+
+                if (!mb_check_encoding($content, 'UTF-8')) {
+                    $validator->errors()->add(
+                        'csv_file',
+                        'The uploaded CSV file must be UTF-8 encoded.'
+                    );
+                }
+            }
+        });
+
+        $validator->validate();
 
         // 2. Retrieve the file
         $file = $request->file('csv_file');
@@ -276,27 +293,64 @@ class TraineeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Trainee $trainee)
+    public function destroy($id)
     {
         try {
+            $trainee = Trainee::find($id);
+
+            if (!$trainee) {
+                return redirect()
+                    ->back()
+                    ->with('error', 'Trainee not found.');
+            }
+
+            // Delete QR image if exists
+            if ($trainee->qr_code && Storage::disk('public')->exists($trainee->qr_code)) {
+                Storage::disk('public')->delete($trainee->qr_code);
+            }
+
+            // Delete trainee record
             $trainee->delete();
 
             return redirect()
-                ->route('trainees.index')
+                ->back()
                 ->with('success', 'Trainee deleted successfully.');
         } catch (\Throwable $e) {
             report($e);
 
-            return back()->with('error', 'Failed to delete trainee.');
+            return back()
+                ->with('error', 'Failed to delete trainee.');
         }
     }
     public function storeCSV(Request $request)
     {
 
-        $request->validate([
-            'csv_file' => 'required|file|mimes:csv,txt|max:10240',
+        $validator = Validator::make($request->all(), [
+            'csv_file' => 'required|file|mimes:csv,txt|max:2048',
         ]);
 
+        $validator->after(function ($validator) use ($request) {
+            if ($request->hasFile('csv_file')) {
+                $content = file_get_contents($request->file('csv_file')->getRealPath());
+
+                // Remove UTF-8 BOM if present
+                $content = preg_replace('/^\xEF\xBB\xBF/', '', $content);
+
+                if (!mb_check_encoding($content, 'UTF-8')) {
+                    $validator->errors()->add(
+                        'csv_file',
+                        'The uploaded CSV file must be UTF-8 encoded.'
+                    );
+                }
+            }
+        });
+
+        $validator->validate();
+        if ($validator->fails()) {
+            return redirect()
+                ->back()
+                ->withErrors($validator);
+        }
 
         ini_set('auto_detect_line_endings', true);
 
@@ -328,6 +382,7 @@ class TraineeController extends Controller
                     'csv_file' => 'Missing column "serial_number". Detected headers were: ' . implode(', ', $headers)
                 ]);
             }
+
 
             $batch = [];
             $skippedRows = [];
@@ -393,6 +448,7 @@ class TraineeController extends Controller
 
                 // 6. QR Generation Safeguard
                 $filename = 'qrcodes/PCG-Class-119/' . $serial . '.png';
+
                 try {
                     $builder = new Builder(
                         writer: new PngWriter(),
@@ -522,6 +578,13 @@ class TraineeController extends Controller
                 ]);
             }
         }
+        if ($skippedRows) {
+            return redirect()
+                ->back()
+                ->withErrors([
+                    'csv_file' => $skippedRows
+                ]);
+        }
 
 
         if (!empty($skippedRows)) {
@@ -531,7 +594,7 @@ class TraineeController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('success', 'All records imported successfully!');
+        return redirect()->back();
     }
 
     public function downloadQrPdf(Request $request)
