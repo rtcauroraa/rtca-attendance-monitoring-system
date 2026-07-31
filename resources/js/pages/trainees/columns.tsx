@@ -90,11 +90,15 @@ export const columns = (
             return (
                 <div className="text-center">
                     <div>
-                        {`${row.original.first_name} ${
-                            row.original.middle_name
-                                ? row.original.middle_name.charAt(0)
-                                : ''
-                        } ${row.original.last_name}`}
+                        {row.original.first_name
+                            ?.toLowerCase()
+                            .replace(/\b\w/g, (char) => char.toUpperCase()) ??
+                            'N/A'}{' '}
+                        {row.original.middle_name.charAt(0)}{' '}
+                        {row.original.last_name
+                            ?.toLowerCase()
+                            .replace(/\b\w/g, (char) => char.toUpperCase()) ??
+                            'N/A'}
                     </div>
                     <div className="text-xs text-gray-500">
                         {row.original.email}

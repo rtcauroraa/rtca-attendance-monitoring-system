@@ -49,27 +49,27 @@ export default function Dashboard({
 
     const formatTimestamp = (isoString: string | null) => {
         if (!isoString) return '—';
+
         try {
             const date = new Date(isoString);
-            // Returns structured readable string format e.g., "02 Jul 2026, 08:06 AM"
+
             return (
                 date.toLocaleDateString('en-GB', {
                     day: '2-digit',
                     month: 'short',
                     year: 'numeric',
                 }) +
-                ' ' +
+                ' ┃ ' +
                 date.toLocaleTimeString('en-US', {
                     hour: '2-digit',
                     minute: '2-digit',
                     hour12: true,
                 })
             );
-        } catch (e) {
+        } catch {
             return isoString;
         }
     };
-
     return (
         <div>
             {loading ? (
@@ -92,9 +92,9 @@ export default function Dashboard({
                                     <CardTitle className="text-sm font-medium">
                                         Total Trainees
                                     </CardTitle>
-                                    <Users className="h-4 w-4 text-muted-foreground" />
+                                    <Users className="h-4 w-4 text-muted-foreground text-primary" />
                                 </CardHeader>
-                                <CardContent className="text-2xl font-bold">
+                                <CardContent className="text-5xl font-bold text-primary">
                                     {totalTrainees}
                                 </CardContent>
                             </Card>
@@ -106,7 +106,7 @@ export default function Dashboard({
                                     </CardTitle>
                                     <ClipboardList className="h-4 w-4 text-muted-foreground" />
                                 </CardHeader>
-                                <CardContent className="text-2xl font-bold">
+                                <CardContent className="text-5xl font-bold">
                                     {activePasses}
                                 </CardContent>
                             </Card>
@@ -118,7 +118,7 @@ export default function Dashboard({
                                     </CardTitle>
                                     <CheckCheckIcon className="h-4 w-4 text-green-500" />
                                 </CardHeader>
-                                <CardContent className="text-2xl font-bold text-green-600">
+                                <CardContent className="text-5xl font-bold text-green-600">
                                     {completedPasses}
                                 </CardContent>
                             </Card>
@@ -285,7 +285,7 @@ export default function Dashboard({
                                                                 'LATE' ? (
                                                                     <Badge
                                                                         variant="destructive"
-                                                                        className="font-semibold"
+                                                                        className="h-[20px] w-[100px] text-[10px] font-semibold"
                                                                     >
                                                                         {activity.late_minutes ??
                                                                             0}{' '}
@@ -293,7 +293,7 @@ export default function Dashboard({
                                                                     </Badge>
                                                                 ) : (
                                                                     <Badge
-                                                                        className={`w-[100px] justify-center font-semibold ${activity.status === 'ACTIVE' ? 'bg-emerald-600 text-white hover:bg-emerald-700' : activity.status === 'COMPLETED' ? 'bg-blue-600 text-white hover:bg-blue-700' : activity.status === 'EXPIRED' ? 'bg-amber-600 text-white hover:bg-amber-700' : activity.status === 'CANCELLED' ? 'bg-gray-500 text-white hover:bg-gray-600' : 'bg-gray-400 text-white'}`}
+                                                                        className={`h-[20px] w-[100px] justify-center text-[10px] font-semibold ${activity.status === 'ACTIVE' ? 'bg-emerald-600 text-white hover:bg-emerald-700' : activity.status === 'COMPLETED' ? 'bg-blue-600 text-white hover:bg-blue-700' : activity.status === 'EXPIRED' ? 'bg-amber-600 text-white hover:bg-amber-700' : activity.status === 'CANCELLED' ? 'bg-gray-500 text-white hover:bg-gray-600' : 'bg-gray-400 text-white'}`}
                                                                     >
                                                                         {
                                                                             activity.status
