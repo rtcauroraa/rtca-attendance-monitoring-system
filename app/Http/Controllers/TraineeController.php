@@ -469,6 +469,8 @@ class TraineeController extends Controller
 
                     $result = $builder->build();
                     Storage::disk('r2')->put($filename, $result->getString());
+
+                    $url = Storage::disk('r2')->url($filename);
                 } catch (\Exception $e) {
                     $skippedRows[] = "Row {$lineNumber} (Serial: {$serial}): QR generation dropped. Reason: " . $e->getMessage();
                     continue;
