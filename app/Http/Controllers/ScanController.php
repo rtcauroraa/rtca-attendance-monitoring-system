@@ -24,7 +24,6 @@ class ScanController extends Controller
             ]);
         }
 
-
         return Inertia::render('scanner', [
             'data' => $person,
             'type' => $type,

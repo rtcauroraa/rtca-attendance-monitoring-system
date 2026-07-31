@@ -82,11 +82,19 @@ export default function EditTrainee({ trainee }: { trainee: Trainee }) {
 
         put(`/trainees/${trainee.id}/update`, {
             onSuccess: () => {
-                toast.success('Trainee has been updated successfully.', {
-                    description: formattedDateTime,
-                    duration: 4000,
-                    position: 'top-center',
-                });
+                toast.success(
+                    'Trainee information has been updated successfully.',
+                    {
+                        position: 'top-center',
+                        style: {
+                            '--normal-bg':
+                                'light-dark(var(--color-green-600), var(--color-green-400))',
+                            '--normal-text': 'var(--color-white)',
+                            '--normal-border':
+                                'light-dark(var(--color-green-600), var(--color-green-400))',
+                        } as React.CSSProperties,
+                    },
+                );
                 router.reload();
             },
         });

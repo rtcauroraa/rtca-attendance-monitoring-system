@@ -482,13 +482,10 @@ export default function ScannerPage() {
                             </DialogHeader>
                             <div className="mt-3 w-full space-y-0 text-center">
                                 <p className="text-xl leading-tight font-semibold tracking-tight">
-                                    {person
-                                        ? `${person.first_name} ${person.middle_name ? person.middle_name.charAt(0) + '.' : ''} ${person.last_name}`
-                                        : 'Loading Trainee...'}
+                                    {`${person?.first_name}. ${person?.last_name}`}
                                 </p>
-                                <p className="text-sm text-gray-500">
-                                    {person?.coy ?? ''}
-                                </p>
+
+                                <p className="text-sm">{person?.coy}</p>
                             </div>
                             {/* Duration */}
                             <Select

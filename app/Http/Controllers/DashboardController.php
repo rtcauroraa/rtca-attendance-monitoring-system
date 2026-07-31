@@ -49,7 +49,10 @@ class DashboardController extends Controller
             ->selectRaw("SUM(CASE WHEN type = 'LEAVE' THEN 1 ELSE 0 END) as `leave`")
             ->selectRaw("SUM(CASE WHEN type = 'OFFICIAL_BUSINESS' THEN 1 ELSE 0 END) as `official_business`")
             ->first();
-
+        $alphaCount = Trainee::where('coy', 'Alpha')->count();
+        $bravoCount = Trainee::where('coy', 'Bravo')->count();
+        $charlieCount = Trainee::where('coy', 'Charlie')->count();
+        $deltaCount = Trainee::where('coy', 'Delta')->count();
 
 
         return Inertia::render('dashboard', [
@@ -62,7 +65,11 @@ class DashboardController extends Controller
                 'liberty' => (int) ($passCounts->liberty ?? 0),
                 'leave' => (int) ($passCounts->leave ?? 0),
                 'official_business' => (int) ($passCounts->official_business ?? 0),
-            ]
+            ],
+            'alphaCount'   => $alphaCount ?? 0,
+            'bravoCount'   => $bravoCount ?? 0,
+            'charlieCount' => $charlieCount ?? 0,
+            'deltaCount'   => $deltaCount  ?? 0,
         ]);
     }
 }

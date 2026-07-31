@@ -23,6 +23,7 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import ManualPassForm from './manual-pass-form';
+import { toast } from 'sonner';
 
 export default function Index({ ashorePasses, filters, trainees }: any) {
     // --- 1. SETUP DECLARED STATES FROM PROPS ---
@@ -153,6 +154,44 @@ export default function Index({ ashorePasses, filters, trainees }: any) {
                 setData('csv_file', null);
                 if (fileInputRef.current) {
                     fileInputRef.current.value = '';
+                }
+                toast.success('All records imported successfully!', {
+                    position: 'top-center',
+                    style: {
+                        '--normal-bg':
+                            'light-dark(var(--color-green-600), var(--color-green-400))',
+                        '--normal-text': 'var(--color-white)',
+                        '--normal-border':
+                            'light-dark(var(--color-green-600), var(--color-green-400))',
+                    } as React.CSSProperties,
+                });
+            },
+
+            onError: (errors) => {
+                const messages = errors.csv_file ?? errors.error ?? [];
+
+                if (Array.isArray(messages)) {
+                    messages.forEach((message) => {
+                        toast.error(message, {
+                            position: 'top-center',
+                            style: {
+                                '--normal-bg':
+                                    'light-dark(var(--destructive), color-mix(in oklab, var(--destructive) 60%, var(--background)))',
+                                '--normal-text': 'var(--color-white)',
+                                '--normal-border': 'transparent',
+                            } as React.CSSProperties,
+                        });
+                    });
+                } else {
+                    toast.error(messages || 'Import failed.', {
+                        position: 'top-center',
+                        style: {
+                            '--normal-bg':
+                                'light-dark(var(--destructive), color-mix(in oklab, var(--destructive) 60%, var(--background)))',
+                            '--normal-text': 'var(--color-white)',
+                            '--normal-border': 'transparent',
+                        } as React.CSSProperties,
+                    });
                 }
             },
         });
