@@ -7,20 +7,22 @@ use App\Models\Trainee;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
+$user = Auth::user();
 class ScanController extends Controller
 {
     public function qr_code($type, $qr_code)
     {
-
+        $user = Auth::user();
         $person = Trainee::with([
-            'movements' => fn($query) => $query->latest()
+            'movements' => fn($query) => $query->latest(),
         ])
             ->where('serial_number', $qr_code)
+            ->where('coy', $user->role) // Must match the user's role
             ->first();
 
         if (!$person) {
             return back()->withErrors([
-                'qr_code' => 'Trainee Not Found.',
+                'qr_code' => 'You are not authorized to scan this trainee.',
             ]);
         }
 
