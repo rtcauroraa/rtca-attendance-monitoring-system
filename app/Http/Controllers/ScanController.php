@@ -6,8 +6,8 @@ use App\Models\Personnel;
 use App\Models\Trainee;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
 
-$user = Auth::user();
 class ScanController extends Controller
 {
     public function qr_code($type, $qr_code)
